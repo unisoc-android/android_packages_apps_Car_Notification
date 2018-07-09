@@ -35,7 +35,7 @@ import java.util.List;
 public class CarNotificationViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private final Context mContext;
     private final LayoutInflater mInflater;
-    private List<StatusBarNotification> mNotifications = new ArrayList<>();
+    private List<NotificationGroup> mNotifications = new ArrayList<>();
     private boolean mIsDistractionOptimizationRequired;
 
     public CarNotificationViewAdapter(Context context) {
@@ -70,7 +70,9 @@ public class CarNotificationViewAdapter extends RecyclerView.Adapter<RecyclerVie
 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
-        StatusBarNotification notification = mNotifications.get(position);
+        NotificationGroup notificationGroup = mNotifications.get(position);
+        StatusBarNotification notification = notificationGroup.getFirstNotification();
+
         switch (holder.getItemViewType()) {
             case NotificationViewType.MESSAGING_NOTIFICATION_VIEW_TYPE:
                 ((NotificationTemplateMessagingViewHolder) holder).bind(notification);
@@ -87,8 +89,9 @@ public class CarNotificationViewAdapter extends RecyclerView.Adapter<RecyclerVie
 
     @Override
     public int getItemViewType(int position) {
-        StatusBarNotification statusBarNotification = mNotifications.get(position);
-        Notification notification = statusBarNotification.getNotification();
+        NotificationGroup notificationGroup = mNotifications.get(position);
+
+        Notification notification = notificationGroup.getFirstNotification().getNotification();
         Bundle extras = notification.extras;
 
         // messaging
@@ -122,7 +125,7 @@ public class CarNotificationViewAdapter extends RecyclerView.Adapter<RecyclerVie
     /**
      * Gets a notification given its adapter position.
      */
-    public StatusBarNotification getNotificationAtPosition(int position) {
+    public NotificationGroup getNotificationAtPosition(int position) {
         if (position < mNotifications.size()) {
             return mNotifications.get(position);
         } else {
@@ -133,7 +136,7 @@ public class CarNotificationViewAdapter extends RecyclerView.Adapter<RecyclerVie
     /**
      * Updates notifications and update views.
      */
-    public void setNotifications(List<StatusBarNotification> notifications) {
+    public void setNotifications(List<NotificationGroup> notifications) {
         DiffUtil.DiffResult diffResult =
                 DiffUtil.calculateDiff(
                         new CarNotificationDiff(mNotifications, notifications), true);
