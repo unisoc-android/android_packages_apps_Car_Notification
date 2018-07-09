@@ -42,6 +42,8 @@ LOCAL_DEX_PREOPT := false
 LOCAL_STATIC_ANDROID_LIBRARIES += \
     androidx.car_car
 
+LOCAL_JAVA_LIBRARIES += android.car
+
 include $(BUILD_PACKAGE)
 
 endif

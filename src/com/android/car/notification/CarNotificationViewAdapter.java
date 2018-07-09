@@ -36,6 +36,7 @@ public class CarNotificationViewAdapter extends RecyclerView.Adapter<RecyclerVie
     private final Context mContext;
     private final LayoutInflater mInflater;
     private List<StatusBarNotification> mNotifications = new ArrayList<>();
+    private boolean mIsDistractionOptimizationRequired;
 
     public CarNotificationViewAdapter(Context context) {
         mContext = context;
@@ -130,7 +131,7 @@ public class CarNotificationViewAdapter extends RecyclerView.Adapter<RecyclerVie
     }
 
     /**
-     * Updates notifications and notify dataset changed.
+     * Updates notifications and update views.
      */
     public void setNotifications(List<StatusBarNotification> notifications) {
         DiffUtil.DiffResult diffResult =
@@ -138,5 +139,20 @@ public class CarNotificationViewAdapter extends RecyclerView.Adapter<RecyclerVie
                         new CarNotificationDiff(mNotifications, notifications), true);
         mNotifications = notifications;
         diffResult.dispatchUpdatesTo(this);
+    }
+
+    /**
+     * Sets whether distraction optimization is required and update views.
+     */
+    public void setIsDistractionOptimizationRequired(boolean isDistractionOptimizationRequired) {
+        mIsDistractionOptimizationRequired = isDistractionOptimizationRequired;
+        notifyDataSetChanged();
+    }
+
+    /**
+     * Gets whether distraction optimization is required.
+     */
+    public boolean getIsDistractionOptimizationRequired() {
+        return mIsDistractionOptimizationRequired;
     }
 }

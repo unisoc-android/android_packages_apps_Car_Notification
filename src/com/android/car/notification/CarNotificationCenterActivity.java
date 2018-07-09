@@ -18,6 +18,10 @@ package com.android.car.notification;
 import android.app.Activity;
 import android.app.Notification;
 import android.app.NotificationManager;
+import android.car.Car;
+import android.car.CarNotConnectedException;
+import android.car.content.pm.CarPackageManager;
+import android.car.drivingstate.CarUxRestrictionsManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -29,6 +33,7 @@ import android.os.Message;
 import android.os.RemoteException;
 import android.os.UserHandle;
 import android.service.notification.StatusBarNotification;
+import android.util.Log;
 
 import androidx.car.widget.PagedListView;
 import androidx.recyclerview.widget.ItemTouchHelper;
@@ -39,11 +44,17 @@ import androidx.recyclerview.widget.RecyclerView;
  */
 public class CarNotificationCenterActivity extends Activity {
 
+    private static final String TAG = "CarNotificationCenterActivity";
+
     private final LocalHandler mHandler = new LocalHandler();
-    private boolean mBound;
-    private CarNotificationListener mListener;
+    private boolean mNotificationListenerBound;
+    private CarNotificationListener mNotificationListener;
     private CarNotificationViewAdapter mAdapter;
     private NotificationManager mNotificationManager;
+    private CarHeadsUpNotificationManager mHeadsUpNotificationManager;
+    private Car mCar;
+    private CarUxRestrictionsManager mCarUxRestrictionsManager;
+    private CarPackageManager mCarPackageManager;
 
     private ItemTouchHelper.SimpleCallback mItemTouchCallback =
             new ItemTouchHelper.SimpleCallback(
@@ -79,32 +90,65 @@ public class CarNotificationCenterActivity extends Activity {
                 }
             };
 
-    private ServiceConnection mConnection = new ServiceConnection() {
+    private ServiceConnection mCarConnectionListener = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            try {
+                mCarUxRestrictionsManager = (CarUxRestrictionsManager) mCar.getCarManager(
+                        Car.CAR_UX_RESTRICTION_SERVICE);
+                mAdapter.setIsDistractionOptimizationRequired(
+                        mCarUxRestrictionsManager
+                                .getCurrentCarUxRestrictions()
+                                .isRequiresDistractionOptimization());
+
+                mCarUxRestrictionsManager.registerListener(
+                        restrictionInfo ->
+                                mAdapter.setIsDistractionOptimizationRequired(
+                                        restrictionInfo.isRequiresDistractionOptimization()));
+
+                mCarPackageManager = (CarPackageManager) mCar.getCarManager(Car.PACKAGE_SERVICE);
+            } catch (CarNotConnectedException e) {
+                Log.e(TAG, "Car not connected in CarConnectionListener", e);
+            }
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+            mCarUxRestrictionsManager = null;
+            mCarPackageManager = null;
+        }
+    };
+
+    private ServiceConnection mNotificationListenerConnectionListener = new ServiceConnection() {
         public void onServiceConnected(ComponentName className, IBinder binder) {
-            mListener = ((CarNotificationListener.LocalBinder) binder).getService();
-            mListener.setHandler(mHandler);
+            mNotificationListener = ((CarNotificationListener.LocalBinder) binder).getService();
+            mNotificationListener.setHandler(mHandler);
             updateNotifications();
-            mBound = true;
+            mNotificationListenerBound = true;
         }
 
         public void onServiceDisconnected(ComponentName className) {
-            mListener.setHandler(null);
-            mListener = null;
-            mBound = false;
+            mNotificationListener.setHandler(null);
+            mNotificationListener = null;
+            mNotificationListenerBound = false;
         }
     };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        mHeadsUpNotificationManager =
+                CarHeadsUpNotificationManager.getInstance(getApplicationContext());
+        mNotificationManager =
+                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        mCar = Car.createCar(this, mCarConnectionListener);
+
         setContentView(R.layout.notification_center_activity);
         findViewById(R.id.exit_button_container).setOnClickListener(v -> finish());
         PagedListView listView = findViewById(R.id.notifications);
         mAdapter = new CarNotificationViewAdapter(this);
         listView.setAdapter(mAdapter);
-
-        mNotificationManager =
-                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
         new ItemTouchHelper(mItemTouchCallback).attachToRecyclerView(listView.getRecyclerView());
     }
@@ -112,27 +156,50 @@ public class CarNotificationCenterActivity extends Activity {
     @Override
     protected void onStart() {
         super.onStart();
+        // Connect to car service
+        mCar.connect();
+
+        // Bind notification listener
         Intent intent = new Intent(this, CarNotificationListener.class);
         intent.setAction(CarNotificationListener.ACTION_LOCAL_BINDING);
-        bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
+        bindService(intent, mNotificationListenerConnectionListener, Context.BIND_AUTO_CREATE);
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-        if (mBound) {
-            unbindService(mConnection);
-            mBound = false;
+
+        // Disconnect from car service
+        try {
+            if (mCarUxRestrictionsManager != null) {
+                mCarUxRestrictionsManager.unregisterListener();
+            }
+        } catch (CarNotConnectedException e) {
+            Log.e(TAG, "Error unregistering car listeners", e);
+        }
+        if (mCar != null) {
+            mCar.disconnect();
+        }
+
+        // Unbind notification listener
+        if (mNotificationListenerBound) {
+            unbindService(mNotificationListenerConnectionListener);
+            mNotificationListenerBound = false;
         }
     }
 
     class LocalHandler extends Handler {
         @Override
         public void handleMessage(Message message) {
-            if (message.obj instanceof String) {
-                if (CarNotificationListener.NOTIFY_NOTIFICATIONS_CHANGED.equals(message.obj)) {
-                    updateNotifications();
-                }
+            if (message.what == CarNotificationListener.NOTIFY_NOTIFICATIONS_CHANGED) {
+                updateNotifications();
+
+            } else if (message.what == CarNotificationListener.NOTIFY_NOTIFICATION_ADDED) {
+                mHeadsUpNotificationManager.maybeShowHeadsUp(
+                        mAdapter.getIsDistractionOptimizationRequired(),
+                        (StatusBarNotification) message.obj,
+                        mNotificationListener.getCurrentRanking());
+                updateNotifications();
             }
         }
     }
@@ -146,6 +213,7 @@ public class CarNotificationCenterActivity extends Activity {
 
     private void updateNotifications() {
         mAdapter.setNotifications(RankingAndFilteringManager.process(
-                mListener.getNotifications(), mListener.getCurrentRanking()));
+                mNotificationListener.getNotifications(),
+                mNotificationListener.getCurrentRanking()));
     }
 }
