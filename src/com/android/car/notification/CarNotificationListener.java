@@ -32,29 +32,25 @@ import java.util.List;
 public class CarNotificationListener extends NotificationListenerService {
     private static final String TAG = "CarNotListener";
     static final String ACTION_LOCAL_BINDING = "local_binding";
-    static final String NOTIFY_NOTIFICATIONS_CHANGED = "notify_notifications_changed";
+    static final int NOTIFY_NOTIFICATION_ADDED = 1;
+    static final int NOTIFY_NOTIFICATIONS_CHANGED = 2;
     private CarNotificationCenterActivity.LocalHandler mHandler;
-    private CarHeadsUpNotificationManager mHeadsUpNotificationManager;
     private List<StatusBarNotification> mNotifications = new ArrayList<>();
     private RankingMap mRankingMap;
 
     @Override
     public IBinder onBind(Intent intent) {
-        mHeadsUpNotificationManager =
-                CarHeadsUpNotificationManager.getInstance(getApplicationContext());
         return ACTION_LOCAL_BINDING.equals(intent.getAction())
                 ? new LocalBinder() : super.onBind(intent);
     }
 
     @Override
     public void onNotificationPosted(StatusBarNotification sbn, RankingMap rankingMap) {
-        mHeadsUpNotificationManager.maybeShowHeadsUp(sbn, rankingMap);
-
         mNotifications.removeIf(notification ->
                 CarNotificationDiff.areNotificationsTheSame(notification, sbn));
         mNotifications.add(sbn);
         mRankingMap = rankingMap;
-        onNotificationChanged();
+        onNotificationAdded(sbn);
     }
 
     @Override
@@ -103,7 +99,17 @@ public class CarNotificationListener extends NotificationListenerService {
             return;
         }
         Message msg = Message.obtain(mHandler);
-        msg.obj = NOTIFY_NOTIFICATIONS_CHANGED;
+        msg.what = NOTIFY_NOTIFICATIONS_CHANGED;
+        mHandler.sendMessage(msg);
+    }
+
+    private void onNotificationAdded(StatusBarNotification sbn) {
+        if (mHandler == null) {
+            return;
+        }
+        Message msg = Message.obtain(mHandler);
+        msg.what = NOTIFY_NOTIFICATION_ADDED;
+        msg.obj = sbn;
         mHandler.sendMessage(msg);
     }
 

@@ -92,6 +92,7 @@ public class CarHeadsUpNotificationManager {
      * Show the notification as a heads-up if it meets the criteria.
      */
     public void maybeShowHeadsUp(
+            boolean isDistractionOptimizationRequired,
             StatusBarNotification statusBarNotification,
             NotificationListenerService.RankingMap rankingMap) {
         if (!shouldShowHeadsUp(statusBarNotification, rankingMap)) {
