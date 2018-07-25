@@ -24,7 +24,9 @@ import java.lang.annotation.RetentionPolicy;
         NotificationViewType.HEADS_UP_BASIC_NOTIFICATION_VIEW_TYPE,
         NotificationViewType.MESSAGING_NOTIFICATION_VIEW_TYPE,
         NotificationViewType.HEADS_UP_MESSAGING_NOTIFICATION_VIEW_TYPE,
-        NotificationViewType.PROGRESS_NOTIFICATION_VIEW_TYPE})
+        NotificationViewType.PROGRESS_NOTIFICATION_VIEW_TYPE,
+        NotificationViewType.COLLAPSED_GROUP_NOTIFICATION_VIEW_TYPE,
+        NotificationViewType.EXPANDED_GROUP_NOTIFICATION_VIEW_TYPE})
 @Retention(RetentionPolicy.SOURCE)
 @interface NotificationViewType {
     int BASIC_NOTIFICATION_VIEW_TYPE = 0;
@@ -32,4 +34,6 @@ import java.lang.annotation.RetentionPolicy;
     int MESSAGING_NOTIFICATION_VIEW_TYPE = 2;
     int HEADS_UP_MESSAGING_NOTIFICATION_VIEW_TYPE = 3;
     int PROGRESS_NOTIFICATION_VIEW_TYPE = 4;
+    int COLLAPSED_GROUP_NOTIFICATION_VIEW_TYPE = 5;
+    int EXPANDED_GROUP_NOTIFICATION_VIEW_TYPE = 6;
 }

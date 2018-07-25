@@ -153,7 +153,7 @@ public class CarNotificationCenterActivity extends Activity {
         setContentView(R.layout.notification_center_activity);
         findViewById(R.id.exit_button_container).setOnClickListener(v -> finish());
         PagedListView listView = findViewById(R.id.notifications);
-        mAdapter = new CarNotificationViewAdapter(this);
+        mAdapter = new CarNotificationViewAdapter(this, /* isChildAdapter= */ false);
         listView.setAdapter(mAdapter);
 
         new ItemTouchHelper(mItemTouchCallback).attachToRecyclerView(listView.getRecyclerView());
