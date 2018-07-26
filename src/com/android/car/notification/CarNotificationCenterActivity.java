@@ -71,8 +71,14 @@ public class CarNotificationCenterActivity extends Activity {
 
                 @Override
                 public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
-                    StatusBarNotification notification =
+                    NotificationGroup notificationGroup =
                             mAdapter.getNotificationAtPosition(viewHolder.getAdapterPosition());
+
+                    StatusBarNotification notification =
+                            notificationGroup.isGroup()
+                                    ? notificationGroup.getGroupHeaderNotification()
+                                    : notificationGroup.getFirstNotification();
+
                     if (isCancelable(notification.getNotification())) {
                         try {
                             mNotificationManager.getService().cancelNotificationWithTag(
@@ -212,7 +218,7 @@ public class CarNotificationCenterActivity extends Activity {
     }
 
     private void updateNotifications() {
-        mAdapter.setNotifications(RankingAndFilteringManager.process(
+        mAdapter.setNotifications(PreprocessingManager.process(
                 mNotificationListener.getNotifications(),
                 mNotificationListener.getCurrentRanking()));
     }

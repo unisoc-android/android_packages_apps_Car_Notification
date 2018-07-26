@@ -26,19 +26,19 @@ import java.util.Objects;
 /**
  * DiffUtil for car notifications. Two notifications are considered the same if they have the same:
  * <ol>
- * <li> Id
  * <li> Package name
- * <li> Targeted user
- * <li> Tag
+ * <li> Number of StatusBarNotifications contained
+ * <li> The order of each StatusBarNotification
+ * <li> The id, package name, targeted user and the tag of each individual StatusBarNotification
  * </ol>
  */
 class CarNotificationDiff extends DiffUtil.Callback {
-    private final List<StatusBarNotification> mOldList;
-    private final List<StatusBarNotification> mNewList;
+    private final List<NotificationGroup> mOldList;
+    private final List<NotificationGroup> mNewList;
 
     CarNotificationDiff(
-            @NonNull List<StatusBarNotification> oldList,
-            @NonNull List<StatusBarNotification> newList) {
+            @NonNull List<NotificationGroup> oldList,
+            @NonNull List<NotificationGroup> newList) {
         mOldList = oldList;
         mNewList = newList;
     }
@@ -55,13 +55,60 @@ class CarNotificationDiff extends DiffUtil.Callback {
 
     @Override
     public boolean areItemsTheSame(int oldItemPosition, int newItemPosition) {
-        StatusBarNotification oldItem = mOldList.get(oldItemPosition);
-        StatusBarNotification newItem = mNewList.get(newItemPosition);
-        return areNotificationsTheSame(oldItem, newItem);
+        NotificationGroup oldItem = mOldList.get(oldItemPosition);
+        NotificationGroup newItem = mNewList.get(newItemPosition);
+        return areNotificationGroupsTheSame(oldItem, newItem);
     }
 
     /**
-     * Whether two notifications are considered the same.
+     * Returns whether two {@link NotificationGroup}s are considered the same.
+     * Two grouped notifications are considered the same if they have the same:
+     * <ol>
+     * <li> Package name
+     * <li> Number of StatusBarNotifications contained
+     * <li> Content of the group header notification
+     * <li> The order of each StatusBarNotification
+     * <li> The identifier of each individual StatusBarNotification
+     * </ol>
+     */
+    static boolean areNotificationGroupsTheSame(
+            NotificationGroup oldItem, NotificationGroup newItem) {
+
+        // return true if referencing the same object, or both are null
+        if (oldItem == newItem) {
+            return true;
+        }
+
+        if (oldItem == null || newItem == null) {
+            return false;
+        }
+
+        if (!oldItem.getPackageName().equals(newItem.getPackageName())
+                || oldItem.getChildCount() != newItem.getChildCount()) {
+            return false;
+        }
+
+        if (!areStatusBarNotificationsTheSame(
+                oldItem.getGroupHeaderNotification(), newItem.getGroupHeaderNotification())) {
+            return false;
+        }
+
+        List<StatusBarNotification> oldNotifications = oldItem.getChildNotifications();
+        List<StatusBarNotification> newNotifications = newItem.getChildNotifications();
+
+        for (int i = 0; i < oldItem.getChildCount(); i++) {
+            StatusBarNotification oldNotification = oldNotifications.get(i);
+            StatusBarNotification newNotification = newNotifications.get(i);
+            if (!areStatusBarNotificationsTheSame(oldNotification, newNotification)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * Whether two {@link StatusBarNotification}s are considered the same.
      * Two notifications are considered the same if they have the same:
      * <ol>
      * <li> Id
@@ -70,8 +117,14 @@ class CarNotificationDiff extends DiffUtil.Callback {
      * <li> Tag
      * </ol>
      */
-    static boolean areNotificationsTheSame(
+    static boolean areStatusBarNotificationsTheSame(
             StatusBarNotification oldItem, StatusBarNotification newItem) {
+
+        // return true if referencing the same object, or both are null
+        if (oldItem == newItem) {
+            return true;
+        }
+
         return oldItem != null
                 && newItem != null
                 && oldItem.getId() == newItem.getId()

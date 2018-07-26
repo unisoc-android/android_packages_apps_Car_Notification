@@ -21,55 +21,91 @@ import android.service.notification.NotificationListenerService;
 import android.service.notification.StatusBarNotification;
 
 import androidx.annotation.NonNull;
-import androidx.recyclerview.widget.DiffUtil;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 /**
- * Manager that filters and ranks the notifications in the notification center.
+ * Manager that groups and ranks the notifications in the notification center.
  */
-public class RankingAndFilteringManager {
+public class PreprocessingManager {
 
     /**
-     * Ranks the given notifications. Currently no filtering is applied to the notifications.
-     * In order for {@link DiffUtil} to work, the adapter needs a new data object each time it
-     * updates, therefore wrapping the return value in a new list.
+     * Process the given notifications.
      *
      * @param notifications the notifications to be processed.
      * @param rankingMap    the ranking map for the notifications.
-     * @return the ranked notifications in a new list.
+     * @return the processed notifications in a new list.
      */
-    public static List<StatusBarNotification> process(
+    public static List<NotificationGroup> process(
             @NonNull List<StatusBarNotification> notifications,
             @NonNull NotificationListenerService.RankingMap rankingMap) {
 
-        return new ArrayList<>(rank(notifications, rankingMap));
+        return new ArrayList<>(rank(group(notifications), rankingMap));
     }
 
     /**
-     * Rank notifications in the following order:
+     * Step 1: Groups notifications from the same app.
+     *
+     * @param list list of ungrouped {@link StatusBarNotification}s.
+     * @return list of grouped notifications as {@link NotificationGroup}s.
+     */
+    private static List<NotificationGroup> group(List<StatusBarNotification> list) {
+        SortedMap<String, NotificationGroup> groupedNotifications = new TreeMap<>();
+
+        for (int i = 0; i < list.size(); i++) {
+            StatusBarNotification statusBarNotification = list.get(i);
+            Notification notification = statusBarNotification.getNotification();
+            String packageName = statusBarNotification.getPackageName();
+
+            if (groupedNotifications.containsKey(packageName)) {
+                if (notification.isGroupSummary()) {
+                    groupedNotifications
+                            .get(packageName).setGroupHeaderNotification(statusBarNotification);
+                } else {
+                    groupedNotifications.get(packageName).addNotification(statusBarNotification);
+                }
+            } else {
+                NotificationGroup notificationGroup = new NotificationGroup();
+                groupedNotifications.put(packageName, notificationGroup);
+                if (notification.isGroupSummary()) {
+                    notificationGroup.setGroupHeaderNotification(statusBarNotification);
+                } else {
+                    notificationGroup.addNotification(statusBarNotification);
+                }
+            }
+        }
+
+        // In order for DiffUtil to work, the adapter needs a new data object each time it
+        // updates, therefore wrapping the return value in a new list.
+        return new ArrayList(groupedNotifications.values());
+    }
+
+    /**
+     * Step 2: Rank notifications in the following order:
      * <ol>
-     *  <li> Category: CAR_EMERGENCY
-     *  <li> Importance: HIGH
-     *  <li> Category: CAR_WARNING
-     *  <li> Category: CAR_INFORMATION
-     *  <li> Importance: Default
-     *  <li> Importance: Low
-     *  <li> Importance: Min
+     * <li> Category: CAR_EMERGENCY
+     * <li> Importance: HIGH
+     * <li> Category: CAR_WARNING
+     * <li> Category: CAR_INFORMATION
+     * <li> Importance: Default
+     * <li> Importance: Low
+     * <li> Importance: Min
      * </ol>
      */
-    private static List<StatusBarNotification> rank(
-            List<StatusBarNotification> notifications,
+    private static List<NotificationGroup> rank(
+            List<NotificationGroup> notifications,
             NotificationListenerService.RankingMap rankingMap) {
 
         Collections.sort(notifications, new NotificationComparator(rankingMap));
         return notifications;
     }
 
-    private static class NotificationComparator implements Comparator<StatusBarNotification> {
+    private static class NotificationComparator implements Comparator<NotificationGroup> {
         private final NotificationListenerService.RankingMap mRankingMap;
 
         NotificationComparator(NotificationListenerService.RankingMap rankingMap) {
@@ -77,10 +113,10 @@ public class RankingAndFilteringManager {
         }
 
         @Override
-        public int compare(StatusBarNotification left, StatusBarNotification right) {
+        public int compare(NotificationGroup left, NotificationGroup right) {
             // Category: CATEGORY_CAR_EMERGENCY
-            String leftCategory = left.getNotification().category;
-            String rightCategory = right.getNotification().category;
+            String leftCategory = left.getFirstNotification().getNotification().category;
+            String rightCategory = right.getFirstNotification().getNotification().category;
             if (Notification.CATEGORY_CAR_EMERGENCY.equals(leftCategory)) {
                 return -1;
             } else if (Notification.CATEGORY_CAR_EMERGENCY.equals(rightCategory)) {
@@ -90,12 +126,12 @@ public class RankingAndFilteringManager {
             // Importance: IMPORTANCE_HIGH
             NotificationListenerService.Ranking leftRanking =
                     new NotificationListenerService.Ranking();
-            mRankingMap.getRanking(left.getKey(), leftRanking);
+            mRankingMap.getRanking(left.getFirstNotification().getKey(), leftRanking);
             int leftImportance = leftRanking.getImportance();
 
             NotificationListenerService.Ranking rightRanking =
                     new NotificationListenerService.Ranking();
-            mRankingMap.getRanking(right.getKey(), rightRanking);
+            mRankingMap.getRanking(right.getFirstNotification().getKey(), rightRanking);
             int rightImportance = rightRanking.getImportance();
 
             if (leftImportance == NotificationManager.IMPORTANCE_HIGH) {
