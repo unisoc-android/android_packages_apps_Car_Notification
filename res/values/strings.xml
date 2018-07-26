@@ -22,5 +22,7 @@
     <string name="notification_service_label">Car Notification Listener Service</string>
     <!-- The title displayed in notification center activity -->
     <string name="notifications">Notifications</string>
+    <string name="expand">Expand</string>
+    <string name="collapse">Collapse</string>
 
 </resources>
