@@ -35,12 +35,28 @@ import java.util.List;
 public class CarNotificationViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private final Context mContext;
     private final LayoutInflater mInflater;
-    private List<StatusBarNotification> mNotifications = new ArrayList<>();
-    private boolean mIsDistractionOptimizationRequired;
+    private final boolean mIsChildAdapter;
+    // book keeping expanded notification groups
+    private final List<String> mExpandedNotifications = new ArrayList<>();
 
-    public CarNotificationViewAdapter(Context context) {
+    private List<NotificationGroup> mNotifications = new ArrayList<>();
+    private boolean mIsDistractionOptimizationRequired;
+    private RecyclerView.RecycledViewPool mViewPool;
+
+    /**
+     * Constructor for a notification adapter.
+     * Can be used both by the root notification list view, or a grouped notification view.
+     *
+     * @param context the context for resources and inflating views
+     * @param isChildAdapter true if this adapter is used by a grouped notification view
+     */
+    public CarNotificationViewAdapter(Context context, boolean isChildAdapter) {
         mContext = context;
         mInflater = LayoutInflater.from(context);
+        mIsChildAdapter = isChildAdapter;
+        if (!mIsChildAdapter) {
+            mViewPool = new RecyclerView.RecycledViewPool();
+        }
     }
 
     @Override
@@ -48,6 +64,12 @@ public class CarNotificationViewAdapter extends RecyclerView.Adapter<RecyclerVie
         RecyclerView.ViewHolder viewHolder;
         View view;
         switch (viewType) {
+            case NotificationViewType.EXPANDED_GROUP_NOTIFICATION_VIEW_TYPE:
+            case NotificationViewType.COLLAPSED_GROUP_NOTIFICATION_VIEW_TYPE:
+                view = mInflater
+                        .inflate(R.layout.car_group_notification_template, parent, false);
+                viewHolder = new NotificationTemplateGroupViewHolder(view);
+                break;
             case NotificationViewType.MESSAGING_NOTIFICATION_VIEW_TYPE:
                 view = mInflater
                         .inflate(R.layout.car_messaging_notification_template, parent, false);
@@ -65,13 +87,22 @@ public class CarNotificationViewAdapter extends RecyclerView.Adapter<RecyclerVie
                 viewHolder = new NotificationTemplateBasicViewHolder(view, mContext);
                 break;
         }
+        // TODO: Do not use card view for children
         return viewHolder;
     }
 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
-        StatusBarNotification notification = mNotifications.get(position);
+        NotificationGroup notificationGroup = mNotifications.get(position);
+        StatusBarNotification notification = notificationGroup.getFirstNotification();
+
         switch (holder.getItemViewType()) {
+            case NotificationViewType.EXPANDED_GROUP_NOTIFICATION_VIEW_TYPE:
+                ((NotificationTemplateGroupViewHolder) holder).bind(notificationGroup, this, true);
+                break;
+            case NotificationViewType.COLLAPSED_GROUP_NOTIFICATION_VIEW_TYPE:
+                ((NotificationTemplateGroupViewHolder) holder).bind(notificationGroup, this, false);
+                break;
             case NotificationViewType.MESSAGING_NOTIFICATION_VIEW_TYPE:
                 ((NotificationTemplateMessagingViewHolder) holder).bind(notification);
                 break;
@@ -87,8 +118,17 @@ public class CarNotificationViewAdapter extends RecyclerView.Adapter<RecyclerVie
 
     @Override
     public int getItemViewType(int position) {
-        StatusBarNotification statusBarNotification = mNotifications.get(position);
-        Notification notification = statusBarNotification.getNotification();
+        NotificationGroup notificationGroup = mNotifications.get(position);
+
+        if (notificationGroup.isGroup()) {
+            if (mExpandedNotifications.contains(notificationGroup.getPackageName())) {
+                return NotificationViewType.EXPANDED_GROUP_NOTIFICATION_VIEW_TYPE;
+            } else {
+                return NotificationViewType.COLLAPSED_GROUP_NOTIFICATION_VIEW_TYPE;
+            }
+        }
+
+        Notification notification = notificationGroup.getFirstNotification().getNotification();
         Bundle extras = notification.extras;
 
         // messaging
@@ -119,10 +159,32 @@ public class CarNotificationViewAdapter extends RecyclerView.Adapter<RecyclerVie
         return mNotifications.size();
     }
 
+    void toggleExpansion(String packageName, boolean isExpanded) {
+        if (mExpandedNotifications.contains(packageName) && !isExpanded) {
+            mExpandedNotifications.remove(packageName);
+            int index = findIndexInNotification(packageName);
+            notifyItemChanged(index);
+        } else if (!mExpandedNotifications.contains(packageName) && isExpanded) {
+            mExpandedNotifications.add(packageName);
+            int index = findIndexInNotification(packageName);
+            notifyItemChanged(index);
+        }
+    }
+
+    private int findIndexInNotification(String packageName) {
+        for (int i = 0; i < mNotifications.size(); i++) {
+            if (mNotifications.get(i).getPackageName().equals(packageName)) {
+                return i;
+            }
+        }
+        // this should never happen because the contains() is already called
+        throw new IllegalStateException("Index not found for in expanded package names");
+    }
+
     /**
      * Gets a notification given its adapter position.
      */
-    public StatusBarNotification getNotificationAtPosition(int position) {
+    public NotificationGroup getNotificationAtPosition(int position) {
         if (position < mNotifications.size()) {
             return mNotifications.get(position);
         } else {
@@ -133,7 +195,7 @@ public class CarNotificationViewAdapter extends RecyclerView.Adapter<RecyclerVie
     /**
      * Updates notifications and update views.
      */
-    public void setNotifications(List<StatusBarNotification> notifications) {
+    public void setNotifications(List<NotificationGroup> notifications) {
         DiffUtil.DiffResult diffResult =
                 DiffUtil.calculateDiff(
                         new CarNotificationDiff(mNotifications, notifications), true);
@@ -154,5 +216,18 @@ public class CarNotificationViewAdapter extends RecyclerView.Adapter<RecyclerVie
      */
     public boolean getIsDistractionOptimizationRequired() {
         return mIsDistractionOptimizationRequired;
+    }
+
+    /**
+     * Get root recycler view's view pool so that the child recycler view can share the same
+     * view pool with the parent.
+     */
+    public RecyclerView.RecycledViewPool getViewPool() {
+        if (mIsChildAdapter) {
+            // currently only support one level of expansion.
+            throw new IllegalStateException("CarNotificationViewAdapter is a child adapter; "
+                    + "its view pool should not be reused.");
+        }
+        return mViewPool;
     }
 }

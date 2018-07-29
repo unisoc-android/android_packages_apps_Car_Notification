@@ -67,6 +67,5 @@
         app:listContentTopOffset="@dimen/car_padding_2"
         app:itemSpacing="@dimen/car_padding_2"
         app:showPagedListViewDivider="false"
-        app:gutter="both"
-        app:dayNightStyle="auto"/>
+        app:gutter="both" />
 </RelativeLayout>
