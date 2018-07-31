@@ -16,6 +16,9 @@
 package com.android.car.notification;
 
 import android.content.Context;
+import android.graphics.Canvas;
+import android.graphics.Paint;
+import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.view.View;
 import android.widget.Button;
@@ -38,6 +41,9 @@ public class NotificationTemplateGroupViewHolder extends RecyclerView.ViewHolder
     private final CarNotificationViewAdapter mAdapter;
     private final Drawable mExpandDrawable;
     private final Drawable mCollapseDrawable;
+    private final Paint mPaint;
+    private final int mDividerMargin;
+    private final int mDividerHeight;
 
     public NotificationTemplateGroupViewHolder(View view) {
         super(view);
@@ -52,9 +58,16 @@ public class NotificationTemplateGroupViewHolder extends RecyclerView.ViewHolder
         mCollapseDrawable = mContext.getDrawable(R.drawable.expand_less);
         mCollapseDrawable.setTint(carAccentColor);
 
+        mDividerMargin = mContext.getResources().getDimensionPixelSize(R.dimen.car_keyline_1);
+        mPaint = new Paint();
+        mPaint.setColor(mContext.getColor(R.color.car_list_divider));
+        mDividerHeight = mContext.getResources().getDimensionPixelSize(
+                R.dimen.car_list_divider_height);
+
         mNotificationListView.setLayoutManager(new LinearLayoutManager(mContext));
+        mNotificationListView.addItemDecoration(new GroupedNotificationItemDecoration());
         mNotificationListView.setNestedScrollingEnabled(false);
-        mAdapter = new CarNotificationViewAdapter(mContext, /* isChildAdapter= */ true);
+        mAdapter = new CarNotificationViewAdapter(mContext, /* isGroupNotificationAdapter= */ true);
         mNotificationListView.setAdapter(mAdapter);
     }
 
@@ -98,6 +111,29 @@ public class NotificationTemplateGroupViewHolder extends RecyclerView.ViewHolder
             mToggleButton.setText(R.string.expand);
             mToggleButton.setCompoundDrawablesWithIntrinsicBounds(
                     mExpandDrawable, null, null, null);
+        }
+    }
+
+    private class GroupedNotificationItemDecoration extends RecyclerView.ItemDecoration {
+
+        @Override
+        public void onDrawOver(Canvas c, RecyclerView parent, RecyclerView.State state) {
+            // not drawing the divider for the last item
+            for (int i = 0; i < parent.getChildCount() - 1; i++) {
+                drawDivider(c, parent.getChildAt(i));
+            }
+        }
+
+        /**
+         * Draws a divider under {@code container}.
+         */
+        private void drawDivider(Canvas c, View container) {
+            int left = container.getLeft() + mDividerMargin;
+            int right = container.getRight() - mDividerMargin;
+            int bottom = container.getBottom() + mDividerHeight;
+            int top = bottom - mDividerHeight;
+
+            c.drawRect(left, top, right, bottom, mPaint);
         }
     }
 }

@@ -17,7 +17,6 @@ package com.android.car.notification;
 
 import android.app.Notification;
 import android.app.PendingIntent;
-import android.content.Context;
 import android.os.Bundle;
 import android.service.notification.StatusBarNotification;
 import android.text.TextUtils;
@@ -41,7 +40,7 @@ public class NotificationTemplateProgressViewHolder extends RecyclerView.ViewHol
     private final ProgressBar mProgressBarView;
     private final View mParentView;
 
-    public NotificationTemplateProgressViewHolder(View view, Context context) {
+    public NotificationTemplateProgressViewHolder(View view) {
         super(view);
         mParentView = view;
         mHeaderView = view.findViewById(R.id.notification_header);
@@ -55,8 +54,9 @@ public class NotificationTemplateProgressViewHolder extends RecyclerView.ViewHol
      * Binds a {@link StatusBarNotification} to a car progress notification template.
      *
      * @param statusBarNotification passing {@code null} clears the view.
+     * @param isInGroup whether this notification card is part of a group.
      */
-    public void bind(StatusBarNotification statusBarNotification) {
+    public void bind(StatusBarNotification statusBarNotification, boolean isInGroup) {
         reset();
         if (statusBarNotification == null) {
             return;
@@ -75,7 +75,7 @@ public class NotificationTemplateProgressViewHolder extends RecyclerView.ViewHol
         }
 
         mHeaderView.bind(statusBarNotification);
-        mActionsView.bind(statusBarNotification);
+        mActionsView.bind(statusBarNotification, isInGroup);
 
         Bundle extraData = notification.extras;
         CharSequence title = extraData.getCharSequence(Notification.EXTRA_TITLE);
