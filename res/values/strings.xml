@@ -24,5 +24,10 @@
     <string name="notifications">Notifications</string>
     <string name="expand">Expand</string>
     <string name="collapse">Collapse</string>
+    <!-- The text used to display child notification count for group notifications -->
+    <plurals name="group_notification_summary_text">
+        <item quantity="one"><xliff:g example="1" id="count">%d</xliff:g> Notification</item>
+        <item quantity="other"><xliff:g example="2" id="count">%d</xliff:g> Notifications</item>
+    </plurals>
 
 </resources>
