@@ -16,7 +16,6 @@
 package com.android.car.notification;
 
 import android.app.Notification;
-import android.app.NotificationManager;
 import android.service.notification.NotificationListenerService;
 import android.service.notification.StatusBarNotification;
 
@@ -49,7 +48,8 @@ public class PreprocessingManager {
     }
 
     /**
-     * Step 1: Groups notifications from the same app.
+     * Step 1: Groups notifications that have the same group key.
+     * Never groups system notifications nor car emergency notifications.
      *
      * @param list list of ungrouped {@link StatusBarNotification}s.
      * @return list of grouped notifications as {@link NotificationGroup}s.
@@ -60,18 +60,18 @@ public class PreprocessingManager {
         for (int i = 0; i < list.size(); i++) {
             StatusBarNotification statusBarNotification = list.get(i);
             Notification notification = statusBarNotification.getNotification();
-            String packageName = statusBarNotification.getPackageName();
 
-            if (groupedNotifications.containsKey(packageName)) {
+            String groupKey = getGroupKey(statusBarNotification);
+            if (groupedNotifications.containsKey(groupKey)) {
                 if (notification.isGroupSummary()) {
                     groupedNotifications
-                            .get(packageName).setGroupHeaderNotification(statusBarNotification);
+                            .get(groupKey).setGroupHeaderNotification(statusBarNotification);
                 } else {
-                    groupedNotifications.get(packageName).addNotification(statusBarNotification);
+                    groupedNotifications.get(groupKey).addNotification(statusBarNotification);
                 }
             } else {
                 NotificationGroup notificationGroup = new NotificationGroup();
-                groupedNotifications.put(packageName, notificationGroup);
+                groupedNotifications.put(groupKey, notificationGroup);
                 if (notification.isGroupSummary()) {
                     notificationGroup.setGroupHeaderNotification(statusBarNotification);
                 } else {
@@ -86,16 +86,33 @@ public class PreprocessingManager {
     }
 
     /**
-     * Step 2: Rank notifications in the following order:
-     * <ol>
-     * <li> Category: CAR_EMERGENCY
-     * <li> Importance: HIGH
-     * <li> Category: CAR_WARNING
-     * <li> Category: CAR_INFORMATION
-     * <li> Importance: Default
-     * <li> Importance: Low
-     * <li> Importance: Min
-     * </ol>
+     * Helper method that generates a unique identifier for each grouped notification.
+     */
+    static String getGroupKey(StatusBarNotification statusBarNotification) {
+        String groupKey = statusBarNotification.getGroup();
+        if (groupKey == null) {
+            // If a notification is not part of a group, use a unique identifier as the group key
+            groupKey = getUniqueIdentifier(statusBarNotification);
+        } else {
+            // Append the package name to the group key,
+            // in case it is the default override group key (same for every package)
+            groupKey += statusBarNotification.getPackageName();
+        }
+        return groupKey;
+    }
+
+    private static String getUniqueIdentifier(StatusBarNotification sbn) {
+        return new StringBuilder()
+                .append(sbn.getPackageName())
+                .append(sbn.getKey())
+                .append(sbn.getTag())
+                .append(sbn.getId())
+                .append(sbn.getUser())
+                .toString();
+    }
+
+    /**
+     * Step 2: Rank notifications according to the ranking key supplied by the notification
      */
     private static List<NotificationGroup> rank(
             List<NotificationGroup> notifications,
@@ -114,48 +131,15 @@ public class PreprocessingManager {
 
         @Override
         public int compare(NotificationGroup left, NotificationGroup right) {
-            // Category: CATEGORY_CAR_EMERGENCY
-            String leftCategory = left.getFirstNotification().getNotification().category;
-            String rightCategory = right.getFirstNotification().getNotification().category;
-            if (Notification.CATEGORY_CAR_EMERGENCY.equals(leftCategory)) {
-                return -1;
-            } else if (Notification.CATEGORY_CAR_EMERGENCY.equals(rightCategory)) {
-                return 1;
-            }
-
-            // Importance: IMPORTANCE_HIGH
             NotificationListenerService.Ranking leftRanking =
                     new NotificationListenerService.Ranking();
-            mRankingMap.getRanking(left.getFirstNotification().getKey(), leftRanking);
-            int leftImportance = leftRanking.getImportance();
+            mRankingMap.getRanking(left.getNotificationForSorting().getKey(), leftRanking);
 
             NotificationListenerService.Ranking rightRanking =
                     new NotificationListenerService.Ranking();
-            mRankingMap.getRanking(right.getFirstNotification().getKey(), rightRanking);
-            int rightImportance = rightRanking.getImportance();
+            mRankingMap.getRanking(right.getNotificationForSorting().getKey(), rightRanking);
 
-            if (leftImportance == NotificationManager.IMPORTANCE_HIGH) {
-                return -1;
-            } else if (rightImportance == NotificationManager.IMPORTANCE_HIGH) {
-                return 1;
-            }
-
-            // Category: CATEGORY_CAR_WARNING
-            if (Notification.CATEGORY_CAR_WARNING.equals(leftCategory)) {
-                return -1;
-            } else if (Notification.CATEGORY_CAR_WARNING.equals(rightCategory)) {
-                return 1;
-            }
-
-            // Category: CATEGORY_CAR_INFORMATION
-            if (Notification.CATEGORY_CAR_INFORMATION.equals(leftCategory)) {
-                return -1;
-            } else if (Notification.CATEGORY_CAR_INFORMATION.equals(rightCategory)) {
-                return 1;
-            }
-
-            // Importance: natural order
-            return rightImportance - leftImportance;
+            return leftRanking.getRank() - rightRanking.getRank();
         }
     }
 }
