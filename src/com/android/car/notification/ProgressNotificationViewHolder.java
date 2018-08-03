@@ -17,43 +17,41 @@ package com.android.car.notification;
 
 import android.app.Notification;
 import android.app.PendingIntent;
-import android.content.Context;
 import android.os.Bundle;
 import android.service.notification.StatusBarNotification;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
-import android.widget.FrameLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import androidx.recyclerview.widget.RecyclerView;
 
 /**
- * Basic notification view template that displays a minimal notification.
+ * Basic notification view template that displays a progress bar notification.
+ * This template is only used in notification center and never as a heads-up notification.
  */
-public class NotificationTemplateBasicViewHolder extends RecyclerView.ViewHolder {
+public class ProgressNotificationViewHolder extends RecyclerView.ViewHolder {
     private static final String TAG = "car_notification_basic";
-    private final Context mContext;
     private final CarNotificationHeaderView mHeaderView;
     private final CarNotificationActionsView mActionsView;
     private final TextView mTitleTextView;
     private final TextView mContentTextView;
+    private final ProgressBar mProgressBarView;
     private final View mParentView;
-    private final FrameLayout mBigContentView;
 
-    public NotificationTemplateBasicViewHolder(View view) {
+    public ProgressNotificationViewHolder(View view) {
         super(view);
-        mContext = view.getContext();
         mParentView = view;
         mHeaderView = view.findViewById(R.id.notification_header);
         mActionsView = view.findViewById(R.id.notification_actions);
         mTitleTextView = view.findViewById(R.id.notification_title);
         mContentTextView = view.findViewById(R.id.notification_text);
-        mBigContentView = view.findViewById(R.id.big_content_view);
+        mProgressBarView = view.findViewById(R.id.progress_bar);
     }
 
     /**
-     * Binds a {@link StatusBarNotification} to a basic car notification template.
+     * Binds a {@link StatusBarNotification} to a car progress notification template.
      *
      * @param statusBarNotification passing {@code null} clears the view.
      * @param isInGroup whether this notification card is part of a group.
@@ -76,15 +74,6 @@ public class NotificationTemplateBasicViewHolder extends RecyclerView.ViewHolder
             });
         }
 
-        if (notification.bigContentView != null) {
-            View view = notification.bigContentView.apply(mContext, /* parent= */ mBigContentView);
-            mBigContentView.setVisibility(View.VISIBLE);
-            mBigContentView.addView(view);
-            // If a notification came with a custom content view,
-            // do not bind anything else other than the custom view.
-            return;
-        }
-
         mHeaderView.bind(statusBarNotification);
         mActionsView.bind(statusBarNotification, isInGroup);
 
@@ -100,6 +89,15 @@ public class NotificationTemplateBasicViewHolder extends RecyclerView.ViewHolder
             mContentTextView.setVisibility(View.VISIBLE);
             mContentTextView.setText(text);
         }
+
+        mProgressBarView.setVisibility(View.VISIBLE);
+        boolean isIndeterminate = extraData.getBoolean(
+                Notification.EXTRA_PROGRESS_INDETERMINATE);
+        int progress = extraData.getInt(Notification.EXTRA_PROGRESS);
+        int progressMax = extraData.getInt(Notification.EXTRA_PROGRESS_MAX);
+        mProgressBarView.setIndeterminate(isIndeterminate);
+        mProgressBarView.setMax(progressMax);
+        mProgressBarView.setProgress(progress);
     }
 
     /**
@@ -109,14 +107,14 @@ public class NotificationTemplateBasicViewHolder extends RecyclerView.ViewHolder
         mParentView.setClickable(false);
         mParentView.setOnClickListener(null);
 
-        mBigContentView.removeAllViews();
-        mBigContentView.setVisibility(View.GONE);
-
         mTitleTextView.setText(null);
         mTitleTextView.setVisibility(View.GONE);
 
         mContentTextView.setText(null);
         mContentTextView.setVisibility(View.GONE);
+
+        mProgressBarView.setProgress(0);
+        mProgressBarView.setVisibility(View.GONE);
 
         mHeaderView.reset();
 
