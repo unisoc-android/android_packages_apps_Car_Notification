@@ -113,8 +113,8 @@ public class CarHeadsUpNotificationManager {
                 notificationView = mInflater.inflate(
                         R.layout.car_messaging_headsup_notification_template, mWrapper);
                 NotificationTemplateMessagingViewHolder holder =
-                        new NotificationTemplateMessagingViewHolder(notificationView, mContext);
-                holder.bind(statusBarNotification);
+                        new NotificationTemplateMessagingViewHolder(notificationView);
+                holder.bind(statusBarNotification, /* isInGroup= */ false);
                 break;
             }
             case NotificationViewType.HEADS_UP_BASIC_NOTIFICATION_VIEW_TYPE:
@@ -122,8 +122,8 @@ public class CarHeadsUpNotificationManager {
                 notificationView = mInflater.inflate(
                         R.layout.car_basic_headsup_notification_template, mWrapper);
                 NotificationTemplateBasicViewHolder holder =
-                        new NotificationTemplateBasicViewHolder(notificationView, mContext);
-                holder.bind(statusBarNotification);
+                        new NotificationTemplateBasicViewHolder(notificationView);
+                holder.bind(statusBarNotification, /* isInGroup= */ false);
                 break;
             }
         }

@@ -40,7 +40,10 @@ public class CarNotificationActionsView extends RelativeLayout {
     // https://developer.android.com/reference/android/app/Notification.Builder.html#addAction
     private static final int MAX_NUM_ACTIONS = 3;
     private final List<Button> mActionButtons = new ArrayList<>();
+    private View mActionsView;
     private int mIconSize;
+    private int mCarActionBarColor;
+    private int mCarCardColor;
 
     public CarNotificationActionsView(Context context) {
         super(context);
@@ -64,12 +67,16 @@ public class CarNotificationActionsView extends RelativeLayout {
     }
 
     private void init(Context context) {
+        // TODO: Use the car theme and card_action_bar as background color when ready
+        mCarActionBarColor = context.getResources().getColor(R.color.car_list_divider);
+        mCarCardColor = context.getResources().getColor(R.color.car_card);
         mIconSize = context.getResources().getDimensionPixelOffset(R.dimen.car_primary_icon_size);
         inflate(context, R.layout.car_notification_actions_view, /* root= */ this);
     }
 
     @Override
     protected void onFinishInflate() {
+        mActionsView = findViewById(R.id.notification_actions);
         mActionButtons.add(findViewById(R.id.action_1));
         mActionButtons.add(findViewById(R.id.action_2));
         mActionButtons.add(findViewById(R.id.action_3));
@@ -77,8 +84,11 @@ public class CarNotificationActionsView extends RelativeLayout {
 
     /**
      * Binds the notification action buttons.
+     *
+     * @param statusBarNotification the notification that contains the actions.
+     * @param isInGroup whether this notification card is part of a group.
      */
-    public void bind(StatusBarNotification statusBarNotification) {
+    public void bind(StatusBarNotification statusBarNotification, boolean isInGroup) {
         reset();
 
         Notification notification = statusBarNotification.getNotification();
@@ -88,6 +98,8 @@ public class CarNotificationActionsView extends RelativeLayout {
         }
 
         setVisibility(View.VISIBLE);
+        mActionsView.setBackgroundColor(isInGroup ? mCarCardColor : mCarActionBarColor);
+
         int length = Math.min(actions.length, MAX_NUM_ACTIONS);
         for (int i = 0; i < length; i++) {
             Notification.Action action = actions[i];
@@ -119,6 +131,7 @@ public class CarNotificationActionsView extends RelativeLayout {
      */
     void reset() {
         setVisibility(View.GONE);
+        mActionsView.setBackgroundColor(mCarActionBarColor);
         for (Button button : mActionButtons) {
             button.setVisibility(View.GONE);
             button.setText(null);

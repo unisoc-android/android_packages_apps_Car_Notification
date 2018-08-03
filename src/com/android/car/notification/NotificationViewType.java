@@ -20,13 +20,16 @@ import android.annotation.IntDef;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
-@IntDef({NotificationViewType.BASIC_NOTIFICATION_VIEW_TYPE,
+@IntDef({NotificationViewType.COLLAPSED_GROUP_NOTIFICATION_VIEW_TYPE,
+        NotificationViewType.EXPANDED_GROUP_NOTIFICATION_VIEW_TYPE,
+        NotificationViewType.BASIC_NOTIFICATION_VIEW_TYPE,
+        NotificationViewType.BASIC_NOTIFICATION_IN_GROUP_VIEW_TYPE,
         NotificationViewType.HEADS_UP_BASIC_NOTIFICATION_VIEW_TYPE,
         NotificationViewType.MESSAGING_NOTIFICATION_VIEW_TYPE,
+        NotificationViewType.MESSAGE_NOTIFICATION_IN_GROUP_VIEW_TYPE,
         NotificationViewType.HEADS_UP_MESSAGING_NOTIFICATION_VIEW_TYPE,
         NotificationViewType.PROGRESS_NOTIFICATION_VIEW_TYPE,
-        NotificationViewType.COLLAPSED_GROUP_NOTIFICATION_VIEW_TYPE,
-        NotificationViewType.EXPANDED_GROUP_NOTIFICATION_VIEW_TYPE})
+        NotificationViewType.PROGRESS_NOTIFICATION_IN_GROUP_VIEW_TYPE})
 @Retention(RetentionPolicy.SOURCE)
 @interface NotificationViewType {
     int BASIC_NOTIFICATION_VIEW_TYPE = 0;
@@ -36,4 +39,7 @@ import java.lang.annotation.RetentionPolicy;
     int PROGRESS_NOTIFICATION_VIEW_TYPE = 4;
     int COLLAPSED_GROUP_NOTIFICATION_VIEW_TYPE = 5;
     int EXPANDED_GROUP_NOTIFICATION_VIEW_TYPE = 6;
+    int MESSAGE_NOTIFICATION_IN_GROUP_VIEW_TYPE = 7;
+    int BASIC_NOTIFICATION_IN_GROUP_VIEW_TYPE = 8;
+    int PROGRESS_NOTIFICATION_IN_GROUP_VIEW_TYPE = 9;
 }

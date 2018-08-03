@@ -44,9 +44,9 @@ public class NotificationTemplateMessagingViewHolder extends RecyclerView.ViewHo
     private final TextView mTitleTextView;
     private final ImageView mAvatarView;
 
-    public NotificationTemplateMessagingViewHolder(View view, Context context) {
+    public NotificationTemplateMessagingViewHolder(View view) {
         super(view);
-        mContext = context;
+        mContext = view.getContext();
         mParentView = view;
         mHeaderView = view.findViewById(R.id.notification_header);
         mActionsView = view.findViewById(R.id.notification_actions);
@@ -59,14 +59,15 @@ public class NotificationTemplateMessagingViewHolder extends RecyclerView.ViewHo
      * Binds a {@link StatusBarNotification} to a messaging car notification template.
      *
      * @param statusBarNotification passing {@code null} clears the view.
+     * @param isInGroup whether this notification card is part of a group.
      */
-    public void bind(@Nullable StatusBarNotification statusBarNotification) {
+    public void bind(@Nullable StatusBarNotification statusBarNotification, boolean isInGroup) {
         reset();
         if (statusBarNotification == null) {
             return;
         }
         mHeaderView.bind(statusBarNotification);
-        mActionsView.bind(statusBarNotification);
+        mActionsView.bind(statusBarNotification, isInGroup);
 
         Notification notification = statusBarNotification.getNotification();
 
