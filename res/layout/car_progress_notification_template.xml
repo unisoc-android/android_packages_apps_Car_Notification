@@ -30,60 +30,10 @@
         app:cardBackgroundColor="@color/car_card"
         app:cardCornerRadius="@dimen/car_radius_3">
 
-        <RelativeLayout
+        <include
+            layout="@layout/progress_notification_template_inner"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignParentTop="true"
-            android:paddingTop="@dimen/car_padding_3">
-
-            <TextView
-                android:id="@+id/notification_title"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_alignParentStart="true"
-                android:layout_alignParentTop="true"
-                android:layout_toStartOf="@id/notification_header"
-                android:layout_marginStart="@dimen/car_keyline_1"
-                android:layout_marginBottom="@dimen/car_padding_0"
-                style="@style/NotificationTitleText"/>
-
-            <TextView
-                android:id="@+id/notification_text"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_alignParentStart="true"
-                android:layout_below="@id/notification_title"
-                android:layout_toStartOf="@id/notification_header"
-                android:layout_marginStart="@dimen/car_keyline_1"
-                android:textAppearance="@style/TextAppearance.Car.Body2"/>
-
-            <com.android.car.notification.CarNotificationHeaderView
-                android:id="@+id/notification_header"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentTop="true"
-                android:layout_alignParentEnd="true"
-                android:layout_marginStart="@dimen/car_padding_4"
-                android:layout_marginEnd="@dimen/car_keyline_1"/>
-
-            <ProgressBar
-                android:id="@+id/progress_bar"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/notification_text"
-                android:layout_marginStart="@dimen/car_keyline_1"
-                android:layout_marginEnd="@dimen/car_keyline_1"
-                android:layout_marginTop="@dimen/car_padding_2"
-                android:layout_marginBottom="@dimen/car_padding_3"
-                style="@style/Widget.Car.ProgressBar.Horizontal"/>
-
-            <com.android.car.notification.CarNotificationActionsView
-                android:id="@+id/notification_actions"
-                android:layout_width="match_parent"
-                android:layout_height="@dimen/car_card_action_bar_height"
-                android:layout_below="@id/progress_bar"/>
-
-        </RelativeLayout>
+            android:layout_height="wrap_content"/>
 
     </androidx.car.widget.ColumnCardView>
 </FrameLayout>

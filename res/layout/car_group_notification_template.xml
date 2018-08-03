@@ -39,23 +39,21 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"/>
 
-            <View
-                android:id="@+id/divider"
+            <!-- TODO: Use card_action_bar as background color when ready -->
+            <FrameLayout
                 android:layout_width="match_parent"
-                android:layout_height="@dimen/car_list_divider_height"
+                android:layout_height="wrap_content"
                 android:layout_below="@id/notification_list"
-                android:layout_marginStart="@dimen/car_keyline_1"
-                android:layout_marginEnd="@dimen/car_keyline_1"
-                android:background="@color/car_list_divider"/>
+                android:background="@color/car_list_divider">
 
-            <Button
-                android:id="@+id/toggle_button"
-                android:layout_width="wrap_content"
-                android:layout_height="@dimen/car_card_action_bar_height"
-                android:layout_centerVertical="true"
-                android:layout_marginStart="@dimen/car_keyline_1"
-                android:layout_below="@id/divider"
-                style="@style/NotificationActionButton"/>
+                <Button
+                    android:id="@+id/toggle_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="@dimen/car_card_action_bar_height"
+                    android:layout_centerVertical="true"
+                    android:layout_marginStart="@dimen/car_keyline_1"
+                    style="@style/NotificationActionButton"/>
+            </FrameLayout>
 
         </RelativeLayout>
 
