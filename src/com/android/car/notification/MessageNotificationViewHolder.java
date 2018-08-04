@@ -34,7 +34,7 @@ import java.util.List;
 /**
  * Messaging notification template that displays a messaging notification and a voice reply button.
  */
-public class NotificationTemplateMessagingViewHolder extends RecyclerView.ViewHolder {
+public class MessageNotificationViewHolder extends RecyclerView.ViewHolder {
     private static final String TAG = "car_notification_messaging";
     private final Context mContext;
     private final CarNotificationHeaderView mHeaderView;
@@ -44,7 +44,7 @@ public class NotificationTemplateMessagingViewHolder extends RecyclerView.ViewHo
     private final TextView mTitleTextView;
     private final ImageView mAvatarView;
 
-    public NotificationTemplateMessagingViewHolder(View view) {
+    public MessageNotificationViewHolder(View view) {
         super(view);
         mContext = view.getContext();
         mParentView = view;
