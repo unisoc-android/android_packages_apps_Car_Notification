@@ -64,42 +64,42 @@ public class CarNotificationViewAdapter extends RecyclerView.Adapter<RecyclerVie
         RecyclerView.ViewHolder viewHolder;
         View view;
         switch (viewType) {
-            case NotificationViewType.EXPANDED_GROUP_NOTIFICATION_VIEW_TYPE:
-            case NotificationViewType.COLLAPSED_GROUP_NOTIFICATION_VIEW_TYPE:
+            case NotificationViewType.GROUP_EXPANDED:
+            case NotificationViewType.GROUP_COLLAPSED:
                 view = mInflater.inflate(
-                        R.layout.car_group_notification_template, parent, false);
-                viewHolder = new NotificationTemplateGroupViewHolder(view);
+                        R.layout.group_notification_template, parent, false);
+                viewHolder = new GroupNotificationViewHolder(view);
                 break;
-            case NotificationViewType.MESSAGE_NOTIFICATION_IN_GROUP_VIEW_TYPE:
+            case NotificationViewType.MESSAGE_IN_GROUP:
                 view = mInflater.inflate(
                         R.layout.message_notification_template_inner, parent, false);
-                viewHolder = new NotificationTemplateMessagingViewHolder(view);
+                viewHolder = new MessageNotificationViewHolder(view);
                 break;
-            case NotificationViewType.MESSAGING_NOTIFICATION_VIEW_TYPE:
+            case NotificationViewType.MESSAGE:
                 view = mInflater.inflate(
-                        R.layout.car_messaging_notification_template, parent, false);
-                viewHolder = new NotificationTemplateMessagingViewHolder(view);
+                        R.layout.message_notification_template, parent, false);
+                viewHolder = new MessageNotificationViewHolder(view);
                 break;
-            case NotificationViewType.PROGRESS_NOTIFICATION_IN_GROUP_VIEW_TYPE:
+            case NotificationViewType.PROGRESS_IN_GROUP:
                 view = mInflater.inflate(
                         R.layout.progress_notification_template_inner, parent, false);
-                viewHolder = new NotificationTemplateProgressViewHolder(view);
+                viewHolder = new ProgressNotificationViewHolder(view);
                 break;
-            case NotificationViewType.PROGRESS_NOTIFICATION_VIEW_TYPE:
+            case NotificationViewType.PROGRESS:
                 view = mInflater
-                        .inflate(R.layout.car_progress_notification_template, parent, false);
-                viewHolder = new NotificationTemplateProgressViewHolder(view);
+                        .inflate(R.layout.progress_notification_template, parent, false);
+                viewHolder = new ProgressNotificationViewHolder(view);
                 break;
-            case NotificationViewType.BASIC_NOTIFICATION_IN_GROUP_VIEW_TYPE:
+            case NotificationViewType.BASIC_IN_GROUP:
                 view = mInflater
                         .inflate(R.layout.basic_notification_template_inner, parent, false);
-                viewHolder = new NotificationTemplateBasicViewHolder(view);
+                viewHolder = new BasicNotificationViewHolder(view);
                 break;
-            case NotificationViewType.BASIC_NOTIFICATION_VIEW_TYPE:
+            case NotificationViewType.BASIC:
             default:
                 view = mInflater
-                        .inflate(R.layout.car_basic_notification_template, parent, false);
-                viewHolder = new NotificationTemplateBasicViewHolder(view);
+                        .inflate(R.layout.basic_notification_template, parent, false);
+                viewHolder = new BasicNotificationViewHolder(view);
                 break;
         }
         return viewHolder;
@@ -111,26 +111,26 @@ public class CarNotificationViewAdapter extends RecyclerView.Adapter<RecyclerVie
         StatusBarNotification notification = notificationGroup.getFirstNotification();
 
         switch (holder.getItemViewType()) {
-            case NotificationViewType.EXPANDED_GROUP_NOTIFICATION_VIEW_TYPE:
-                ((NotificationTemplateGroupViewHolder) holder).bind(notificationGroup, this, true);
+            case NotificationViewType.GROUP_EXPANDED:
+                ((GroupNotificationViewHolder) holder).bind(notificationGroup, this, true);
                 break;
-            case NotificationViewType.COLLAPSED_GROUP_NOTIFICATION_VIEW_TYPE:
-                ((NotificationTemplateGroupViewHolder) holder).bind(notificationGroup, this, false);
+            case NotificationViewType.GROUP_COLLAPSED:
+                ((GroupNotificationViewHolder) holder).bind(notificationGroup, this, false);
                 break;
-            case NotificationViewType.MESSAGE_NOTIFICATION_IN_GROUP_VIEW_TYPE:
-            case NotificationViewType.MESSAGING_NOTIFICATION_VIEW_TYPE:
-                ((NotificationTemplateMessagingViewHolder) holder)
+            case NotificationViewType.MESSAGE_IN_GROUP:
+            case NotificationViewType.MESSAGE:
+                ((MessageNotificationViewHolder) holder)
                         .bind(notification, /* isInGroup= */ mIsGroupNotificationAdapter);
                 break;
-            case NotificationViewType.PROGRESS_NOTIFICATION_IN_GROUP_VIEW_TYPE:
-            case NotificationViewType.PROGRESS_NOTIFICATION_VIEW_TYPE:
-                ((NotificationTemplateProgressViewHolder) holder)
+            case NotificationViewType.PROGRESS_IN_GROUP:
+            case NotificationViewType.PROGRESS:
+                ((ProgressNotificationViewHolder) holder)
                         .bind(notification, /* isInGroup= */ mIsGroupNotificationAdapter);
                 break;
-            case NotificationViewType.BASIC_NOTIFICATION_IN_GROUP_VIEW_TYPE:
-            case NotificationViewType.BASIC_NOTIFICATION_VIEW_TYPE:
+            case NotificationViewType.BASIC_IN_GROUP:
+            case NotificationViewType.BASIC:
             default:
-                ((NotificationTemplateBasicViewHolder) holder)
+                ((BasicNotificationViewHolder) holder)
                         .bind(notification, /* isInGroup= */ mIsGroupNotificationAdapter);
                 break;
         }
@@ -142,9 +142,9 @@ public class CarNotificationViewAdapter extends RecyclerView.Adapter<RecyclerVie
 
         if (notificationGroup.isGroup()) {
             if (mExpandedNotifications.contains(notificationGroup.getPackageName())) {
-                return NotificationViewType.EXPANDED_GROUP_NOTIFICATION_VIEW_TYPE;
+                return NotificationViewType.GROUP_EXPANDED;
             } else {
-                return NotificationViewType.COLLAPSED_GROUP_NOTIFICATION_VIEW_TYPE;
+                return NotificationViewType.GROUP_COLLAPSED;
             }
         }
 
@@ -155,8 +155,8 @@ public class CarNotificationViewAdapter extends RecyclerView.Adapter<RecyclerVie
         boolean isMessage = Notification.CATEGORY_MESSAGE.equals(notification.category);
         if (isMessage) {
             return mIsGroupNotificationAdapter
-                    ? NotificationViewType.MESSAGE_NOTIFICATION_IN_GROUP_VIEW_TYPE
-                    : NotificationViewType.MESSAGING_NOTIFICATION_VIEW_TYPE;
+                    ? NotificationViewType.MESSAGE_IN_GROUP
+                    : NotificationViewType.MESSAGE;
         }
 
         // progress
@@ -170,14 +170,14 @@ public class CarNotificationViewAdapter extends RecyclerView.Adapter<RecyclerVie
                 && !notification.hasCompletedProgress();
         if (isProgress) {
             return mIsGroupNotificationAdapter
-                    ? NotificationViewType.PROGRESS_NOTIFICATION_IN_GROUP_VIEW_TYPE
-                    : NotificationViewType.PROGRESS_NOTIFICATION_VIEW_TYPE;
+                    ? NotificationViewType.PROGRESS_IN_GROUP
+                    : NotificationViewType.PROGRESS;
         }
 
         // basic
         return mIsGroupNotificationAdapter
-                ? NotificationViewType.BASIC_NOTIFICATION_IN_GROUP_VIEW_TYPE
-                : NotificationViewType.BASIC_NOTIFICATION_VIEW_TYPE;
+                ? NotificationViewType.BASIC_IN_GROUP
+                : NotificationViewType.BASIC;
     }
 
     @Override

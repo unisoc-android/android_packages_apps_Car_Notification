@@ -109,20 +109,20 @@ public class CarHeadsUpNotificationManager {
         View notificationView;
         @NotificationViewType int viewType = getNotificationViewType(statusBarNotification);
         switch (viewType) {
-            case NotificationViewType.HEADS_UP_MESSAGING_NOTIFICATION_VIEW_TYPE: {
+            case NotificationViewType.MESSAGE_HEADSUP: {
                 notificationView = mInflater.inflate(
-                        R.layout.car_messaging_headsup_notification_template, mWrapper);
-                NotificationTemplateMessagingViewHolder holder =
-                        new NotificationTemplateMessagingViewHolder(notificationView);
+                        R.layout.message_headsup_notification_template, mWrapper);
+                MessageNotificationViewHolder holder =
+                        new MessageNotificationViewHolder(notificationView);
                 holder.bind(statusBarNotification, /* isInGroup= */ false);
                 break;
             }
-            case NotificationViewType.HEADS_UP_BASIC_NOTIFICATION_VIEW_TYPE:
+            case NotificationViewType.BASIC_HEADSUP:
             default: {
                 notificationView = mInflater.inflate(
-                        R.layout.car_basic_headsup_notification_template, mWrapper);
-                NotificationTemplateBasicViewHolder holder =
-                        new NotificationTemplateBasicViewHolder(notificationView);
+                        R.layout.basic_headsup_notification_template, mWrapper);
+                BasicNotificationViewHolder holder =
+                        new BasicNotificationViewHolder(notificationView);
                 holder.bind(statusBarNotification, /* isInGroup= */ false);
                 break;
             }
@@ -177,9 +177,9 @@ public class CarHeadsUpNotificationManager {
     private static int getNotificationViewType(StatusBarNotification statusBarNotification) {
         String category = statusBarNotification.getNotification().category;
         if (Notification.CATEGORY_MESSAGE.equals(category)) {
-            return NotificationViewType.HEADS_UP_MESSAGING_NOTIFICATION_VIEW_TYPE;
+            return NotificationViewType.MESSAGE_HEADSUP;
         }
-        return NotificationViewType.HEADS_UP_BASIC_NOTIFICATION_VIEW_TYPE;
+        return NotificationViewType.BASIC_HEADSUP;
     }
 
     /**

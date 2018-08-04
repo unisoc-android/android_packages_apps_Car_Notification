@@ -32,7 +32,7 @@ import java.util.List;
 /**
  * ViewHolder that binds a list of notifications as a grouped notification.
  */
-public class NotificationTemplateGroupViewHolder extends RecyclerView.ViewHolder {
+public class GroupNotificationViewHolder extends RecyclerView.ViewHolder {
     private static final String TAG = "car_notification_group";
     private final Context mContext;
     private final View mParentView;
@@ -45,7 +45,7 @@ public class NotificationTemplateGroupViewHolder extends RecyclerView.ViewHolder
     private final int mDividerMargin;
     private final int mDividerHeight;
 
-    public NotificationTemplateGroupViewHolder(View view) {
+    public GroupNotificationViewHolder(View view) {
         super(view);
         mContext = view.getContext();
         mParentView = view;
