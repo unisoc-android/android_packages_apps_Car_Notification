@@ -34,7 +34,7 @@ import java.util.List;
 /**
  * Messaging notification template that displays a messaging notification and a voice reply button.
  */
-public class NotificationTemplateMessagingViewHolder extends RecyclerView.ViewHolder {
+public class MessageNotificationViewHolder extends RecyclerView.ViewHolder {
     private static final String TAG = "car_notification_messaging";
     private final Context mContext;
     private final CarNotificationHeaderView mHeaderView;
@@ -44,9 +44,9 @@ public class NotificationTemplateMessagingViewHolder extends RecyclerView.ViewHo
     private final TextView mTitleTextView;
     private final ImageView mAvatarView;
 
-    public NotificationTemplateMessagingViewHolder(View view, Context context) {
+    public MessageNotificationViewHolder(View view) {
         super(view);
-        mContext = context;
+        mContext = view.getContext();
         mParentView = view;
         mHeaderView = view.findViewById(R.id.notification_header);
         mActionsView = view.findViewById(R.id.notification_actions);
@@ -59,14 +59,15 @@ public class NotificationTemplateMessagingViewHolder extends RecyclerView.ViewHo
      * Binds a {@link StatusBarNotification} to a messaging car notification template.
      *
      * @param statusBarNotification passing {@code null} clears the view.
+     * @param isInGroup whether this notification card is part of a group.
      */
-    public void bind(@Nullable StatusBarNotification statusBarNotification) {
+    public void bind(@Nullable StatusBarNotification statusBarNotification, boolean isInGroup) {
         reset();
         if (statusBarNotification == null) {
             return;
         }
         mHeaderView.bind(statusBarNotification);
-        mActionsView.bind(statusBarNotification);
+        mActionsView.bind(statusBarNotification, isInGroup);
 
         Notification notification = statusBarNotification.getNotification();
 

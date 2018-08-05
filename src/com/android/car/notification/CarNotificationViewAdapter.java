@@ -35,7 +35,7 @@ import java.util.List;
 public class CarNotificationViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private final Context mContext;
     private final LayoutInflater mInflater;
-    private final boolean mIsChildAdapter;
+    private final boolean mIsGroupNotificationAdapter;
     // book keeping expanded notification groups
     private final List<String> mExpandedNotifications = new ArrayList<>();
 
@@ -47,14 +47,14 @@ public class CarNotificationViewAdapter extends RecyclerView.Adapter<RecyclerVie
      * Constructor for a notification adapter.
      * Can be used both by the root notification list view, or a grouped notification view.
      *
-     * @param context the context for resources and inflating views
-     * @param isChildAdapter true if this adapter is used by a grouped notification view
+     * @param context                    the context for resources and inflating views
+     * @param isGroupNotificationAdapter true if this adapter is used by a grouped notification view
      */
-    public CarNotificationViewAdapter(Context context, boolean isChildAdapter) {
+    public CarNotificationViewAdapter(Context context, boolean isGroupNotificationAdapter) {
         mContext = context;
         mInflater = LayoutInflater.from(context);
-        mIsChildAdapter = isChildAdapter;
-        if (!mIsChildAdapter) {
+        mIsGroupNotificationAdapter = isGroupNotificationAdapter;
+        if (!mIsGroupNotificationAdapter) {
             mViewPool = new RecyclerView.RecycledViewPool();
         }
     }
@@ -64,30 +64,44 @@ public class CarNotificationViewAdapter extends RecyclerView.Adapter<RecyclerVie
         RecyclerView.ViewHolder viewHolder;
         View view;
         switch (viewType) {
-            case NotificationViewType.EXPANDED_GROUP_NOTIFICATION_VIEW_TYPE:
-            case NotificationViewType.COLLAPSED_GROUP_NOTIFICATION_VIEW_TYPE:
-                view = mInflater
-                        .inflate(R.layout.car_group_notification_template, parent, false);
-                viewHolder = new NotificationTemplateGroupViewHolder(view);
+            case NotificationViewType.GROUP_EXPANDED:
+            case NotificationViewType.GROUP_COLLAPSED:
+                view = mInflater.inflate(
+                        R.layout.group_notification_template, parent, false);
+                viewHolder = new GroupNotificationViewHolder(view);
                 break;
-            case NotificationViewType.MESSAGING_NOTIFICATION_VIEW_TYPE:
-                view = mInflater
-                        .inflate(R.layout.car_messaging_notification_template, parent, false);
-                viewHolder = new NotificationTemplateMessagingViewHolder(view, mContext);
+            case NotificationViewType.MESSAGE_IN_GROUP:
+                view = mInflater.inflate(
+                        R.layout.message_notification_template_inner, parent, false);
+                viewHolder = new MessageNotificationViewHolder(view);
                 break;
-            case NotificationViewType.PROGRESS_NOTIFICATION_VIEW_TYPE:
-                view = mInflater
-                        .inflate(R.layout.car_progress_notification_template, parent, false);
-                viewHolder = new NotificationTemplateProgressViewHolder(view, mContext);
+            case NotificationViewType.MESSAGE:
+                view = mInflater.inflate(
+                        R.layout.message_notification_template, parent, false);
+                viewHolder = new MessageNotificationViewHolder(view);
                 break;
-            case NotificationViewType.BASIC_NOTIFICATION_VIEW_TYPE:
+            case NotificationViewType.PROGRESS_IN_GROUP:
+                view = mInflater.inflate(
+                        R.layout.progress_notification_template_inner, parent, false);
+                viewHolder = new ProgressNotificationViewHolder(view);
+                break;
+            case NotificationViewType.PROGRESS:
+                view = mInflater
+                        .inflate(R.layout.progress_notification_template, parent, false);
+                viewHolder = new ProgressNotificationViewHolder(view);
+                break;
+            case NotificationViewType.BASIC_IN_GROUP:
+                view = mInflater
+                        .inflate(R.layout.basic_notification_template_inner, parent, false);
+                viewHolder = new BasicNotificationViewHolder(view);
+                break;
+            case NotificationViewType.BASIC:
             default:
                 view = mInflater
-                        .inflate(R.layout.car_basic_notification_template, parent, false);
-                viewHolder = new NotificationTemplateBasicViewHolder(view, mContext);
+                        .inflate(R.layout.basic_notification_template, parent, false);
+                viewHolder = new BasicNotificationViewHolder(view);
                 break;
         }
-        // TODO: Do not use card view for children
         return viewHolder;
     }
 
@@ -97,21 +111,27 @@ public class CarNotificationViewAdapter extends RecyclerView.Adapter<RecyclerVie
         StatusBarNotification notification = notificationGroup.getFirstNotification();
 
         switch (holder.getItemViewType()) {
-            case NotificationViewType.EXPANDED_GROUP_NOTIFICATION_VIEW_TYPE:
-                ((NotificationTemplateGroupViewHolder) holder).bind(notificationGroup, this, true);
+            case NotificationViewType.GROUP_EXPANDED:
+                ((GroupNotificationViewHolder) holder).bind(notificationGroup, this, true);
                 break;
-            case NotificationViewType.COLLAPSED_GROUP_NOTIFICATION_VIEW_TYPE:
-                ((NotificationTemplateGroupViewHolder) holder).bind(notificationGroup, this, false);
+            case NotificationViewType.GROUP_COLLAPSED:
+                ((GroupNotificationViewHolder) holder).bind(notificationGroup, this, false);
                 break;
-            case NotificationViewType.MESSAGING_NOTIFICATION_VIEW_TYPE:
-                ((NotificationTemplateMessagingViewHolder) holder).bind(notification);
+            case NotificationViewType.MESSAGE_IN_GROUP:
+            case NotificationViewType.MESSAGE:
+                ((MessageNotificationViewHolder) holder)
+                        .bind(notification, /* isInGroup= */ mIsGroupNotificationAdapter);
                 break;
-            case NotificationViewType.PROGRESS_NOTIFICATION_VIEW_TYPE:
-                ((NotificationTemplateProgressViewHolder) holder).bind(notification);
+            case NotificationViewType.PROGRESS_IN_GROUP:
+            case NotificationViewType.PROGRESS:
+                ((ProgressNotificationViewHolder) holder)
+                        .bind(notification, /* isInGroup= */ mIsGroupNotificationAdapter);
                 break;
-            case NotificationViewType.BASIC_NOTIFICATION_VIEW_TYPE:
+            case NotificationViewType.BASIC_IN_GROUP:
+            case NotificationViewType.BASIC:
             default:
-                ((NotificationTemplateBasicViewHolder) holder).bind(notification);
+                ((BasicNotificationViewHolder) holder)
+                        .bind(notification, /* isInGroup= */ mIsGroupNotificationAdapter);
                 break;
         }
     }
@@ -122,9 +142,9 @@ public class CarNotificationViewAdapter extends RecyclerView.Adapter<RecyclerVie
 
         if (notificationGroup.isGroup()) {
             if (mExpandedNotifications.contains(notificationGroup.getPackageName())) {
-                return NotificationViewType.EXPANDED_GROUP_NOTIFICATION_VIEW_TYPE;
+                return NotificationViewType.GROUP_EXPANDED;
             } else {
-                return NotificationViewType.COLLAPSED_GROUP_NOTIFICATION_VIEW_TYPE;
+                return NotificationViewType.GROUP_COLLAPSED;
             }
         }
 
@@ -134,7 +154,9 @@ public class CarNotificationViewAdapter extends RecyclerView.Adapter<RecyclerVie
         // messaging
         boolean isMessage = Notification.CATEGORY_MESSAGE.equals(notification.category);
         if (isMessage) {
-            return NotificationViewType.MESSAGING_NOTIFICATION_VIEW_TYPE;
+            return mIsGroupNotificationAdapter
+                    ? NotificationViewType.MESSAGE_IN_GROUP
+                    : NotificationViewType.MESSAGE;
         }
 
         // progress
@@ -147,11 +169,15 @@ public class CarNotificationViewAdapter extends RecyclerView.Adapter<RecyclerVie
                 && hasValidProgress
                 && !notification.hasCompletedProgress();
         if (isProgress) {
-            return NotificationViewType.PROGRESS_NOTIFICATION_VIEW_TYPE;
+            return mIsGroupNotificationAdapter
+                    ? NotificationViewType.PROGRESS_IN_GROUP
+                    : NotificationViewType.PROGRESS;
         }
 
         // basic
-        return NotificationViewType.BASIC_NOTIFICATION_VIEW_TYPE;
+        return mIsGroupNotificationAdapter
+                ? NotificationViewType.BASIC_IN_GROUP
+                : NotificationViewType.BASIC;
     }
 
     @Override
@@ -223,7 +249,7 @@ public class CarNotificationViewAdapter extends RecyclerView.Adapter<RecyclerVie
      * view pool with the parent.
      */
     public RecyclerView.RecycledViewPool getViewPool() {
-        if (mIsChildAdapter) {
+        if (mIsGroupNotificationAdapter) {
             // currently only support one level of expansion.
             throw new IllegalStateException("CarNotificationViewAdapter is a child adapter; "
                     + "its view pool should not be reused.");

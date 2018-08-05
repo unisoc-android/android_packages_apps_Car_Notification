@@ -17,7 +17,6 @@ package com.android.car.notification;
 
 import android.app.Notification;
 import android.app.PendingIntent;
-import android.content.Context;
 import android.os.Bundle;
 import android.service.notification.StatusBarNotification;
 import android.text.TextUtils;
@@ -32,7 +31,7 @@ import androidx.recyclerview.widget.RecyclerView;
  * Basic notification view template that displays a progress bar notification.
  * This template is only used in notification center and never as a heads-up notification.
  */
-public class NotificationTemplateProgressViewHolder extends RecyclerView.ViewHolder {
+public class ProgressNotificationViewHolder extends RecyclerView.ViewHolder {
     private static final String TAG = "car_notification_basic";
     private final CarNotificationHeaderView mHeaderView;
     private final CarNotificationActionsView mActionsView;
@@ -41,7 +40,7 @@ public class NotificationTemplateProgressViewHolder extends RecyclerView.ViewHol
     private final ProgressBar mProgressBarView;
     private final View mParentView;
 
-    public NotificationTemplateProgressViewHolder(View view, Context context) {
+    public ProgressNotificationViewHolder(View view) {
         super(view);
         mParentView = view;
         mHeaderView = view.findViewById(R.id.notification_header);
@@ -55,8 +54,9 @@ public class NotificationTemplateProgressViewHolder extends RecyclerView.ViewHol
      * Binds a {@link StatusBarNotification} to a car progress notification template.
      *
      * @param statusBarNotification passing {@code null} clears the view.
+     * @param isInGroup whether this notification card is part of a group.
      */
-    public void bind(StatusBarNotification statusBarNotification) {
+    public void bind(StatusBarNotification statusBarNotification, boolean isInGroup) {
         reset();
         if (statusBarNotification == null) {
             return;
@@ -75,7 +75,7 @@ public class NotificationTemplateProgressViewHolder extends RecyclerView.ViewHol
         }
 
         mHeaderView.bind(statusBarNotification);
-        mActionsView.bind(statusBarNotification);
+        mActionsView.bind(statusBarNotification, isInGroup);
 
         Bundle extraData = notification.extras;
         CharSequence title = extraData.getCharSequence(Notification.EXTRA_TITLE);

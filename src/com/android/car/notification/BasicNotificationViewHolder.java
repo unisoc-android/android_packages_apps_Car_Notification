@@ -31,7 +31,7 @@ import androidx.recyclerview.widget.RecyclerView;
 /**
  * Basic notification view template that displays a minimal notification.
  */
-public class NotificationTemplateBasicViewHolder extends RecyclerView.ViewHolder {
+public class BasicNotificationViewHolder extends RecyclerView.ViewHolder {
     private static final String TAG = "car_notification_basic";
     private final Context mContext;
     private final CarNotificationHeaderView mHeaderView;
@@ -41,9 +41,9 @@ public class NotificationTemplateBasicViewHolder extends RecyclerView.ViewHolder
     private final View mParentView;
     private final FrameLayout mBigContentView;
 
-    public NotificationTemplateBasicViewHolder(View view, Context context) {
+    public BasicNotificationViewHolder(View view) {
         super(view);
-        mContext = context;
+        mContext = view.getContext();
         mParentView = view;
         mHeaderView = view.findViewById(R.id.notification_header);
         mActionsView = view.findViewById(R.id.notification_actions);
@@ -56,8 +56,9 @@ public class NotificationTemplateBasicViewHolder extends RecyclerView.ViewHolder
      * Binds a {@link StatusBarNotification} to a basic car notification template.
      *
      * @param statusBarNotification passing {@code null} clears the view.
+     * @param isInGroup whether this notification card is part of a group.
      */
-    public void bind(StatusBarNotification statusBarNotification) {
+    public void bind(StatusBarNotification statusBarNotification, boolean isInGroup) {
         reset();
         if (statusBarNotification == null) {
             return;
@@ -85,7 +86,7 @@ public class NotificationTemplateBasicViewHolder extends RecyclerView.ViewHolder
         }
 
         mHeaderView.bind(statusBarNotification);
-        mActionsView.bind(statusBarNotification);
+        mActionsView.bind(statusBarNotification, isInGroup);
 
         Bundle extraData = notification.extras;
         CharSequence title = extraData.getCharSequence(Notification.EXTRA_TITLE);
