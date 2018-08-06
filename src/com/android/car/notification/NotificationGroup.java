@@ -29,83 +29,113 @@ import java.util.List;
  * Data structure representing a notification card in car.
  * A notification group can hold either:
  * <ol>
- *     <li>One notification with no group header</li>
- *     <li>A group of notifications with a group header notification</li>
+ * <li>One notification with no group header</li>
+ * <li>One group header with no child notifications</li>
+ * <li>A group of notifications with a group header notification</li>
  * </ol>
  */
 class NotificationGroup {
 
     private static final String TAG = "NotificationGroup";
 
-    @NonNull private String mPackageName;
-    @NonNull private final List<StatusBarNotification> mNotifications = new ArrayList<>();
-    @Nullable private StatusBarNotification mGroupHeaderNotification;
+    @NonNull
+    private String mGroupKey;
+    @NonNull
+    private final List<StatusBarNotification> mNotifications = new ArrayList<>();
+    @Nullable
+    private StatusBarNotification mGroupHeaderNotification;
 
     NotificationGroup() {
     }
 
     void addNotification(StatusBarNotification statusBarNotification) {
-        assertSamePackageName(statusBarNotification.getPackageName());
+        assertSameGroupKey(PreprocessingManager.getGroupKey(statusBarNotification));
         mNotifications.add(statusBarNotification);
-        Collections.sort(mNotifications, new PostTimeComparator());
+        // Sort the child notifications by the group key
+        // If a group key is not supplied, sort by the posted time in the descending order
+        Collections.sort(
+                mNotifications,
+                Comparator.comparing(StatusBarNotification::getGroupKey, String::compareTo)
+                        .thenComparing((left, right)
+                                -> left.getPostTime() < right.getPostTime() ? 1 : -1));
     }
 
     void setGroupHeaderNotification(StatusBarNotification groupHeaderNotification) {
-        assertSamePackageName(groupHeaderNotification.getPackageName());
+        assertSameGroupKey(PreprocessingManager.getGroupKey(groupHeaderNotification));
+        // There exists a group summary notification
+        if (mGroupHeaderNotification != null) {
+            mNotifications.add(groupHeaderNotification);
+        }
         mGroupHeaderNotification = groupHeaderNotification;
     }
 
-    void setPackageName(@NonNull String packageName) {
-        mPackageName = packageName;
+    void setGroupKey(@NonNull String groupKey) {
+        mGroupKey = groupKey;
     }
 
-    @NonNull String getPackageName() {
-        return mPackageName;
+    @NonNull
+    String getGroupKey() {
+        return mGroupKey;
     }
 
     int getChildCount() {
         return mNotifications.size();
     }
 
+    /**
+     * Returns true when it has a group header and >1 child notifications
+     */
     boolean isGroup() {
         return mGroupHeaderNotification != null && getChildCount() > 1;
     }
 
-    StatusBarNotification getFirstNotification() {
-        if (isGroup()) {
-            Log.w(TAG, "Getting only the first notification from a grouped notification!");
-        }
-        return mNotifications.get(0);
-    }
-
-    @NonNull List<StatusBarNotification> getChildNotifications() {
+    @NonNull
+    List<StatusBarNotification> getChildNotifications() {
         return mNotifications;
     }
 
-    @Nullable StatusBarNotification getGroupHeaderNotification() {
+    @Nullable
+    StatusBarNotification getGroupHeaderNotification() {
         return mGroupHeaderNotification;
     }
 
-    private void assertSamePackageName(String packageName) {
-        if (mPackageName == null) {
-            setPackageName(packageName);
-        } else if (!mPackageName.equals(packageName)) {
-            throw new IllegalStateException(
-                    "Package name mismatch when adding a notification to a group. " +
-                            "mPackageName: " + mPackageName + "; packageName:" + packageName);
+    /**
+     * Returns a single notification that represents this NotificationGroup:
+     *
+     * <p> If the NotificationGroup is a valid grouped notification or has no child notifications,
+     * the group header notification is returned.
+     *
+     * <p> If the NotificationGroup has only 1 child notification,
+     * or has more than 1 child notifications without a valid group header,
+     * the first child notification is returned.
+     *
+     * @return the notification that represents this NotificationGroup
+     */
+    @NonNull
+    StatusBarNotification getSingleNotification() {
+        if (isGroup() || getChildCount() == 0) {
+            return getGroupHeaderNotification();
+
+        } else {
+            return mNotifications.get(0);
         }
     }
 
-    /**
-     * Comparator that ranks the notifications in the descending order according to the posted time.
-     */
-    private static class PostTimeComparator implements Comparator<StatusBarNotification> {
-        PostTimeComparator() {
+    @NonNull
+    StatusBarNotification getNotificationForSorting() {
+        if (mGroupHeaderNotification != null) {
+            return getGroupHeaderNotification();
         }
+        return getSingleNotification();
+    }
 
-        @Override
-        public int compare(StatusBarNotification left, StatusBarNotification right) {
-            return left.getPostTime() < right.getPostTime() ? 1 : -1;
+    private void assertSameGroupKey(String groupKey) {
+        if (mGroupKey == null) {
+            setGroupKey(groupKey);
+        } else if (!mGroupKey.equals(groupKey)) {
+            throw new IllegalStateException(
+                    "Group key mismatch when adding a notification to a group. " +
+                            "mGroupKey: " + mGroupKey + "; groupKey:" + groupKey);
         }
     }
 }

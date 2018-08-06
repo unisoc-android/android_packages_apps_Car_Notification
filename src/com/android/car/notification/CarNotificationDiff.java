@@ -79,7 +79,7 @@ class CarNotificationDiff extends DiffUtil.Callback {
             return true;
         }
 
-        if (!Objects.equals(oldItem.getPackageName(), newItem.getPackageName())
+        if (!oldItem.getGroupKey().equals(newItem.getGroupKey())
                 || oldItem.getChildCount() != newItem.getChildCount()) {
             return false;
         }
