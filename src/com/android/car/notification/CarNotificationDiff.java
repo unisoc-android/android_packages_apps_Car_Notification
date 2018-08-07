@@ -15,30 +15,39 @@
  */
 package com.android.car.notification;
 
+import android.app.Notification;
+import android.content.Context;
+import android.os.Bundle;
 import android.service.notification.StatusBarNotification;
 
-import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.DiffUtil;
 
 import java.util.List;
 import java.util.Objects;
 
 /**
- * DiffUtil for car notifications. Two notifications are considered the same if they have the same:
+ * {@link DiffUtil} for car notifications.
+ * This class is not intended for general usage except for the static methods.
+ *
+ * <p> Two notifications are considered the same if they have the same:
  * <ol>
- * <li> Package name
+ * <li> GroupKey
  * <li> Number of StatusBarNotifications contained
  * <li> The order of each StatusBarNotification
- * <li> The id, package name, targeted user and the tag of each individual StatusBarNotification
+ * <li> The identifier of each individual StatusBarNotification contained
+ * <li> The content of each individual StatusBarNotification contained
  * </ol>
  */
 class CarNotificationDiff extends DiffUtil.Callback {
+    private final Context mContext;
     private final List<NotificationGroup> mOldList;
     private final List<NotificationGroup> mNewList;
 
     CarNotificationDiff(
-            @NonNull List<NotificationGroup> oldList,
-            @NonNull List<NotificationGroup> newList) {
+            Context context,
+            List<NotificationGroup> oldList,
+            List<NotificationGroup> newList) {
+        mContext = context;
         mOldList = oldList;
         mNewList = newList;
     }
@@ -57,34 +66,35 @@ class CarNotificationDiff extends DiffUtil.Callback {
     public boolean areItemsTheSame(int oldItemPosition, int newItemPosition) {
         NotificationGroup oldItem = mOldList.get(oldItemPosition);
         NotificationGroup newItem = mNewList.get(newItemPosition);
-        return areNotificationGroupsTheSame(oldItem, newItem);
+        return sameGroupUniqueIdentifiers(oldItem, newItem);
     }
 
     /**
-     * Returns whether two {@link NotificationGroup}s are considered the same.
-     * Two grouped notifications are considered the same if they have the same:
+     * Shallow comparison for {@link NotificationGroup}.
+     * <p>
+     * Checks if two grouped notifications have the same:
      * <ol>
-     * <li> Package name
+     * <li> GroupKey
      * <li> Number of StatusBarNotifications contained
-     * <li> Content of the group header notification
-     * <li> The order of each StatusBarNotification
-     * <li> The identifier of each individual StatusBarNotification
+     * <li> The identifier of each individual StatusBarNotification contained
      * </ol>
      */
-    static boolean areNotificationGroupsTheSame(
+    static boolean sameGroupUniqueIdentifiers(
             NotificationGroup oldItem, NotificationGroup newItem) {
 
-        // return true if referencing the same object, or both are null
         if (oldItem == newItem) {
             return true;
         }
 
-        if (!oldItem.getGroupKey().equals(newItem.getGroupKey())
-                || oldItem.getChildCount() != newItem.getChildCount()) {
+        if (!oldItem.getGroupKey().equals(newItem.getGroupKey())) {
             return false;
         }
 
-        if (!areStatusBarNotificationsTheSame(
+        if (oldItem.getChildCount() != newItem.getChildCount()) {
+            return false;
+        }
+
+        if (!sameNotificationUniqueIdentifiers(
                 oldItem.getGroupHeaderNotification(), newItem.getGroupHeaderNotification())) {
             return false;
         }
@@ -95,7 +105,7 @@ class CarNotificationDiff extends DiffUtil.Callback {
         for (int i = 0; i < oldItem.getChildCount(); i++) {
             StatusBarNotification oldNotification = oldNotifications.get(i);
             StatusBarNotification newNotification = newNotifications.get(i);
-            if (!areStatusBarNotificationsTheSame(oldNotification, newNotification)) {
+            if (!sameNotificationUniqueIdentifiers(oldNotification, newNotification)) {
                 return false;
             }
         }
@@ -104,8 +114,8 @@ class CarNotificationDiff extends DiffUtil.Callback {
     }
 
     /**
-     * Whether two {@link StatusBarNotification}s are considered the same.
-     * Two notifications are considered the same if they have the same:
+     * Shallow comparison for {@link StatusBarNotification}: only comparing the unique IDs.
+     * <p> Two status bar notifications are considered to have the same ID if they have the same:
      * <ol>
      * <li> Id
      * <li> Package name
@@ -113,10 +123,9 @@ class CarNotificationDiff extends DiffUtil.Callback {
      * <li> Tag
      * </ol>
      */
-    static boolean areStatusBarNotificationsTheSame(
+    static boolean sameNotificationUniqueIdentifiers(
             StatusBarNotification oldItem, StatusBarNotification newItem) {
 
-        // return true if referencing the same object, or both are null
         if (oldItem == newItem) {
             return true;
         }
@@ -130,11 +139,102 @@ class CarNotificationDiff extends DiffUtil.Callback {
     }
 
     /**
-     * This method will only be called if {@link #areItemsTheSame} returns true.
+     * Deep comparison for {@link NotificationGroup}.
+     *
+     * <p> Compare the content of each StatusBarNotification inside the NotificationGroup.
+     *
+     * <p> This method will only be called if {@link #areItemsTheSame} returns true.
      */
     @Override
     public boolean areContentsTheSame(int oldItemPosition, int newItemPosition) {
-        // always update if we get a duplicated notification.
-        return false;
+        NotificationGroup oldItem = mOldList.get(oldItemPosition);
+        NotificationGroup newItem = mNewList.get(newItemPosition);
+
+        if (!sameNotificationContent(
+                oldItem.getGroupHeaderNotification(), newItem.getGroupHeaderNotification())) {
+            return false;
+        }
+
+        List<StatusBarNotification> oldChildNotifications = oldItem.getChildNotifications();
+        List<StatusBarNotification> newChildNotifications = newItem.getChildNotifications();
+
+        for (int i = 0; i < oldItem.getChildCount(); i++) {
+            StatusBarNotification oldNotification = oldChildNotifications.get(i);
+            StatusBarNotification newNotification = newChildNotifications.get(i);
+            if (!sameNotificationContent(oldNotification, newNotification)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * Deep comparison for {@link StatusBarNotification}.
+     *
+     * <p> We are only comparing a subset of the fields that have visible effects on our product.
+     * Most of the deprecated fields are not compared.
+     * Fields that do not have visible effects, e.g. privacy-related things are ignored for now.
+     */
+    private boolean sameNotificationContent(
+            StatusBarNotification oldItem, StatusBarNotification newItem) {
+
+        if (oldItem == newItem) {
+            return true;
+        }
+
+        if (oldItem == null || newItem == null) {
+            return false;
+        }
+
+        if (oldItem.isGroup() != newItem.isGroup()
+                || oldItem.isClearable() != newItem.isClearable()
+                || oldItem.isOngoing() != newItem.isOngoing()) {
+            return false;
+        }
+
+        Notification oldNotification = oldItem.getNotification();
+        Notification newNotification = newItem.getNotification();
+
+        if (oldNotification.flags != newNotification.flags
+                || oldNotification.category != newNotification.category
+                || oldNotification.color != newNotification.color
+                || oldNotification.bigContentView != newNotification.bigContentView
+                || !areBundlesEqual(oldNotification.extras, newNotification.extras)
+                || !Objects.equals(oldNotification.contentIntent, newNotification.contentIntent)
+                || !Objects.equals(oldNotification.deleteIntent, newNotification.deleteIntent)
+                || !Objects.equals(
+                        oldNotification.fullScreenIntent, newNotification.fullScreenIntent)
+                || !Objects.deepEquals(oldNotification.actions, newNotification.actions)){
+            return false;
+        }
+
+        // Recover builders only until the above if-statements fail
+        Notification.Builder oldBuilder =
+                Notification.Builder.recoverBuilder(mContext, oldNotification);
+        Notification.Builder newBuilder =
+                Notification.Builder.recoverBuilder(mContext, newNotification);
+
+        return !Notification.areStyledNotificationsVisiblyDifferent(oldBuilder, newBuilder);
+    }
+
+    private boolean areBundlesEqual(Bundle oldBundle, Bundle newBundle) {
+        if (oldBundle.size() != newBundle.size()) {
+            return false;
+        }
+
+        for (String key : oldBundle.keySet()) {
+            if (!newBundle.containsKey(key)) {
+                return false;
+            }
+
+            Object oldValue = oldBundle.get(key);
+            Object newValue = newBundle.get(key);
+            if (!Objects.equals(oldValue, newValue)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 }
