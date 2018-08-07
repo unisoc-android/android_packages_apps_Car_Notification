@@ -108,7 +108,6 @@ public class CarNotificationViewAdapter extends RecyclerView.Adapter<RecyclerVie
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
         NotificationGroup notificationGroup = mNotifications.get(position);
-        StatusBarNotification notification = notificationGroup.getFirstNotification();
 
         switch (holder.getItemViewType()) {
             case NotificationViewType.GROUP_EXPANDED:
@@ -118,21 +117,27 @@ public class CarNotificationViewAdapter extends RecyclerView.Adapter<RecyclerVie
                 ((GroupNotificationViewHolder) holder).bind(notificationGroup, this, false);
                 break;
             case NotificationViewType.MESSAGE_IN_GROUP:
-            case NotificationViewType.MESSAGE:
+            case NotificationViewType.MESSAGE: {
+                StatusBarNotification notification = notificationGroup.getSingleNotification();
                 ((MessageNotificationViewHolder) holder)
                         .bind(notification, /* isInGroup= */ mIsGroupNotificationAdapter);
                 break;
+            }
             case NotificationViewType.PROGRESS_IN_GROUP:
-            case NotificationViewType.PROGRESS:
+            case NotificationViewType.PROGRESS: {
+                StatusBarNotification notification = notificationGroup.getSingleNotification();
                 ((ProgressNotificationViewHolder) holder)
                         .bind(notification, /* isInGroup= */ mIsGroupNotificationAdapter);
                 break;
+            }
             case NotificationViewType.BASIC_IN_GROUP:
             case NotificationViewType.BASIC:
-            default:
+            default: {
+                StatusBarNotification notification = notificationGroup.getSingleNotification();
                 ((BasicNotificationViewHolder) holder)
                         .bind(notification, /* isInGroup= */ mIsGroupNotificationAdapter);
                 break;
+            }
         }
     }
 
@@ -141,14 +146,15 @@ public class CarNotificationViewAdapter extends RecyclerView.Adapter<RecyclerVie
         NotificationGroup notificationGroup = mNotifications.get(position);
 
         if (notificationGroup.isGroup()) {
-            if (mExpandedNotifications.contains(notificationGroup.getPackageName())) {
+            if (mExpandedNotifications.contains(notificationGroup.getGroupKey())) {
                 return NotificationViewType.GROUP_EXPANDED;
             } else {
                 return NotificationViewType.GROUP_COLLAPSED;
             }
         }
 
-        Notification notification = notificationGroup.getFirstNotification().getNotification();
+        Notification notification =
+                notificationGroup.getSingleNotification().getNotification();
         Bundle extras = notification.extras;
 
         // messaging
@@ -185,21 +191,21 @@ public class CarNotificationViewAdapter extends RecyclerView.Adapter<RecyclerVie
         return mNotifications.size();
     }
 
-    void toggleExpansion(String packageName, boolean isExpanded) {
-        if (mExpandedNotifications.contains(packageName) && !isExpanded) {
-            mExpandedNotifications.remove(packageName);
-            int index = findIndexInNotification(packageName);
+    void toggleExpansion(String groupKey, boolean isExpanded) {
+        if (mExpandedNotifications.contains(groupKey) && !isExpanded) {
+            mExpandedNotifications.remove(groupKey);
+            int index = findIndexInNotification(groupKey);
             notifyItemChanged(index);
-        } else if (!mExpandedNotifications.contains(packageName) && isExpanded) {
-            mExpandedNotifications.add(packageName);
-            int index = findIndexInNotification(packageName);
+        } else if (!mExpandedNotifications.contains(groupKey) && isExpanded) {
+            mExpandedNotifications.add(groupKey);
+            int index = findIndexInNotification(groupKey);
             notifyItemChanged(index);
         }
     }
 
-    private int findIndexInNotification(String packageName) {
+    private int findIndexInNotification(String groupKey) {
         for (int i = 0; i < mNotifications.size(); i++) {
-            if (mNotifications.get(i).getPackageName().equals(packageName)) {
+            if (mNotifications.get(i).getGroupKey().equals(groupKey)) {
                 return i;
             }
         }

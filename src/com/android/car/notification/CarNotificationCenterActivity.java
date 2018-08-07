@@ -74,10 +74,11 @@ public class CarNotificationCenterActivity extends Activity {
                     NotificationGroup notificationGroup =
                             mAdapter.getNotificationAtPosition(viewHolder.getAdapterPosition());
 
+                    // TODO: implement dismissal for grouped notification
                     StatusBarNotification notification =
                             notificationGroup.isGroup()
                                     ? notificationGroup.getGroupHeaderNotification()
-                                    : notificationGroup.getFirstNotification();
+                                    : notificationGroup.getSingleNotification();
 
                     if (isCancelable(notification.getNotification())) {
                         try {

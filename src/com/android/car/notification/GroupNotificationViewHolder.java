@@ -35,7 +35,6 @@ import java.util.List;
 public class GroupNotificationViewHolder extends RecyclerView.ViewHolder {
     private static final String TAG = "car_notification_group";
     private final Context mContext;
-    private final View mParentView;
     private final Button mToggleButton;
     private final RecyclerView mNotificationListView;
     private final CarNotificationViewAdapter mAdapter;
@@ -48,7 +47,6 @@ public class GroupNotificationViewHolder extends RecyclerView.ViewHolder {
     public GroupNotificationViewHolder(View view) {
         super(view);
         mContext = view.getContext();
-        mParentView = view;
         mToggleButton = view.findViewById(R.id.toggle_button);
         mNotificationListView = view.findViewById(R.id.notification_list);
 
@@ -80,9 +78,9 @@ public class GroupNotificationViewHolder extends RecyclerView.ViewHolder {
         mNotificationListView.setRecycledViewPool(parentAdapter.getViewPool());
 
         // bind expand button
-        updateToggleButton(isExpanded);
+        updateToggleButton(group.getChildCount(), isExpanded);
         mToggleButton.setOnClickListener(
-                view -> parentAdapter.toggleExpansion(group.getPackageName(), !isExpanded));
+                view -> parentAdapter.toggleExpansion(group.getGroupKey(), !isExpanded));
 
         // bind notification cards
         List<NotificationGroup> list = new ArrayList<>();
@@ -102,7 +100,14 @@ public class GroupNotificationViewHolder extends RecyclerView.ViewHolder {
         mAdapter.setNotifications(list);
     }
 
-    private void updateToggleButton(boolean isExpanded) {
+    private void updateToggleButton(int childCount, boolean isExpanded) {
+        if (childCount == 0) {
+            mToggleButton.setVisibility(View.GONE);
+            return;
+        }
+
+        mToggleButton.setVisibility(View.VISIBLE);
+
         if (isExpanded) {
             mToggleButton.setText(R.string.collapse);
             mToggleButton.setCompoundDrawablesWithIntrinsicBounds(
