@@ -33,7 +33,6 @@ import android.widget.FrameLayout;
  * Notification Manager for heads-up notifications in car.
  */
 public class CarHeadsUpNotificationManager {
-
     private static CarHeadsUpNotificationManager sManager;
     private final Context mContext;
     private final WindowManager mWindowManager;
@@ -84,7 +83,7 @@ public class CarHeadsUpNotificationManager {
         wrapperParams.gravity = Gravity.TOP;
         mWrapper = new FrameLayout(mContext);
         mWrapper.setPadding(
-                0, mContext.getResources().getDimensionPixelOffset(R.dimen.car_padding_4), 0, 0);
+                0, mContext.getResources().getDimensionPixelOffset(R.dimen.car_padding_1), 0, 0);
         mWindowManager.addView(mWrapper, wrapperParams);
     }
 
