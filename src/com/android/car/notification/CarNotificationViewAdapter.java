@@ -90,6 +90,16 @@ public class CarNotificationViewAdapter extends RecyclerView.Adapter<RecyclerVie
                         .inflate(R.layout.progress_notification_template, parent, false);
                 viewHolder = new ProgressNotificationViewHolder(view);
                 break;
+            case NotificationViewType.INBOX_IN_GROUP:
+                view = mInflater
+                        .inflate(R.layout.inbox_notification_template_inner, parent, false);
+                viewHolder = new InboxNotificationViewHolder(view);
+                break;
+            case NotificationViewType.INBOX:
+                view = mInflater
+                        .inflate(R.layout.inbox_notification_template, parent, false);
+                viewHolder = new InboxNotificationViewHolder(view);
+                break;
             case NotificationViewType.BASIC_IN_GROUP:
                 view = mInflater
                         .inflate(R.layout.basic_notification_template_inner, parent, false);
@@ -130,6 +140,13 @@ public class CarNotificationViewAdapter extends RecyclerView.Adapter<RecyclerVie
                         .bind(notification, /* isInGroup= */ mIsGroupNotificationAdapter);
                 break;
             }
+            case NotificationViewType.INBOX_IN_GROUP:
+            case NotificationViewType.INBOX: {
+                StatusBarNotification notification = notificationGroup.getSingleNotification();
+                ((InboxNotificationViewHolder) holder)
+                        .bind(notification, /* isInGroup= */ mIsGroupNotificationAdapter);
+                break;
+            }
             case NotificationViewType.BASIC_IN_GROUP:
             case NotificationViewType.BASIC:
             default: {
@@ -161,8 +178,7 @@ public class CarNotificationViewAdapter extends RecyclerView.Adapter<RecyclerVie
         boolean isMessage = Notification.CATEGORY_MESSAGE.equals(notification.category);
         if (isMessage) {
             return mIsGroupNotificationAdapter
-                    ? NotificationViewType.MESSAGE_IN_GROUP
-                    : NotificationViewType.MESSAGE;
+                    ? NotificationViewType.MESSAGE_IN_GROUP : NotificationViewType.MESSAGE;
         }
 
         // progress
@@ -176,14 +192,20 @@ public class CarNotificationViewAdapter extends RecyclerView.Adapter<RecyclerVie
                 && !notification.hasCompletedProgress();
         if (isProgress) {
             return mIsGroupNotificationAdapter
-                    ? NotificationViewType.PROGRESS_IN_GROUP
-                    : NotificationViewType.PROGRESS;
+                    ? NotificationViewType.PROGRESS_IN_GROUP : NotificationViewType.PROGRESS;
+        }
+
+        // inbox
+        boolean isInbox = extras.containsKey(Notification.EXTRA_TITLE_BIG)
+                && extras.containsKey(Notification.EXTRA_SUMMARY_TEXT);
+        if (isInbox) {
+            return mIsGroupNotificationAdapter
+                    ? NotificationViewType.INBOX_IN_GROUP : NotificationViewType.INBOX;
         }
 
         // basic
         return mIsGroupNotificationAdapter
-                ? NotificationViewType.BASIC_IN_GROUP
-                : NotificationViewType.BASIC;
+                ? NotificationViewType.BASIC_IN_GROUP : NotificationViewType.BASIC;
     }
 
     @Override

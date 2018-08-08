@@ -19,6 +19,7 @@ import android.app.Notification;
 import android.app.NotificationManager;
 import android.content.Context;
 import android.graphics.PixelFormat;
+import android.os.Bundle;
 import android.os.Handler;
 import android.service.notification.NotificationListenerService;
 import android.service.notification.StatusBarNotification;
@@ -117,6 +118,14 @@ public class CarHeadsUpNotificationManager {
                 holder.bind(statusBarNotification, /* isInGroup= */ false);
                 break;
             }
+            case NotificationViewType.INBOX_HEADSUP: {
+                notificationView = mInflater.inflate(
+                        R.layout.inbox_headsup_notification_template, mWrapper);
+                InboxNotificationViewHolder holder =
+                        new InboxNotificationViewHolder(notificationView);
+                holder.bind(statusBarNotification, /* isInGroup= */ false);
+                break;
+            }
             case NotificationViewType.BASIC_HEADSUP:
             default: {
                 notificationView = mInflater.inflate(
@@ -178,6 +187,11 @@ public class CarHeadsUpNotificationManager {
         String category = statusBarNotification.getNotification().category;
         if (Notification.CATEGORY_MESSAGE.equals(category)) {
             return NotificationViewType.MESSAGE_HEADSUP;
+        }
+        Bundle extras = statusBarNotification.getNotification().extras;
+        if (extras.containsKey(Notification.EXTRA_BIG_TEXT)
+                && extras.containsKey(Notification.EXTRA_SUMMARY_TEXT)) {
+            return NotificationViewType.INBOX_HEADSUP;
         }
         return NotificationViewType.BASIC_HEADSUP;
     }
