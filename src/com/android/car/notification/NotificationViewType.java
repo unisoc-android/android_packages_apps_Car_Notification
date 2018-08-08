@@ -28,6 +28,9 @@ import java.lang.annotation.RetentionPolicy;
         NotificationViewType.MESSAGE_IN_GROUP,
         NotificationViewType.PROGRESS,
         NotificationViewType.PROGRESS_IN_GROUP,
+        NotificationViewType.INBOX,
+        NotificationViewType.INBOX_HEADSUP,
+        NotificationViewType.INBOX_IN_GROUP,
         NotificationViewType.GROUP_COLLAPSED,
         NotificationViewType.GROUP_EXPANDED
 })
@@ -45,6 +48,10 @@ import java.lang.annotation.RetentionPolicy;
     int PROGRESS = 6;
     int PROGRESS_IN_GROUP = 7;
 
-    int GROUP_COLLAPSED = 8;
-    int GROUP_EXPANDED = 9;
+    int INBOX = 8;
+    int INBOX_HEADSUP = 9;
+    int INBOX_IN_GROUP = 10;
+
+    int GROUP_COLLAPSED = 11;
+    int GROUP_EXPANDED = 12;
 }

@@ -52,6 +52,7 @@ public class CarNotificationCenterActivity extends Activity {
     private CarNotificationViewAdapter mAdapter;
     private NotificationManager mNotificationManager;
     private CarHeadsUpNotificationManager mHeadsUpNotificationManager;
+    private PreprocessingManager mPreprocessingManager;
     private Car mCar;
     private CarUxRestrictionsManager mCarUxRestrictionsManager;
     private CarPackageManager mCarPackageManager;
@@ -145,6 +146,7 @@ public class CarNotificationCenterActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        mPreprocessingManager = new PreprocessingManager(this);
         mHeadsUpNotificationManager =
                 CarHeadsUpNotificationManager.getInstance(getApplicationContext());
         mNotificationManager =
@@ -219,7 +221,7 @@ public class CarNotificationCenterActivity extends Activity {
     }
 
     private void updateNotifications() {
-        mAdapter.setNotifications(PreprocessingManager.process(
+        mAdapter.setNotifications(mPreprocessingManager.process(
                 mNotificationListener.getNotifications(),
                 mNotificationListener.getCurrentRanking()));
     }
