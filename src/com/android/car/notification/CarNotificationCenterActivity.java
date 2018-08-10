@@ -102,14 +102,13 @@ public class CarNotificationCenterActivity extends Activity {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
             try {
-                mCarUxRestrictionsManager = (CarUxRestrictionsManager) mCar.getCarManager(
+                CarUxRestrictionsManager manager = (CarUxRestrictionsManager) mCar.getCarManager(
                         Car.CAR_UX_RESTRICTION_SERVICE);
-                mAdapter.setIsDistractionOptimizationRequired(
-                        mCarUxRestrictionsManager
-                                .getCurrentCarUxRestrictions()
-                                .isRequiresDistractionOptimization());
 
-                mCarUxRestrictionsManager.registerListener(
+                mAdapter.setIsDistractionOptimizationRequired(
+                        manager.getCurrentCarUxRestrictions().isRequiresDistractionOptimization());
+
+                manager.registerListener(
                         restrictionInfo ->
                                 mAdapter.setIsDistractionOptimizationRequired(
                                         restrictionInfo.isRequiresDistractionOptimization()));
@@ -122,7 +121,7 @@ public class CarNotificationCenterActivity extends Activity {
 
         @Override
         public void onServiceDisconnected(ComponentName name) {
-            mCarUxRestrictionsManager = null;
+            Log.e(TAG, "Car service disconnected unexpectedly");
             mCarPackageManager = null;
         }
     };
@@ -166,7 +165,9 @@ public class CarNotificationCenterActivity extends Activity {
     protected void onStart() {
         super.onStart();
         // Connect to car service
-        mCar.connect();
+        if (mCar != null) {
+            mCar.connect();
+        }
 
         // Bind notification listener
         Intent intent = new Intent(this, CarNotificationListener.class);
@@ -179,13 +180,6 @@ public class CarNotificationCenterActivity extends Activity {
         super.onStop();
 
         // Disconnect from car service
-        try {
-            if (mCarUxRestrictionsManager != null) {
-                mCarUxRestrictionsManager.unregisterListener();
-            }
-        } catch (CarNotConnectedException e) {
-            Log.e(TAG, "Error unregistering car listeners", e);
-        }
         if (mCar != null) {
             mCar.disconnect();
         }
@@ -204,6 +198,8 @@ public class CarNotificationCenterActivity extends Activity {
                 updateNotifications();
 
             } else if (message.what == CarNotificationListener.NOTIFY_NOTIFICATION_ADDED) {
+                mHeadsUpNotificationManager =
+                        CarHeadsUpNotificationManager.getInstance(getApplicationContext());
                 mHeadsUpNotificationManager.maybeShowHeadsUp(
                         mAdapter.getIsDistractionOptimizationRequired(),
                         (StatusBarNotification) message.obj,
