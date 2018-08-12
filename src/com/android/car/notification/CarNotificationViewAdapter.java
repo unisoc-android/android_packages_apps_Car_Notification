@@ -252,7 +252,7 @@ public class CarNotificationViewAdapter extends RecyclerView.Adapter<RecyclerVie
     public void setNotifications(List<NotificationGroup> notifications) {
         DiffUtil.DiffResult diffResult =
                 DiffUtil.calculateDiff(
-                        new CarNotificationDiff(mNotifications, notifications), true);
+                        new CarNotificationDiff(mContext, mNotifications, notifications), true);
         mNotifications = notifications;
         diffResult.dispatchUpdatesTo(this);
     }

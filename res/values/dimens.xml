@@ -16,5 +16,5 @@
 -->
 <resources>
     <dimen name="headsup_notification_action_bar_height">96dp</dimen>
-    <dimen name="headsup_scrim_height_below_notification">60dp</dimen>
+    <dimen name="headsup_scrim_height_below_notification">164dp</dimen>
 </resources>
