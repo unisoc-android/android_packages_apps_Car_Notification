@@ -94,7 +94,7 @@ public class MessageNotificationViewHolder extends RecyclerView.ViewHolder {
         }
 
         // Use the latest message
-        Notification.MessagingStyle.Message message = messages.get(0);
+        Notification.MessagingStyle.Message message = messages.get(messages.size() - 1);
 
         mSenderNameView.setVisibility(View.VISIBLE);
         mSenderNameView.setText(message.getSenderPerson().getName());
