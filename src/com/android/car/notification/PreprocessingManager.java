@@ -175,22 +175,12 @@ class PreprocessingManager {
         String groupKey = statusBarNotification.getGroup();
         if (groupKey == null) {
             // If a notification is not part of a group, use a unique identifier as the group key
-            groupKey = getUniqueIdentifier(statusBarNotification);
+            groupKey = statusBarNotification.getKey();
         } else {
             // Append the package name to the group key,
             // in case it is the default override group key (same for every package)
             groupKey += statusBarNotification.getPackageName();
         }
         return groupKey;
-    }
-
-    private static String getUniqueIdentifier(StatusBarNotification sbn) {
-        return new StringBuilder()
-                .append(sbn.getPackageName())
-                .append(sbn.getKey())
-                .append(sbn.getTag())
-                .append(sbn.getId())
-                .append(sbn.getUser())
-                .toString();
     }
 }
