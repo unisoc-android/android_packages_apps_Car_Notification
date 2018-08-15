@@ -20,7 +20,7 @@ import android.app.Notification;
 import android.app.NotificationManager;
 import android.car.Car;
 import android.car.CarNotConnectedException;
-import android.car.content.pm.CarPackageManager;
+import android.car.drivingstate.CarUxRestrictions;
 import android.car.drivingstate.CarUxRestrictionsManager;
 import android.content.ComponentName;
 import android.content.Context;
@@ -54,8 +54,6 @@ public class CarNotificationCenterActivity extends Activity {
     private CarHeadsUpNotificationManager mHeadsUpNotificationManager;
     private PreprocessingManager mPreprocessingManager;
     private Car mCar;
-    private CarUxRestrictionsManager mCarUxRestrictionsManager;
-    private CarPackageManager mCarPackageManager;
 
     private ItemTouchHelper.SimpleCallback mItemTouchCallback =
             new ItemTouchHelper.SimpleCallback(
@@ -105,15 +103,9 @@ public class CarNotificationCenterActivity extends Activity {
                 CarUxRestrictionsManager manager = (CarUxRestrictionsManager) mCar.getCarManager(
                         Car.CAR_UX_RESTRICTION_SERVICE);
 
-                mAdapter.setIsDistractionOptimizationRequired(
-                        manager.getCurrentCarUxRestrictions().isRequiresDistractionOptimization());
-
+                mAdapter.setCarUxRestrictions(manager.getCurrentCarUxRestrictions());
                 manager.registerListener(
-                        restrictionInfo ->
-                                mAdapter.setIsDistractionOptimizationRequired(
-                                        restrictionInfo.isRequiresDistractionOptimization()));
-
-                mCarPackageManager = (CarPackageManager) mCar.getCarManager(Car.PACKAGE_SERVICE);
+                        restrictionInfo -> mAdapter.setCarUxRestrictions(restrictionInfo));
             } catch (CarNotConnectedException e) {
                 Log.e(TAG, "Car not connected in CarConnectionListener", e);
             }
@@ -122,7 +114,6 @@ public class CarNotificationCenterActivity extends Activity {
         @Override
         public void onServiceDisconnected(ComponentName name) {
             Log.e(TAG, "Car service disconnected unexpectedly");
-            mCarPackageManager = null;
         }
     };
 
@@ -145,7 +136,7 @@ public class CarNotificationCenterActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        mPreprocessingManager = new PreprocessingManager(this);
+        mPreprocessingManager = PreprocessingManager.getInstance(getApplicationContext());
         mHeadsUpNotificationManager =
                 CarHeadsUpNotificationManager.getInstance(getApplicationContext());
         mNotificationManager =
@@ -201,7 +192,7 @@ public class CarNotificationCenterActivity extends Activity {
                 mHeadsUpNotificationManager =
                         CarHeadsUpNotificationManager.getInstance(getApplicationContext());
                 mHeadsUpNotificationManager.maybeShowHeadsUp(
-                        mAdapter.getIsDistractionOptimizationRequired(),
+                        mNotificationListener.getCarUxRestrictions(),
                         (StatusBarNotification) message.obj,
                         mNotificationListener.getCurrentRanking());
                 updateNotifications();
@@ -217,8 +208,10 @@ public class CarNotificationCenterActivity extends Activity {
     }
 
     private void updateNotifications() {
-        mAdapter.setNotifications(mPreprocessingManager.process(
-                mNotificationListener.getNotifications(),
-                mNotificationListener.getCurrentRanking()));
+        mAdapter.setNotifications(
+                mPreprocessingManager.process(
+                        mNotificationListener.getCarUxRestrictions(),
+                        mNotificationListener.getNotifications(),
+                        mNotificationListener.getCurrentRanking()));
     }
 }
