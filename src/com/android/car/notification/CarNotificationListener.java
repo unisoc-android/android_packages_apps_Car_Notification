@@ -15,6 +15,7 @@
  */
 package com.android.car.notification;
 
+import android.annotation.Nullable;
 import android.car.Car;
 import android.car.CarNotConnectedException;
 import android.car.drivingstate.CarUxRestrictionsManager;
@@ -31,21 +32,26 @@ import android.util.Log;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * NotificationListenerService that fetches all notifications from system.
  */
 public class CarNotificationListener extends NotificationListenerService {
     private static final String TAG = "CarNotListener";
+
     static final String ACTION_LOCAL_BINDING = "local_binding";
     static final int NOTIFY_NOTIFICATION_ADDED = 1;
     static final int NOTIFY_NOTIFICATIONS_CHANGED = 2;
+    /** Temporary {@link Ranking} object that serves as a reused value holder */
+    final private Ranking mTemporaryRanking = new Ranking();
+
     private CarNotificationCenterActivity.LocalHandler mHandler;
-    private List<StatusBarNotification> mNotifications = new ArrayList<>();
     private RankingMap mRankingMap;
     private CarHeadsUpNotificationManager mHeadsUpManager;
     private Car mCar;
     private boolean mIsDistractionOptimizationRequired;
+    private List<StatusBarNotification> mNotifications = new ArrayList<>();
 
     private ServiceConnection mCarConnectionListener = new ServiceConnection() {
         @Override
@@ -114,7 +120,30 @@ public class CarNotificationListener extends NotificationListenerService {
     @Override
     public void onNotificationRankingUpdate(RankingMap rankingMap) {
         mRankingMap = rankingMap;
+        for (int i = 0; i < mNotifications.size(); i++) {
+            StatusBarNotification sbn = mNotifications.get(i);
+            if (!mRankingMap.getRanking(sbn.getKey(), mTemporaryRanking)) {
+                continue;
+            }
+            String oldOverrideGroupKey = sbn.getOverrideGroupKey();
+            String newOverrideGroupKey = getOverrideGroupKey(sbn.getKey());
+            if (!Objects.equals(oldOverrideGroupKey, newOverrideGroupKey)) {
+                sbn.setOverrideGroupKey(newOverrideGroupKey);
+            }
+        }
         onNotificationChanged();
+    }
+
+    /**
+     * Get the override group key of a {@link StatusBarNotification} given its key.
+     */
+    @Nullable
+    private String getOverrideGroupKey(String key) {
+        if (mRankingMap != null) {
+            mRankingMap.getRanking(key, mTemporaryRanking);
+            return mTemporaryRanking.getOverrideGroupKey();
+        }
+        return null;
     }
 
     /**
