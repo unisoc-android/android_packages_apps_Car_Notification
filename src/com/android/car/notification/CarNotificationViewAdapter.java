@@ -203,7 +203,9 @@ public class CarNotificationViewAdapter extends RecyclerView.Adapter<RecyclerVie
                     ? NotificationViewType.INBOX_IN_GROUP : NotificationViewType.INBOX;
         }
 
-        // basic
+        // basic, big text, and big picture
+        // the big text and big picture styles are fallen back to basic template in AAE
+        // i.e. setting the big text and big picture do not have an effect in AAE
         return mIsGroupNotificationAdapter
                 ? NotificationViewType.BASIC_IN_GROUP : NotificationViewType.BASIC;
     }
