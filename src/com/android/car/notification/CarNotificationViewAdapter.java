@@ -19,6 +19,7 @@ import android.app.Notification;
 import android.content.Context;
 import android.os.Bundle;
 import android.service.notification.StatusBarNotification;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -33,6 +34,8 @@ import java.util.List;
  * Notification data adapter that binds a notification to the corresponding view.
  */
 public class CarNotificationViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+    private static final String TAG = "CarNotificationAdapter";
+
     private final Context mContext;
     private final LayoutInflater mInflater;
     private final boolean mIsGroupNotificationAdapter;
@@ -204,8 +207,17 @@ public class CarNotificationViewAdapter extends RecyclerView.Adapter<RecyclerVie
         }
 
         // basic, big text, and big picture
-        // the big text and big picture styles are fallen back to basic template in AAE
-        // i.e. setting the big text and big picture do not have an effect in AAE
+        // the big text and big picture styles are fallen back to basic template in car
+        // i.e. setting the big text and big picture does not have an effect
+        boolean isBigText = extras.containsKey(Notification.EXTRA_BIG_TEXT);
+        if (isBigText) {
+            Log.i(TAG, "Big text style is not supported as a car notification");
+        }
+        boolean isBigPicture = extras.containsKey(Notification.EXTRA_PICTURE);
+        if (isBigPicture) {
+            Log.i(TAG, "Big picture style is not supported as a car notification");
+        }
+
         return mIsGroupNotificationAdapter
                 ? NotificationViewType.BASIC_IN_GROUP : NotificationViewType.BASIC;
     }
