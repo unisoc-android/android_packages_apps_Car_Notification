@@ -15,6 +15,7 @@
  */
 package com.android.car.notification;
 
+import android.app.NotificationManager;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Paint;
@@ -22,6 +23,7 @@ import android.graphics.drawable.Drawable;
 import android.view.View;
 import android.widget.Button;
 
+import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -42,6 +44,7 @@ public class GroupNotificationViewHolder extends RecyclerView.ViewHolder {
     private final Paint mPaint;
     private final int mDividerMargin;
     private final int mDividerHeight;
+    private final NotificationManager mNotificationManager;
 
     public GroupNotificationViewHolder(View view) {
         super(view);
@@ -49,6 +52,8 @@ public class GroupNotificationViewHolder extends RecyclerView.ViewHolder {
 
         mToggleButton = view.findViewById(R.id.toggle_button);
         mNotificationListView = view.findViewById(R.id.notification_list);
+        mNotificationManager =
+                (NotificationManager) mContext.getSystemService(Context.NOTIFICATION_SERVICE);
 
         int carAccentColor = mContext.getColor(R.color.car_body2);
         mExpandDrawable = mContext.getDrawable(R.drawable.expand_more);
@@ -67,6 +72,9 @@ public class GroupNotificationViewHolder extends RecyclerView.ViewHolder {
         mNotificationListView.setNestedScrollingEnabled(false);
         mAdapter = new CarNotificationViewAdapter(mContext, /* isGroupNotificationAdapter= */ true);
         mNotificationListView.setAdapter(mAdapter);
+
+        new ItemTouchHelper(new CarNotificationItemTouchHelper(mContext, mAdapter))
+                .attachToRecyclerView(mNotificationListView);
     }
 
     public void bind(
@@ -82,7 +90,7 @@ public class GroupNotificationViewHolder extends RecyclerView.ViewHolder {
         // bind expand button
         updateToggleButton(group.getChildCount(), isExpanded);
         mToggleButton.setOnClickListener(
-                view -> parentAdapter.toggleExpansion(group.getGroupKey(), !isExpanded));
+                view -> parentAdapter.setExpanded(group.getGroupKey(), !isExpanded));
 
         // bind notification cards
         List<NotificationGroup> list = new ArrayList<>();
