@@ -113,6 +113,14 @@ public class CarHeadsUpNotificationManager {
         View notificationView;
         @NotificationViewType int viewType = getNotificationViewType(statusBarNotification);
         switch (viewType) {
+            case NotificationViewType.EMERGENCY_HEADSUP: {
+                notificationView = mInflater.inflate(
+                        R.layout.emergency_headsup_notification_template, mWrapper);
+                EmergencyNotificationViewHolder holder =
+                        new EmergencyNotificationViewHolder(notificationView);
+                holder.bind(statusBarNotification);
+                break;
+            }
             case NotificationViewType.MESSAGE_HEADSUP: {
                 notificationView = mInflater.inflate(
                         R.layout.message_headsup_notification_template, mWrapper);
@@ -188,6 +196,9 @@ public class CarHeadsUpNotificationManager {
     @NotificationViewType
     private static int getNotificationViewType(StatusBarNotification statusBarNotification) {
         String category = statusBarNotification.getNotification().category;
+        if (Notification.CATEGORY_CAR_EMERGENCY.equals(category)) {
+            return NotificationViewType.EMERGENCY_HEADSUP;
+        }
         if (Notification.CATEGORY_MESSAGE.equals(category)) {
             return NotificationViewType.MESSAGE_HEADSUP;
         }
