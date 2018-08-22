@@ -70,8 +70,7 @@ class PreprocessingManager {
             @NonNull NotificationListenerService.RankingMap rankingMap) {
 
         return new ArrayList<>(
-                rank(summarize(group(optimizeForDriving(carUxRestrictions, notifications))),
-                        rankingMap));
+                rank(group(optimizeForDriving(carUxRestrictions, notifications)), rankingMap));
     }
 
     /**
@@ -128,21 +127,15 @@ class PreprocessingManager {
             Notification notification = statusBarNotification.getNotification();
 
             String groupKey = getGroupKey(statusBarNotification);
-            if (groupedNotifications.containsKey(groupKey)) {
-                if (notification.isGroupSummary()) {
-                    groupedNotifications
-                            .get(groupKey).setGroupHeaderNotification(statusBarNotification);
-                } else {
-                    groupedNotifications.get(groupKey).addNotification(statusBarNotification);
-                }
-            } else {
+            if (!groupedNotifications.containsKey(groupKey)) {
                 NotificationGroup notificationGroup = new NotificationGroup();
                 groupedNotifications.put(groupKey, notificationGroup);
-                if (notification.isGroupSummary()) {
-                    notificationGroup.setGroupHeaderNotification(statusBarNotification);
-                } else {
-                    notificationGroup.addNotification(statusBarNotification);
-                }
+            }
+            if (notification.isGroupSummary()) {
+                groupedNotifications.get(groupKey)
+                        .setGroupHeaderNotification(statusBarNotification);
+            } else {
+                groupedNotifications.get(groupKey).addNotification(statusBarNotification);
             }
         }
 
@@ -152,46 +145,7 @@ class PreprocessingManager {
     }
 
     /**
-     * Step 3: Add summary texts to system generated group header notifications.
-     *
-     * @param list list of {@link NotificationGroup}s.
-     * @return list of {@link NotificationGroup}s with summary texts populated for group
-     * headers. Operation is done on the list passed in; no new list is generated.
-     */
-    private List<NotificationGroup> summarize(List<NotificationGroup> list) {
-
-        list.forEach(notificationGroup -> {
-            if (notificationGroup.isGroup()) {
-
-                StatusBarNotification headerNotification =
-                        notificationGroup.getGroupHeaderNotification();
-
-                if (headerNotification.getOverrideGroupKey() != null) {
-                    // Add texts to a automatically generated group summary notification
-                    Bundle extras = headerNotification.getNotification().extras;
-                    if (!extras.containsKey(Notification.EXTRA_TITLE_BIG)
-                            && extras.containsKey(Notification.EXTRA_BUILDER_APPLICATION_INFO)) {
-                        ApplicationInfo appInfo =
-                                extras.getParcelable(Notification.EXTRA_BUILDER_APPLICATION_INFO);
-                        extras.putString(
-                                Notification.EXTRA_TITLE_BIG,
-                                appInfo.loadLabel(mPackageManager).toString());
-                    }
-                    if (!extras.containsKey(Notification.EXTRA_SUMMARY_TEXT)) {
-                        String summaryString = mContext.getResources().getQuantityString(
-                                R.plurals.group_notification_summary_text,
-                                notificationGroup.getChildCount(),
-                                notificationGroup.getChildCount());
-                        extras.putString(Notification.EXTRA_SUMMARY_TEXT, summaryString);
-                    }
-                }
-            }
-        });
-        return list;
-    }
-
-    /**
-     * Step 4: Rank notifications according to the ranking key supplied by the notification.
+     * Step 3: Rank notifications according to the ranking key supplied by the notification.
      */
     private static List<NotificationGroup> rank(
             List<NotificationGroup> notifications,

@@ -46,6 +46,7 @@ public class GroupNotificationViewHolder extends RecyclerView.ViewHolder {
     public GroupNotificationViewHolder(View view) {
         super(view);
         mContext = view.getContext();
+
         mToggleButton = view.findViewById(R.id.toggle_button);
         mNotificationListView = view.findViewById(R.id.notification_list);
 
@@ -94,9 +95,13 @@ public class GroupNotificationViewHolder extends RecyclerView.ViewHolder {
             });
         } else {
             // only show group header
-            NotificationGroup notificationGroup = new NotificationGroup();
-            notificationGroup.addNotification(group.getGroupHeaderNotification());
-            list.add(notificationGroup);
+            NotificationGroup newGroup = new NotificationGroup();
+            newGroup.addNotification(group.getGroupHeaderNotification());
+            // If the group header is automatically generated, it does not contain a summary of
+            // the titles of the child notifications. Therefore, we generate a list of
+            // the child notification titles from the parent notification group, and pass them on.
+            newGroup.setChildTitles(group.generateChildTitles());
+            list.add(newGroup);
         }
         mAdapter.setNotifications(list);
     }

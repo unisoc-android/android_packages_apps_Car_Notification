@@ -17,8 +17,11 @@ package com.android.car.notification;
 
 import android.annotation.NonNull;
 import android.annotation.Nullable;
+import android.app.Notification;
+import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageManager;
+import android.os.Bundle;
 import android.service.notification.StatusBarNotification;
-import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -36,12 +39,10 @@ import java.util.List;
  */
 class NotificationGroup {
 
-    private static final String TAG = "NotificationGroup";
-
-    @NonNull
     private String mGroupKey;
-    @NonNull
     private final List<StatusBarNotification> mNotifications = new ArrayList<>();
+    @Nullable
+    private List<String> mChildTitles;
     @Nullable
     private StatusBarNotification mGroupHeaderNotification;
 
@@ -65,6 +66,7 @@ class NotificationGroup {
         // There exists a group summary notification
         if (mGroupHeaderNotification != null) {
             mNotifications.add(groupHeaderNotification);
+            return;
         }
         mGroupHeaderNotification = groupHeaderNotification;
     }
@@ -97,6 +99,50 @@ class NotificationGroup {
     @Nullable
     StatusBarNotification getGroupHeaderNotification() {
         return mGroupHeaderNotification;
+    }
+
+    /**
+     * Sets the list of child notification titles.
+     */
+    void setChildTitles(List<String> childTitles) {
+        mChildTitles = childTitles;
+    }
+
+    /**
+     * Returns the list of child notification titles.
+     */
+    @Nullable
+    List<String> getChildTitles() {
+        return mChildTitles;
+    }
+
+    /**
+     * Generates the list of the child notification titles for a group summary notification.
+     */
+    List<String> generateChildTitles() {
+        List<String> titles = new ArrayList<>();
+
+        for(StatusBarNotification notification : mNotifications) {
+            Bundle extras = notification.getNotification().extras;
+            if (extras.containsKey(Notification.EXTRA_TITLE)) {
+                titles.add(extras.getString(Notification.EXTRA_TITLE));
+
+            } else if (extras.containsKey(Notification.EXTRA_TITLE_BIG)) {
+                titles.add(extras.getString(Notification.EXTRA_TITLE_BIG));
+
+            } else if (extras.containsKey(Notification.EXTRA_MESSAGES)) {
+                List<Notification.MessagingStyle.Message> messages =
+                        Notification.MessagingStyle.Message.getMessagesFromBundleArray(
+                                extras.getParcelableArray(Notification.EXTRA_MESSAGES));
+                Notification.MessagingStyle.Message lastMessage = messages.get(messages.size() - 1);
+                titles.add(lastMessage.getSenderPerson().getName().toString());
+
+            } else if (extras.containsKey(Notification.EXTRA_SUB_TEXT)) {
+                titles.add(extras.getString(Notification.EXTRA_SUB_TEXT));
+            }
+        }
+
+        return titles;
     }
 
     /**
