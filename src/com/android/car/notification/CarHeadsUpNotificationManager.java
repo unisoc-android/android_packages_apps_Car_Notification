@@ -17,6 +17,7 @@ package com.android.car.notification;
 
 import android.app.Notification;
 import android.app.NotificationManager;
+import android.car.drivingstate.CarUxRestrictions;
 import android.content.Context;
 import android.graphics.PixelFormat;
 import android.os.Bundle;
@@ -36,6 +37,7 @@ import android.widget.FrameLayout;
 public class CarHeadsUpNotificationManager {
     private static CarHeadsUpNotificationManager sManager;
     private final Context mContext;
+    private final PreprocessingManager mPreprocessingManager;
     private final WindowManager mWindowManager;
     private final LayoutInflater mInflater;
     private final Handler mTimer;
@@ -47,6 +49,7 @@ public class CarHeadsUpNotificationManager {
 
     private CarHeadsUpNotificationManager(Context context) {
         mContext = context.getApplicationContext();
+        mPreprocessingManager = PreprocessingManager.getInstance(context);
         mWindowManager =
                 (WindowManager) mContext.getSystemService(Context.WINDOW_SERVICE);
         mInflater = LayoutInflater.from(mContext);
@@ -92,13 +95,14 @@ public class CarHeadsUpNotificationManager {
      * Show the notification as a heads-up if it meets the criteria.
      */
     public void maybeShowHeadsUp(
-            boolean isDistractionOptimizationRequired,
+            CarUxRestrictions carUxRestrictions,
             StatusBarNotification statusBarNotification,
             NotificationListenerService.RankingMap rankingMap) {
         if (!shouldShowHeadsUp(statusBarNotification, rankingMap)) {
             return;
         }
-        showHeadsUp(statusBarNotification);
+        showHeadsUp(
+                mPreprocessingManager.optimizeForDriving(carUxRestrictions, statusBarNotification));
     }
 
     private void showHeadsUp(StatusBarNotification statusBarNotification) {

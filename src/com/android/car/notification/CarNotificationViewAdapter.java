@@ -16,6 +16,7 @@
 package com.android.car.notification;
 
 import android.app.Notification;
+import android.car.drivingstate.CarUxRestrictions;
 import android.content.Context;
 import android.os.Bundle;
 import android.service.notification.StatusBarNotification;
@@ -43,8 +44,8 @@ public class CarNotificationViewAdapter extends RecyclerView.Adapter<RecyclerVie
     private final List<String> mExpandedNotifications = new ArrayList<>();
 
     private List<NotificationGroup> mNotifications = new ArrayList<>();
-    private boolean mIsDistractionOptimizationRequired;
     private RecyclerView.RecycledViewPool mViewPool;
+    private CarUxRestrictions mCarUxRestrictions;
 
     /**
      * Constructor for a notification adapter.
@@ -224,6 +225,14 @@ public class CarNotificationViewAdapter extends RecyclerView.Adapter<RecyclerVie
 
     @Override
     public int getItemCount() {
+        boolean shouldLimitContent =
+                (mCarUxRestrictions.getActiveRestrictions()
+                        & CarUxRestrictions.UX_RESTRICTIONS_LIMIT_CONTENT) != 0
+                && !mIsGroupNotificationAdapter;
+
+        if (shouldLimitContent) {
+            return mCarUxRestrictions.getMaxCumulativeContentItems();
+        }
         return mNotifications.size();
     }
 
@@ -272,18 +281,18 @@ public class CarNotificationViewAdapter extends RecyclerView.Adapter<RecyclerVie
     }
 
     /**
-     * Sets whether distraction optimization is required and update views.
+     * Sets the current {@link CarUxRestrictions}.
      */
-    public void setIsDistractionOptimizationRequired(boolean isDistractionOptimizationRequired) {
-        mIsDistractionOptimizationRequired = isDistractionOptimizationRequired;
+    public void setCarUxRestrictions(CarUxRestrictions carUxRestrictions) {
+        mCarUxRestrictions = carUxRestrictions;
         notifyDataSetChanged();
     }
 
     /**
-     * Gets whether distraction optimization is required.
+     * Gets the current {@link CarUxRestrictions}.
      */
-    public boolean getIsDistractionOptimizationRequired() {
-        return mIsDistractionOptimizationRequired;
+    public CarUxRestrictions getCarUxRestrictions() {
+        return mCarUxRestrictions;
     }
 
     /**

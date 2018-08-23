@@ -18,6 +18,7 @@ package com.android.car.notification;
 import android.annotation.Nullable;
 import android.car.Car;
 import android.car.CarNotConnectedException;
+import android.car.drivingstate.CarUxRestrictions;
 import android.car.drivingstate.CarUxRestrictionsManager;
 import android.content.ComponentName;
 import android.content.Intent;
@@ -50,7 +51,7 @@ public class CarNotificationListener extends NotificationListenerService {
     private RankingMap mRankingMap;
     private CarHeadsUpNotificationManager mHeadsUpManager;
     private Car mCar;
-    private boolean mIsDistractionOptimizationRequired;
+    private CarUxRestrictions mCarUxRestrictions;
     private List<StatusBarNotification> mNotifications = new ArrayList<>();
 
     private ServiceConnection mCarConnectionListener = new ServiceConnection() {
@@ -60,13 +61,8 @@ public class CarNotificationListener extends NotificationListenerService {
                 CarUxRestrictionsManager manager = (CarUxRestrictionsManager) mCar.getCarManager(
                         Car.CAR_UX_RESTRICTION_SERVICE);
 
-                mIsDistractionOptimizationRequired =
-                        manager.getCurrentCarUxRestrictions().isRequiresDistractionOptimization();
-
-                manager.registerListener(
-                        restrictionInfo ->
-                                mIsDistractionOptimizationRequired =
-                                        restrictionInfo.isRequiresDistractionOptimization());
+                mCarUxRestrictions = manager.getCurrentCarUxRestrictions();
+                manager.registerListener(restrictionInfo -> mCarUxRestrictions = restrictionInfo);
             } catch (CarNotConnectedException e) {
                 Log.e(TAG, "Car not connected in CarHeadsUpNotificationManager", e);
             }
@@ -155,6 +151,13 @@ public class CarNotificationListener extends NotificationListenerService {
         return mNotifications;
     }
 
+    /**
+     * Get the current car UX restrictions.
+     */
+    public CarUxRestrictions getCarUxRestrictions() {
+        return mCarUxRestrictions;
+    }
+
     @Override
     public RankingMap getCurrentRanking() {
         return mRankingMap;
@@ -184,8 +187,7 @@ public class CarNotificationListener extends NotificationListenerService {
     }
 
     private void onNotificationAdded(StatusBarNotification sbn) {
-        mHeadsUpManager.maybeShowHeadsUp(
-                mIsDistractionOptimizationRequired, sbn, getCurrentRanking());
+        mHeadsUpManager.maybeShowHeadsUp(mCarUxRestrictions, sbn, getCurrentRanking());
 
         if (mHandler == null) {
             return;

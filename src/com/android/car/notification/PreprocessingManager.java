@@ -16,12 +16,14 @@
 package com.android.car.notification;
 
 import android.app.Notification;
+import android.car.drivingstate.CarUxRestrictions;
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.service.notification.NotificationListenerService;
 import android.service.notification.StatusBarNotification;
+import android.text.TextUtils;
 
 import androidx.annotation.NonNull;
 
@@ -37,12 +39,22 @@ import java.util.TreeMap;
  */
 class PreprocessingManager {
 
+    private static PreprocessingManager mInstance;
+    private final String mEllipsizedString;
     private final Context mContext;
     private final PackageManager mPackageManager;
 
-    PreprocessingManager(Context context) {
-        mContext = context;
+    private PreprocessingManager(Context context) {
+        mContext = context.getApplicationContext();
         mPackageManager = context.getPackageManager();
+        mEllipsizedString = context.getString(R.string.ellipsized_string);
+    }
+
+    public static PreprocessingManager getInstance(Context context) {
+        if (mInstance == null) {
+            mInstance = new PreprocessingManager(context);
+        }
+        return mInstance;
     }
 
     /**
@@ -53,14 +65,56 @@ class PreprocessingManager {
      * @return the processed notifications in a new list.
      */
     public List<NotificationGroup> process(
+            CarUxRestrictions carUxRestrictions,
             @NonNull List<StatusBarNotification> notifications,
             @NonNull NotificationListenerService.RankingMap rankingMap) {
 
-        return new ArrayList<>(rank(summarize(group(notifications)), rankingMap));
+        return new ArrayList<>(
+                rank(summarize(group(optimizeForDriving(carUxRestrictions, notifications))),
+                        rankingMap));
     }
 
     /**
-     * Step 1: Groups notifications that have the same group key.
+     * Step 1: Process a list of {@link StatusBarNotification}s to be driving optimized.
+     * Note that the string length limit is always respected regardless of whether distraction
+     * optimization is required.
+     */
+    private List<StatusBarNotification> optimizeForDriving(
+            CarUxRestrictions carUxRestrictions, List<StatusBarNotification> notifications) {
+        notifications.forEach(
+                notification -> notification = optimizeForDriving(carUxRestrictions, notification));
+        return notifications;
+    }
+
+    /**
+     * Helper method that optimize a single {@link StatusBarNotification} for driving.
+     * Currently only trimming texts that have visual effects in car.
+     * Operation is done on the original notification object passed in; no new object is created.
+     */
+    StatusBarNotification optimizeForDriving(
+            CarUxRestrictions carUxRestrictions, StatusBarNotification notification) {
+        int maxStringLength = carUxRestrictions.getMaxRestrictedStringLength();
+        Bundle extras = notification.getNotification().extras;
+        for (String key : extras.keySet()) {
+            switch (key) {
+                case Notification.EXTRA_TITLE:
+                case Notification.EXTRA_TEXT:
+                case Notification.EXTRA_TITLE_BIG:
+                case Notification.EXTRA_SUMMARY_TEXT:
+                    String value = extras.getString(key);
+                    if (!TextUtils.isEmpty(value) && value.length() > maxStringLength) {
+                        extras.putString(
+                                key, value.substring(0, maxStringLength).concat(mEllipsizedString));
+                    }
+                default:
+                    continue;
+            }
+        }
+        return notification;
+    }
+
+    /**
+     * Step 2: Group notifications that have the same group key.
      * Never groups system notifications nor car emergency notifications.
      *
      * @param list list of ungrouped {@link StatusBarNotification}s.
@@ -98,7 +152,7 @@ class PreprocessingManager {
     }
 
     /**
-     * Step 2: Add summary texts to system generated group header notifications.
+     * Step 3: Add summary texts to system generated group header notifications.
      *
      * @param list list of {@link NotificationGroup}s.
      * @return list of {@link NotificationGroup}s with summary texts populated for group
@@ -137,7 +191,7 @@ class PreprocessingManager {
     }
 
     /**
-     * Step 3: Rank notifications according to the ranking key supplied by the notification
+     * Step 4: Rank notifications according to the ranking key supplied by the notification.
      */
     private static List<NotificationGroup> rank(
             List<NotificationGroup> notifications,

@@ -18,7 +18,6 @@ package com.android.car.notification;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Paint;
-import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.view.View;
 import android.widget.Button;
@@ -72,9 +71,11 @@ public class GroupNotificationViewHolder extends RecyclerView.ViewHolder {
     public void bind(
             NotificationGroup group, CarNotificationViewAdapter parentAdapter, boolean isExpanded) {
 
-        // use the same view pool as the parent recycler view
-        // so that all child recycler views can share the same view pool with the parent
+        mAdapter.setCarUxRestrictions(parentAdapter.getCarUxRestrictions());
+
+        // use the same view pool with all the grouped notifications
         // to increase the number of the shared views and reduce memory cost
+        // the view pool is created and stored in the root adapter
         mNotificationListView.setRecycledViewPool(parentAdapter.getViewPool());
 
         // bind expand button
