@@ -38,7 +38,7 @@ import java.util.TreeMap;
  * Manager that groups and ranks the notifications in the notification center.
  */
 class PreprocessingManager {
-
+    private static final String SYSTEM_PACKAGE_NAME = "android";
     private static PreprocessingManager mInstance;
     private final String mEllipsizedString;
     private final Context mContext;
@@ -227,7 +227,12 @@ class PreprocessingManager {
      */
     static String getGroupKey(StatusBarNotification statusBarNotification) {
         String groupKey = statusBarNotification.getGroup();
-        if (groupKey == null) {
+        boolean isEmergency =
+                Notification.CATEGORY_CAR_EMERGENCY.equals(
+                        statusBarNotification.getNotification().category);
+        boolean isSystem = SYSTEM_PACKAGE_NAME.equals(statusBarNotification.getPackageName());
+
+        if (groupKey == null || isEmergency || isSystem) {
             // If a notification is not part of a group, use a unique identifier as the group key
             groupKey = statusBarNotification.getKey();
         } else {

@@ -32,7 +32,9 @@ import java.lang.annotation.RetentionPolicy;
         NotificationViewType.INBOX_HEADSUP,
         NotificationViewType.INBOX_IN_GROUP,
         NotificationViewType.GROUP_COLLAPSED,
-        NotificationViewType.GROUP_EXPANDED
+        NotificationViewType.GROUP_EXPANDED,
+        NotificationViewType.EMERGENCY,
+        NotificationViewType.EMERGENCY_HEADSUP
 })
 @Retention(RetentionPolicy.SOURCE)
 @interface NotificationViewType {
@@ -54,4 +56,7 @@ import java.lang.annotation.RetentionPolicy;
 
     int GROUP_COLLAPSED = 11;
     int GROUP_EXPANDED = 12;
+
+    int EMERGENCY = 13;
+    int EMERGENCY_HEADSUP = 14;
 }
