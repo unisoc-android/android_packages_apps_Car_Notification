@@ -62,12 +62,10 @@
         android:layout_marginBottom="@dimen/car_padding_3"
         style="@style/Widget.Car.ProgressBar.Horizontal"/>
 
-    <!-- TODO: Use card_action_bar as background color when ready -->
     <com.android.car.notification.CarNotificationActionsView
         android:id="@+id/notification_actions"
         android:layout_width="match_parent"
         android:layout_height="@dimen/car_card_action_bar_height"
-        android:layout_below="@id/progress_bar"
-        android:background="@color/car_list_divider"/>
+        android:layout_below="@id/progress_bar"/>
 
 </RelativeLayout>
