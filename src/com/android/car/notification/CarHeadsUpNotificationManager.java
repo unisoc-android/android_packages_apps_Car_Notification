@@ -225,13 +225,11 @@ public class CarHeadsUpNotificationManager {
     private static boolean shouldShowHeadsUp(
             StatusBarNotification statusBarNotification,
             NotificationListenerService.RankingMap rankingMap) {
-        // Don't show persistent notifications
-        if (statusBarNotification.isOngoing()) {
-            return false;
-        }
 
-        // Don't show group summary notification
-        if (statusBarNotification.getNotification().isGroupSummary()) {
+        Notification notification = statusBarNotification.getNotification();
+
+        // Group alert behavior
+        if (notification.suppressAlertingDueToGrouping()) {
             return false;
         }
 
@@ -244,7 +242,7 @@ public class CarHeadsUpNotificationManager {
         }
 
         // Show if category in {CAR_EMERGENCY, CAR_WARNING}
-        String category = statusBarNotification.getNotification().category;
+        String category = notification.category;
         if (Notification.CATEGORY_CAR_EMERGENCY.equals(category)
                 || Notification.CATEGORY_CAR_WARNING.equals(category)) {
             return true;
