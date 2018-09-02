@@ -18,10 +18,13 @@ package com.android.car.notification;
 import android.annotation.Nullable;
 import android.app.Notification;
 import android.app.PendingIntent;
+import android.app.Person;
 import android.content.Context;
 import android.graphics.drawable.Icon;
+import android.os.Bundle;
 import android.os.Parcelable;
 import android.service.notification.StatusBarNotification;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
@@ -81,28 +84,49 @@ public class MessageNotificationViewHolder extends RecyclerView.ViewHolder {
             });
         }
 
-        Parcelable[] messagesData =
-                notification.extras.getParcelableArray(Notification.EXTRA_MESSAGES);
-        if (messagesData == null) {
-            return;
+        CharSequence messageText = null;
+        CharSequence senderName = null;
+        Icon avatar = null;
+
+        Bundle extras = notification.extras;
+        Parcelable[] messagesData = extras.getParcelableArray(Notification.EXTRA_MESSAGES);
+        if (messagesData != null) {
+            List<Notification.MessagingStyle.Message> messages =
+                    Notification.MessagingStyle.Message.getMessagesFromBundleArray(messagesData);
+            if (messages != null && !messages.isEmpty()) {
+                // Use the latest message
+                Notification.MessagingStyle.Message message = messages.get(messages.size() - 1);
+                messageText = message.getText();
+                Person sender = message.getSenderPerson();
+                if (sender != null) {
+                    senderName = sender.getName();
+                    avatar = sender.getIcon();
+                } else {
+                    senderName = message.getSender();
+                }
+            }
+        }
+        // app did not use messaging style, fall back to standard fields
+        if (TextUtils.isEmpty(senderName)) {
+            senderName = extras.getCharSequence(Notification.EXTRA_TITLE);
+        }
+        if (TextUtils.isEmpty(messageText)) {
+            messageText = extras.getCharSequence(Notification.EXTRA_TEXT);
+        }
+        if (avatar == null) {
+            avatar = notification.getLargeIcon();
         }
 
-        List<Notification.MessagingStyle.Message> messages =
-                Notification.MessagingStyle.Message.getMessagesFromBundleArray(messagesData);
-        if (messages == null && messages.size() == 0) {
-            return;
+        if (!TextUtils.isEmpty(messageText)) {
+            mTitleTextView.setVisibility(View.VISIBLE);
+            mTitleTextView.setText(messageText);
         }
-
-        // Use the latest message
-        Notification.MessagingStyle.Message message = messages.get(messages.size() - 1);
-
-        mSenderNameView.setVisibility(View.VISIBLE);
-        mSenderNameView.setText(message.getSenderPerson().getName());
-        mTitleTextView.setVisibility(View.VISIBLE);
-        mTitleTextView.setText(message.getText());
-        Icon icon = message.getSenderPerson().getIcon();
-        if (icon != null) {
-            mAvatarView.setImageDrawable(icon.loadDrawable(mContext));
+        if (!TextUtils.isEmpty(senderName)) {
+            mSenderNameView.setVisibility(View.VISIBLE);
+            mSenderNameView.setText(senderName);
+        }
+        if (avatar != null) {
+            mAvatarView.setImageIcon(avatar);
         }
     }
 
