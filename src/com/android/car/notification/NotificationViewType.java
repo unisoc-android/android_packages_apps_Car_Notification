@@ -20,7 +20,11 @@ import android.annotation.IntDef;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
-@IntDef({NotificationViewType.BASIC,
+@IntDef({
+        NotificationViewType.GROUP_COLLAPSED,
+        NotificationViewType.GROUP_EXPANDED,
+        NotificationViewType.GROUP_SUMMARY,
+        NotificationViewType.BASIC,
         NotificationViewType.BASIC_HEADSUP,
         NotificationViewType.BASIC_IN_GROUP,
         NotificationViewType.MESSAGE,
@@ -31,32 +35,31 @@ import java.lang.annotation.RetentionPolicy;
         NotificationViewType.INBOX,
         NotificationViewType.INBOX_HEADSUP,
         NotificationViewType.INBOX_IN_GROUP,
-        NotificationViewType.GROUP_COLLAPSED,
-        NotificationViewType.GROUP_EXPANDED,
         NotificationViewType.EMERGENCY,
         NotificationViewType.EMERGENCY_HEADSUP
 })
 @Retention(RetentionPolicy.SOURCE)
 @interface NotificationViewType {
 
-    int BASIC = 0;
-    int BASIC_HEADSUP = 1;
-    int BASIC_IN_GROUP = 2;
+    int GROUP_COLLAPSED = 1;
+    int GROUP_EXPANDED = 2;
+    int GROUP_SUMMARY = 3;
 
-    int MESSAGE = 3;
-    int MESSAGE_HEADSUP = 4;
-    int MESSAGE_IN_GROUP = 5;
+    int BASIC = 4;
+    int BASIC_HEADSUP = 5;
+    int BASIC_IN_GROUP = 6;
 
-    int PROGRESS = 6;
-    int PROGRESS_IN_GROUP = 7;
+    int MESSAGE = 7;
+    int MESSAGE_HEADSUP = 8;
+    int MESSAGE_IN_GROUP = 9;
 
-    int INBOX = 8;
-    int INBOX_HEADSUP = 9;
-    int INBOX_IN_GROUP = 10;
+    int PROGRESS = 10;
+    int PROGRESS_IN_GROUP = 11;
 
-    int GROUP_COLLAPSED = 11;
-    int GROUP_EXPANDED = 12;
+    int INBOX = 12;
+    int INBOX_HEADSUP = 13;
+    int INBOX_IN_GROUP = 14;
 
-    int EMERGENCY = 13;
-    int EMERGENCY_HEADSUP = 14;
+    int EMERGENCY = 15;
+    int EMERGENCY_HEADSUP = 16;
 }
