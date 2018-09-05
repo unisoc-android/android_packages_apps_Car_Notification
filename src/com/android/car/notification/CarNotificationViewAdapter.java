@@ -74,6 +74,11 @@ public class CarNotificationViewAdapter extends RecyclerView.Adapter<RecyclerVie
                         R.layout.group_notification_template, parent, false);
                 viewHolder = new GroupNotificationViewHolder(view);
                 break;
+            case NotificationViewType.GROUP_SUMMARY:
+                view = mInflater
+                        .inflate(R.layout.group_summary_notification_template, parent, false);
+                viewHolder = new GroupSummaryNotificationViewHolder(view);
+                break;
             case NotificationViewType.EMERGENCY:
                 view = mInflater.inflate(
                         R.layout.emergency_notification_template, parent, false);
@@ -134,6 +139,9 @@ public class CarNotificationViewAdapter extends RecyclerView.Adapter<RecyclerVie
                 break;
             case NotificationViewType.GROUP_COLLAPSED:
                 ((GroupNotificationViewHolder) holder).bind(notificationGroup, this, false);
+                break;
+            case NotificationViewType.GROUP_SUMMARY:
+                ((GroupSummaryNotificationViewHolder) holder).bind(notificationGroup);
                 break;
             case NotificationViewType.EMERGENCY: {
                 StatusBarNotification notification = notificationGroup.getSingleNotification();
@@ -221,6 +229,12 @@ public class CarNotificationViewAdapter extends RecyclerView.Adapter<RecyclerVie
         if (isInbox) {
             return mIsGroupNotificationAdapter
                     ? NotificationViewType.INBOX_IN_GROUP : NotificationViewType.INBOX;
+        }
+
+        // group summary
+        boolean isGroupSummary = notificationGroup.getChildTitles() != null;
+        if (isGroupSummary) {
+            return NotificationViewType.GROUP_SUMMARY;
         }
 
         // the big text and big picture styles are fallen back to basic template in car
