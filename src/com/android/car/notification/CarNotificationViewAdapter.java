@@ -266,16 +266,32 @@ public class CarNotificationViewAdapter extends RecyclerView.Adapter<RecyclerVie
         return mNotifications.size();
     }
 
-    void toggleExpansion(String groupKey, boolean isExpanded) {
-        if (mExpandedNotifications.contains(groupKey) && !isExpanded) {
-            mExpandedNotifications.remove(groupKey);
-            int index = findIndexInNotification(groupKey);
-            notifyItemChanged(index);
-        } else if (!mExpandedNotifications.contains(groupKey) && isExpanded) {
-            mExpandedNotifications.add(groupKey);
-            int index = findIndexInNotification(groupKey);
-            notifyItemChanged(index);
+    /**
+     * Set the expansion state of a group notification given its group key.
+     *
+     * @param groupKey the unique identifier of a {@link NotificationGroup}
+     * @param isExpanded whether the group notification should be expanded.
+     */
+    void setExpanded(String groupKey, boolean isExpanded) {
+        if (isExpanded(groupKey) == isExpanded) {
+            return;
         }
+
+        if (isExpanded) {
+            mExpandedNotifications.add(groupKey);
+        } else {
+            mExpandedNotifications.remove(groupKey);
+        }
+
+        int index = findIndexInNotification(groupKey);
+        notifyItemChanged(index);
+    }
+
+    /**
+     * Returns whether the notification is expanded given its group key.
+     */
+    boolean isExpanded(String groupKey) {
+        return mExpandedNotifications.contains(groupKey);
     }
 
     private int findIndexInNotification(String groupKey) {
