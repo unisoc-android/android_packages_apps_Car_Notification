@@ -18,4 +18,6 @@
     <color name="background_color">@color/car_grey_200</color>
     <color name="emergency_background_color">#B41B1A</color>
     <color name="emergency_action_bar_background_color">#A81314</color>
+    <color name="notification_action_bar_color">@color/car_card_action_bar</color>
+    <color name="notification_action_button_text_color">#FFFFFF</color>
 </resources>
