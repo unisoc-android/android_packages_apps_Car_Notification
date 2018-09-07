@@ -15,7 +15,8 @@
     limitations under the License.
 -->
 <resources>
-    <dimen name="notification_card_radius">@dimen/car_radius_2</dimen>
-    <dimen name="media_action_icon_size">@dimen/car_primary_icon_size</dimen>
-    <dimen name="headsup_scrim_height_below_notification">164dp</dimen>
+    <!-- Whether media notifications should be shown in car. -->
+    <bool name="config_showMediaNotification">true</bool>
+    <!-- Whether ongoing notifications should be shown in car. Note that apps may use ongoing notifications to show important information, e.g. turn-by-turn navigation. -->
+    <bool name="config_showOngoingNotification">true</bool>
 </resources>

@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright (C) 2018 The Android Open Source Project
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+        http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+-->
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <!-- Needed so that the child views can be stacked -->
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <ImageView
+            android:id="@+id/album_art"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="centerCrop"/>
+
+        <View
+            android:id="@+id/color_overlay"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:alpha="0.8"/>
+    </FrameLayout>
+
+    <com.android.car.notification.CarNotificationHeaderView
+        android:id="@+id/header"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginStart="@dimen/car_padding_4"
+        android:layout_marginTop="@dimen/car_padding_3"
+        android:layout_marginEnd="@dimen/car_keyline_1"/>
+
+    <TextView
+        android:id="@+id/title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_toStartOf="@+id/header"
+        android:layout_marginStart="@dimen/car_keyline_1"
+        android:layout_marginBottom="@dimen/car_padding_0"
+        android:paddingTop="@dimen/car_padding_3"
+        style="@style/NotificationTitleText"/>
+
+    <TextView
+        android:id="@+id/content"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_below="@id/title"
+        android:layout_toStartOf="@+id/header"
+        android:layout_marginStart="@dimen/car_keyline_1"
+        android:layout_marginBottom="@dimen/car_padding_3"
+        android:textAppearance="@style/TextAppearance.Car.Body3"/>
+
+    <LinearLayout
+        android:id="@+id/action_bar"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/car_card_action_bar_height"
+        android:layout_below="@+id/content"
+        android:gravity="center_vertical">
+
+        <ImageButton
+            style="@android:style/Widget.Material.Button.Borderless.Small"
+            android:id="@+id/action_1"
+            android:layout_width="@dimen/media_action_icon_size"
+            android:layout_height="@dimen/media_action_icon_size"
+            android:layout_weight="1"
+            android:scaleType="fitCenter"
+            android:visibility="gone"/>
+
+        <ImageButton
+            style="@android:style/Widget.Material.Button.Borderless.Small"
+            android:id="@+id/action_2"
+            android:layout_width="@dimen/media_action_icon_size"
+            android:layout_height="@dimen/media_action_icon_size"
+            android:layout_weight="1"
+            android:scaleType="fitCenter"
+            android:visibility="gone"/>
+
+        <ImageButton
+            style="@android:style/Widget.Material.Button.Borderless.Small"
+            android:id="@+id/action_3"
+            android:layout_width="@dimen/media_action_icon_size"
+            android:layout_height="@dimen/media_action_icon_size"
+            android:layout_weight="1"
+            android:scaleType="fitCenter"
+            android:visibility="gone"/>
+
+        <ImageButton
+            style="@android:style/Widget.Material.Button.Borderless.Small"
+            android:id="@+id/action_4"
+            android:layout_width="@dimen/media_action_icon_size"
+            android:layout_height="@dimen/media_action_icon_size"
+            android:layout_weight="1"
+            android:scaleType="fitCenter"
+            android:visibility="gone"/>
+
+        <ImageButton
+            style="@android:style/Widget.Material.Button.Borderless.Small"
+            android:id="@+id/action_5"
+            android:layout_width="@dimen/media_action_icon_size"
+            android:layout_height="@dimen/media_action_icon_size"
+            android:layout_weight="1"
+            android:scaleType="fitCenter"
+            android:visibility="gone"/>
+    </LinearLayout>
+
+</RelativeLayout>

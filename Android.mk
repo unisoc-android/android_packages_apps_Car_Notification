@@ -40,7 +40,9 @@ LOCAL_PROGUARD_ENABLED := disabled
 LOCAL_DEX_PREOPT := false
 
 LOCAL_STATIC_ANDROID_LIBRARIES += \
-    androidx.car_car
+    androidx.car_car \
+    androidx.palette_palette \
+
 
 LOCAL_JAVA_LIBRARIES += android.car
 

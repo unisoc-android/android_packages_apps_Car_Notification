@@ -74,7 +74,7 @@ public class ProgressNotificationViewHolder extends RecyclerView.ViewHolder {
             });
         }
 
-        mHeaderView.bind(statusBarNotification);
+        mHeaderView.bind(statusBarNotification, /* primaryColor= */ null);
         mActionsView.bind(statusBarNotification, isInGroup);
 
         Bundle extraData = notification.extras;

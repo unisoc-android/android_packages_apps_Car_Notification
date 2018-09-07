@@ -18,13 +18,11 @@ package com.android.car.notification;
 import android.annotation.Nullable;
 import android.app.Notification;
 import android.app.PendingIntent;
-import android.content.Context;
 import android.os.Bundle;
 import android.service.notification.StatusBarNotification;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
-import android.widget.FrameLayout;
 import android.widget.TextView;
 
 import androidx.recyclerview.widget.RecyclerView;
@@ -74,7 +72,7 @@ public class InboxNotificationViewHolder extends RecyclerView.ViewHolder {
             });
         }
 
-        mHeaderView.bind(statusBarNotification);
+        mHeaderView.bind(statusBarNotification, /* primaryColor= */ null);
         mActionsView.bind(statusBarNotification, isInGroup);
 
         Bundle extraData = notification.extras;

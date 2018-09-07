@@ -43,11 +43,17 @@ class PreprocessingManager {
     private final String mEllipsizedString;
     private final Context mContext;
     private final PackageManager mPackageManager;
+    private final boolean mEnableMediaNotification;
+    private final boolean mEnableOngoingNotification;
 
     private PreprocessingManager(Context context) {
         mContext = context.getApplicationContext();
         mPackageManager = context.getPackageManager();
         mEllipsizedString = context.getString(R.string.ellipsized_string);
+        mEnableMediaNotification =
+                context.getResources().getBoolean(R.bool.config_showMediaNotification);
+        mEnableOngoingNotification =
+                context.getResources().getBoolean(R.bool.config_showOngoingNotification);
     }
 
     public static PreprocessingManager getInstance(Context context) {
@@ -70,7 +76,23 @@ class PreprocessingManager {
             @NonNull NotificationListenerService.RankingMap rankingMap) {
 
         return new ArrayList<>(
-                rank(group(optimizeForDriving(carUxRestrictions, notifications)), rankingMap));
+                rank(group(optimizeForDriving(carUxRestrictions, filter(notifications))), rankingMap));
+    }
+
+    /**
+     * Step 1: Process a list of {@link StatusBarNotification}s to be driving optimized.
+     */
+    private List<StatusBarNotification> filter(List<StatusBarNotification> notifications) {
+        if (!mEnableMediaNotification) {
+            notifications.removeIf(
+                    statusBarNotification ->
+                            Notification.CATEGORY_TRANSPORT.equals(
+                                    statusBarNotification.getNotification().category));
+        }
+        if (!mEnableOngoingNotification) {
+            notifications.removeIf(statusBarNotification -> statusBarNotification.isOngoing());
+        }
+        return notifications;
     }
 
     /**
@@ -183,12 +205,12 @@ class PreprocessingManager {
      */
     static String getGroupKey(StatusBarNotification statusBarNotification) {
         String groupKey = statusBarNotification.getGroup();
-        boolean isEmergency =
-                Notification.CATEGORY_CAR_EMERGENCY.equals(
-                        statusBarNotification.getNotification().category);
+        String category = statusBarNotification.getNotification().category;
+        boolean isEmergency = Notification.CATEGORY_CAR_EMERGENCY.equals(category);
+        boolean isMedia = Notification.CATEGORY_TRANSPORT.equals(category);
         boolean isSystem = SYSTEM_PACKAGE_NAME.equals(statusBarNotification.getPackageName());
 
-        if (groupKey == null || isEmergency || isSystem) {
+        if (groupKey == null || isEmergency || isMedia || isSystem) {
             // If a notification is not part of a group, use a unique identifier as the group key
             groupKey = statusBarNotification.getKey();
         } else {
