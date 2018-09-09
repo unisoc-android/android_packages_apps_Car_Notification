@@ -67,8 +67,7 @@ public class CarNotificationActionsView extends RelativeLayout {
     }
 
     private void init(Context context) {
-        // TODO: Use the car theme and card_action_bar as background color when ready
-        mCarActionBarColor = context.getResources().getColor(R.color.car_list_divider);
+        mCarActionBarColor = context.getResources().getColor(R.color.notification_action_bar_color);
         mCarCardColor = context.getResources().getColor(R.color.car_card);
         mIconSize = context.getResources().getDimensionPixelOffset(R.dimen.car_primary_icon_size);
         inflate(context, R.layout.car_notification_actions_view, /* root= */ this);

@@ -24,6 +24,8 @@
         android:targetSdkVersion="27"/>
     <!-- Permission to show system alert window for heads-up notifications -->
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW"/>
+    <!-- Permission to get the current user id to cancel a notification -->
+    <uses-permission android:name="android.permission.INTERACT_ACROSS_USERS"/>
 
     <application android:label="@string/application_label">
         <activity

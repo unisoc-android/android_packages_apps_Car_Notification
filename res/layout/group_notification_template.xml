@@ -28,7 +28,7 @@
         android:layout_gravity="center_horizontal"
         app:columnSpan="@integer/notification_center_column_number"
         app:cardBackgroundColor="@color/car_card"
-        app:cardCornerRadius="@dimen/car_radius_3">
+        app:cardCornerRadius="@dimen/notification_card_radius">
 
         <RelativeLayout
             android:layout_width="match_parent"
@@ -39,12 +39,11 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"/>
 
-            <!-- TODO: Use card_action_bar as background color when ready -->
             <FrameLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/notification_list"
-                android:background="@color/car_list_divider">
+                android:background="@color/car_card_action_bar">
 
                 <Button
                     android:id="@+id/toggle_button"
