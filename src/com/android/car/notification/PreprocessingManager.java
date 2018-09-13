@@ -92,7 +92,9 @@ class PreprocessingManager {
      */
     StatusBarNotification optimizeForDriving(
             CarUxRestrictions carUxRestrictions, StatusBarNotification notification) {
-        int maxStringLength = carUxRestrictions.getMaxRestrictedStringLength();
+        int maxStringLength = carUxRestrictions != null
+                ? carUxRestrictions.getMaxRestrictedStringLength()
+                : Integer.MAX_VALUE;
         Bundle extras = notification.getNotification().extras;
         for (String key : extras.keySet()) {
             switch (key) {
