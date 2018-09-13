@@ -20,6 +20,7 @@
         android:layout_width="@dimen/car_secondary_icon_size"
         android:layout_height="@dimen/car_secondary_icon_size"
         android:layout_gravity="center_vertical"
+        android:tint="@color/notification_small_icon_tint"
         android:scaleType="fitCenter"/>
 </merge>
 
