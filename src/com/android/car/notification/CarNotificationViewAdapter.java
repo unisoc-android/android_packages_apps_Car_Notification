@@ -256,9 +256,10 @@ public class CarNotificationViewAdapter extends RecyclerView.Adapter<RecyclerVie
     @Override
     public int getItemCount() {
         boolean shouldLimitContent =
-                (mCarUxRestrictions.getActiveRestrictions()
-                        & CarUxRestrictions.UX_RESTRICTIONS_LIMIT_CONTENT) != 0
-                && !mIsGroupNotificationAdapter;
+                mCarUxRestrictions != null
+                        && !mIsGroupNotificationAdapter
+                        && (mCarUxRestrictions.getActiveRestrictions()
+                        & CarUxRestrictions.UX_RESTRICTIONS_LIMIT_CONTENT) != 0;
 
         if (shouldLimitContent) {
             return mCarUxRestrictions.getMaxCumulativeContentItems();
@@ -269,7 +270,7 @@ public class CarNotificationViewAdapter extends RecyclerView.Adapter<RecyclerVie
     /**
      * Set the expansion state of a group notification given its group key.
      *
-     * @param groupKey the unique identifier of a {@link NotificationGroup}
+     * @param groupKey   the unique identifier of a {@link NotificationGroup}
      * @param isExpanded whether the group notification should be expanded.
      */
     void setExpanded(String groupKey, boolean isExpanded) {
