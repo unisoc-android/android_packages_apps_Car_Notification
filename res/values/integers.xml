@@ -16,7 +16,7 @@
 -->
 <resources>
     <!-- Columns -->
-    <integer name="notification_center_column_number">10</integer>
+    <integer name="notification_center_column_number">@integer/column_card_default_column_span</integer>
     <integer name="notification_headsup_column_number">12</integer>
     <!-- Duration of heads-up notifications in milliseconds -->
     <integer name="headsup_notification_duration_ms">5000</integer>
