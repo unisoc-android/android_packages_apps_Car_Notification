@@ -106,22 +106,22 @@ public class CarNotificationActionsView extends RelativeLayout {
             button.setVisibility(View.VISIBLE);
             button.setText(action.title);
 
-            Icon icon = action.getIcon();
+            Context packageContext = statusBarNotification.getPackageContext(getContext());
+            Drawable icon = packageContext.getDrawable(action.icon);
             if (icon != null) {
-                Drawable drawable = icon.loadDrawable(getContext());
-                if (drawable != null) {
-                    drawable.setBounds(0, 0, mIconSize, mIconSize);
-                    button.setCompoundDrawablesRelative(drawable, null, null, null);
-                }
+                icon.setBounds(0, 0, mIconSize, mIconSize);
+                button.setCompoundDrawablesRelative(icon, null, null, null);
             }
 
-            button.setOnClickListener(v -> {
-                try {
-                    action.actionIntent.send();
-                } catch (PendingIntent.CanceledException e) {
-                    Log.e(TAG, "Cannot send pendingIntent in action button");
-                }
-            });
+            if (action.actionIntent != null) {
+                button.setOnClickListener(v -> {
+                    try {
+                        action.actionIntent.send();
+                    } catch (PendingIntent.CanceledException e) {
+                        Log.e(TAG, "Cannot send pendingIntent in action button");
+                    }
+                });
+            }
         }
     }
 
