@@ -106,9 +106,9 @@ public class CarNotificationActionsView extends RelativeLayout {
             button.setVisibility(View.VISIBLE);
             button.setText(action.title);
 
-            Context packageContext = statusBarNotification.getPackageContext(getContext());
-            Drawable icon = packageContext.getDrawable(action.icon);
-            if (icon != null) {
+            if (action.getIcon() != null) {
+                Context packageContext = statusBarNotification.getPackageContext(getContext());
+                Drawable icon = packageContext.getDrawable(action.icon);
                 icon.setBounds(0, 0, mIconSize, mIconSize);
                 button.setCompoundDrawablesRelative(icon, null, null, null);
             }

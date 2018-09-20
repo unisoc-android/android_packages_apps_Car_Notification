@@ -255,16 +255,18 @@ public class CarNotificationViewAdapter extends RecyclerView.Adapter<RecyclerVie
 
     @Override
     public int getItemCount() {
-        boolean shouldLimitContent =
-                mCarUxRestrictions != null
-                        && !mIsGroupNotificationAdapter
-                        && (mCarUxRestrictions.getActiveRestrictions()
-                        & CarUxRestrictions.UX_RESTRICTIONS_LIMIT_CONTENT) != 0;
+        int itemCount = mNotifications.size();
 
-        if (shouldLimitContent) {
-            return mCarUxRestrictions.getMaxCumulativeContentItems();
+        if (!mIsGroupNotificationAdapter
+                && mCarUxRestrictions != null
+                && (mCarUxRestrictions.getActiveRestrictions()
+                    & CarUxRestrictions.UX_RESTRICTIONS_LIMIT_CONTENT) != 0) {
+
+            int maxItemCount = mCarUxRestrictions.getMaxCumulativeContentItems();
+
+            return Math.min(itemCount, maxItemCount);
         }
-        return mNotifications.size();
+        return itemCount;
     }
 
     /**
