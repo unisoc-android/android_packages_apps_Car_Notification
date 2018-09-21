@@ -18,8 +18,6 @@ package com.android.car.notification;
 import android.app.Notification;
 import android.app.PendingIntent;
 import android.content.Context;
-import android.graphics.drawable.Drawable;
-import android.graphics.drawable.Icon;
 import android.service.notification.StatusBarNotification;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -41,7 +39,6 @@ public class CarNotificationActionsView extends RelativeLayout {
     private static final int MAX_NUM_ACTIONS = 3;
     private final List<Button> mActionButtons = new ArrayList<>();
     private View mActionsView;
-    private int mIconSize;
     private int mCarActionBarColor;
     private int mCarCardColor;
 
@@ -69,7 +66,6 @@ public class CarNotificationActionsView extends RelativeLayout {
     private void init(Context context) {
         mCarActionBarColor = context.getResources().getColor(R.color.notification_action_bar_color);
         mCarCardColor = context.getResources().getColor(R.color.car_card);
-        mIconSize = context.getResources().getDimensionPixelOffset(R.dimen.car_primary_icon_size);
         inflate(context, R.layout.car_notification_actions_view, /* root= */ this);
     }
 
@@ -105,13 +101,6 @@ public class CarNotificationActionsView extends RelativeLayout {
             Button button = mActionButtons.get(i);
             button.setVisibility(View.VISIBLE);
             button.setText(action.title);
-
-            if (action.getIcon() != null) {
-                Context packageContext = statusBarNotification.getPackageContext(getContext());
-                Drawable icon = packageContext.getDrawable(action.icon);
-                icon.setBounds(0, 0, mIconSize, mIconSize);
-                button.setCompoundDrawablesRelative(icon, null, null, null);
-            }
 
             if (action.actionIntent != null) {
                 button.setOnClickListener(v -> {
