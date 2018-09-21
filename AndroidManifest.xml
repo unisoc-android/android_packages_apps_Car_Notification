@@ -27,7 +27,8 @@
     <!-- Permission to get the current user id to cancel a notification -->
     <uses-permission android:name="android.permission.INTERACT_ACROSS_USERS"/>
 
-    <application android:label="@string/application_label">
+    <application android:label="@string/application_label"
+                 android:name=".NotificationApplication">
         <activity
             android:name=".CarNotificationCenterActivity"
             android:label="@string/application_label"
