@@ -37,27 +37,33 @@ import android.widget.FrameLayout;
 public class CarHeadsUpNotificationManager {
     private static CarHeadsUpNotificationManager sManager;
     private final Context mContext;
+    private final boolean mEnableMediaNotification;
+    private final boolean mEnableOngoingNotification;
+    private final long mDuration;
+    private final long mEnterAnimationDuration;
+    private final int mScrimHeightBelowNotification;
     private final PreprocessingManager mPreprocessingManager;
     private final WindowManager mWindowManager;
     private final LayoutInflater mInflater;
     private final Handler mTimer;
     private final View mScrimView;
     private final FrameLayout mWrapper;
-    private final long mDuration;
-    private final long mEnterAnimationDuration;
-    private final int mScrimHeightBelowNotification;
 
     private CarHeadsUpNotificationManager(Context context) {
         mContext = context.getApplicationContext();
-        mPreprocessingManager = PreprocessingManager.getInstance(context);
-        mWindowManager =
-                (WindowManager) mContext.getSystemService(Context.WINDOW_SERVICE);
-        mInflater = LayoutInflater.from(mContext);
+        mEnableMediaNotification =
+                context.getResources().getBoolean(R.bool.config_showMediaNotification);
+        mEnableOngoingNotification =
+                context.getResources().getBoolean(R.bool.config_showOngoingNotification);
         mDuration = mContext.getResources().getInteger(R.integer.headsup_notification_duration_ms);
         mEnterAnimationDuration =
                 mContext.getResources().getInteger(R.integer.headsup_enter_duration_ms);
         mScrimHeightBelowNotification = mContext.getResources().getDimensionPixelOffset(
                 R.dimen.headsup_scrim_height_below_notification);
+        mPreprocessingManager = PreprocessingManager.getInstance(context);
+        mWindowManager =
+                (WindowManager) mContext.getSystemService(Context.WINDOW_SERVICE);
+        mInflater = LayoutInflater.from(mContext);
         mTimer = new Handler();
 
         // The reason we are adding the gradient scrim as its own window is because
@@ -222,11 +228,23 @@ public class CarHeadsUpNotificationManager {
      *
      * @return true if a notification should be shown as a heads-up
      */
-    private static boolean shouldShowHeadsUp(
+    private boolean shouldShowHeadsUp(
             StatusBarNotification statusBarNotification,
             NotificationListenerService.RankingMap rankingMap) {
 
         Notification notification = statusBarNotification.getNotification();
+
+        // Media notification configured by OEM
+        if (!mEnableMediaNotification
+                && Notification.CATEGORY_TRANSPORT.equals(
+                statusBarNotification.getNotification().category)) {
+            return false;
+        }
+
+        // Ongoing notification configured by OEM
+        if (!mEnableOngoingNotification && statusBarNotification.isOngoing()) {
+            return false;
+        }
 
         // Group alert behavior
         if (notification.suppressAlertingDueToGrouping()) {
