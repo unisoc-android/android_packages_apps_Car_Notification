@@ -15,7 +15,9 @@
  */
 package com.android.car.notification;
 
+import android.annotation.Nullable;
 import android.content.Context;
+import android.graphics.drawable.Drawable;
 import android.service.notification.StatusBarNotification;
 import android.util.AttributeSet;
 import android.view.View;
@@ -62,13 +64,21 @@ public class CarNotificationHeaderView extends LinearLayout {
 
     /**
      * Binds the notification header that contains the issuer app icon and name.
+     *
+     * @param statusBarNotification the notification to be bound.
+     * @param primaryColor the foreground color used for the small icon.
+     *                     Passing {@code null} will use the default colors.
      */
-    public void bind(StatusBarNotification statusBarNotification) {
+    public void bind(StatusBarNotification statusBarNotification, @Nullable Integer primaryColor) {
         setVisibility(View.VISIBLE);
 
         mIconView.setVisibility(View.VISIBLE);
-        mIconView.setImageDrawable(
-                statusBarNotification.getNotification().getSmallIcon().loadDrawable(getContext()));
+        Drawable drawable =
+                statusBarNotification.getNotification().getSmallIcon().loadDrawable(getContext());
+        mIconView.setImageDrawable(drawable);
+        if (primaryColor != null) {
+            mIconView.setColorFilter(primaryColor);
+        }
     }
 
     /**
