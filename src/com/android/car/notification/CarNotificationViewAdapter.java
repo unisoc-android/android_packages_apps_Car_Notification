@@ -90,9 +90,12 @@ public class CarNotificationViewAdapter extends RecyclerView.Adapter<RecyclerVie
                 viewHolder = new MessageNotificationViewHolder(view);
                 break;
             case NotificationViewType.MESSAGE:
-                view = mInflater.inflate(
-                        R.layout.message_notification_template, parent, false);
+                view = mInflater.inflate(R.layout.message_notification_template, parent, false);
                 viewHolder = new MessageNotificationViewHolder(view);
+                break;
+            case NotificationViewType.MEDIA:
+                view = mInflater.inflate(R.layout.media_notification_template, parent, false);
+                viewHolder = new MediaNotificationViewHolder(view);
                 break;
             case NotificationViewType.PROGRESS_IN_GROUP:
                 view = mInflater.inflate(
@@ -155,6 +158,11 @@ public class CarNotificationViewAdapter extends RecyclerView.Adapter<RecyclerVie
                         .bind(notification, /* isInGroup= */ mIsGroupNotificationAdapter);
                 break;
             }
+            case NotificationViewType.MEDIA: {
+                StatusBarNotification notification = notificationGroup.getSingleNotification();
+                ((MediaNotificationViewHolder) holder).bind(notification);
+                break;
+            }
             case NotificationViewType.PROGRESS_IN_GROUP:
             case NotificationViewType.PROGRESS: {
                 StatusBarNotification notification = notificationGroup.getSingleNotification();
@@ -209,6 +217,11 @@ public class CarNotificationViewAdapter extends RecyclerView.Adapter<RecyclerVie
                     ? NotificationViewType.MESSAGE_IN_GROUP : NotificationViewType.MESSAGE;
         }
 
+        // media
+        if (notification.isMediaNotification()) {
+            return NotificationViewType.MEDIA;
+        }
+
         // progress
         int progressMax = extras.getInt(Notification.EXTRA_PROGRESS_MAX);
         boolean isIndeterminate = extras.getBoolean(
@@ -255,16 +268,18 @@ public class CarNotificationViewAdapter extends RecyclerView.Adapter<RecyclerVie
 
     @Override
     public int getItemCount() {
-        boolean shouldLimitContent =
-                mCarUxRestrictions != null
-                        && !mIsGroupNotificationAdapter
-                        && (mCarUxRestrictions.getActiveRestrictions()
-                        & CarUxRestrictions.UX_RESTRICTIONS_LIMIT_CONTENT) != 0;
+        int itemCount = mNotifications.size();
 
-        if (shouldLimitContent) {
-            return mCarUxRestrictions.getMaxCumulativeContentItems();
+        if (!mIsGroupNotificationAdapter
+                && mCarUxRestrictions != null
+                && (mCarUxRestrictions.getActiveRestrictions()
+                    & CarUxRestrictions.UX_RESTRICTIONS_LIMIT_CONTENT) != 0) {
+
+            int maxItemCount = mCarUxRestrictions.getMaxCumulativeContentItems();
+
+            return Math.min(itemCount, maxItemCount);
         }
-        return mNotifications.size();
+        return itemCount;
     }
 
     /**

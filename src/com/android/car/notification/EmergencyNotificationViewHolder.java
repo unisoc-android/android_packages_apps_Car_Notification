@@ -15,7 +15,6 @@
  */
 package com.android.car.notification;
 
-import android.annotation.Nullable;
 import android.app.Notification;
 import android.app.PendingIntent;
 import android.content.Context;
@@ -27,7 +26,6 @@ import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 
-import androidx.car.widget.ColumnCardView;
 import androidx.recyclerview.widget.RecyclerView;
 
 /**
@@ -88,7 +86,7 @@ public class EmergencyNotificationViewHolder extends RecyclerView.ViewHolder {
             return;
         }
 
-        mHeaderView.bind(statusBarNotification);
+        mHeaderView.bind(statusBarNotification, /* primaryColor= */ null);
         mActionsView.bind(statusBarNotification, /* isInGroup= */ false);
 
         // Override the car action bar color that was set in CarNotificationActionsView.bind()

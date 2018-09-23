@@ -69,7 +69,7 @@ public class MessageNotificationViewHolder extends RecyclerView.ViewHolder {
         if (statusBarNotification == null) {
             return;
         }
-        mHeaderView.bind(statusBarNotification);
+        mHeaderView.bind(statusBarNotification, /* primaryColor= */ null);
         mActionsView.bind(statusBarNotification, isInGroup);
 
         Notification notification = statusBarNotification.getNotification();

@@ -85,7 +85,7 @@ public class BasicNotificationViewHolder extends RecyclerView.ViewHolder {
             return;
         }
 
-        mHeaderView.bind(statusBarNotification);
+        mHeaderView.bind(statusBarNotification, /* primaryColor= */ null);
         mActionsView.bind(statusBarNotification, isInGroup);
 
         Bundle extraData = notification.extras;

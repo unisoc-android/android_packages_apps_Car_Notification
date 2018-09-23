@@ -16,6 +16,7 @@
 -->
 <resources>
     <color name="background_color">@android:color/black</color>
+    <color name="notification_card_background">@color/car_card</color>
     <color name="emergency_background_color">#B41B1A</color>
     <color name="emergency_action_bar_background_color">#A81314</color>
     <color name="notification_action_bar_color">@color/car_card_action_bar</color>
