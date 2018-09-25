@@ -15,6 +15,7 @@
  */
 package com.android.car.notification;
 
+import android.app.KeyguardManager;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.car.drivingstate.CarUxRestrictions;
@@ -42,6 +43,7 @@ public class CarHeadsUpNotificationManager {
     private final long mDuration;
     private final long mEnterAnimationDuration;
     private final int mScrimHeightBelowNotification;
+    private final KeyguardManager mKeyguardManager;
     private final PreprocessingManager mPreprocessingManager;
     private final WindowManager mWindowManager;
     private final LayoutInflater mInflater;
@@ -60,6 +62,7 @@ public class CarHeadsUpNotificationManager {
                 mContext.getResources().getInteger(R.integer.headsup_enter_duration_ms);
         mScrimHeightBelowNotification = mContext.getResources().getDimensionPixelOffset(
                 R.dimen.headsup_scrim_height_below_notification);
+        mKeyguardManager = (KeyguardManager) context.getSystemService(Context.KEYGUARD_SERVICE);
         mPreprocessingManager = PreprocessingManager.getInstance(context);
         mWindowManager =
                 (WindowManager) mContext.getSystemService(Context.WINDOW_SERVICE);
@@ -220,17 +223,26 @@ public class CarHeadsUpNotificationManager {
      * Helper method that determines whether a notification should show as a heads-up.
      *
      * <p> A notification will never be shown as a heads-up if:
-     * Is ongoing
+     * <ul>
+     * <li> Keyguard (lock screen) is showing
+     * <li> Is ongoing
+     * </ul>
      *
      * <p> A non-ongoing notification will be shown as a heads-up if:
-     * Importance >= HIGH
-     * or, Category in {CAR_EMERGENCY, CAR_WARNING}
+     * <ul>
+     * <li> Importance >= HIGH
+     * <li> Category in {CAR_EMERGENCY, CAR_WARNING}
+     * </ul>
      *
      * @return true if a notification should be shown as a heads-up
      */
     private boolean shouldShowHeadsUp(
             StatusBarNotification statusBarNotification,
             NotificationListenerService.RankingMap rankingMap) {
+
+        if (mKeyguardManager.isKeyguardLocked()) {
+            return false;
+        }
 
         Notification notification = statusBarNotification.getNotification();
 
