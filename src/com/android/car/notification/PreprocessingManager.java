@@ -124,10 +124,10 @@ class PreprocessingManager {
                 case Notification.EXTRA_TEXT:
                 case Notification.EXTRA_TITLE_BIG:
                 case Notification.EXTRA_SUMMARY_TEXT:
-                    String value = extras.getString(key);
+                    CharSequence value = extras.getCharSequence(key);
                     if (!TextUtils.isEmpty(value) && value.length() > maxStringLength) {
-                        extras.putString(
-                                key, value.substring(0, maxStringLength).concat(mEllipsizedString));
+                        extras.putString(key, value.toString()
+                                .substring(0, maxStringLength).concat(mEllipsizedString));
                     }
                 default:
                     continue;
