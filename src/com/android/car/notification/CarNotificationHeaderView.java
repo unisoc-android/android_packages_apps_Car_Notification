@@ -16,6 +16,7 @@
 package com.android.car.notification;
 
 import android.annotation.Nullable;
+import android.app.Notification;
 import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.service.notification.StatusBarNotification;
@@ -73,8 +74,9 @@ public class CarNotificationHeaderView extends LinearLayout {
         setVisibility(View.VISIBLE);
 
         mIconView.setVisibility(View.VISIBLE);
-        Drawable drawable =
-                statusBarNotification.getNotification().getSmallIcon().loadDrawable(getContext());
+        Notification notification = statusBarNotification.getNotification();
+        Context packageContext = statusBarNotification.getPackageContext(getContext());
+        Drawable drawable = notification.getSmallIcon().loadDrawable(packageContext);
         mIconView.setImageDrawable(drawable);
         if (primaryColor != null) {
             mIconView.setColorFilter(primaryColor);
