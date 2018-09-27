@@ -15,7 +15,6 @@
  */
 package com.android.car.notification;
 
-import android.app.NotificationManager;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Paint;
@@ -44,7 +43,6 @@ public class GroupNotificationViewHolder extends RecyclerView.ViewHolder {
     private final Paint mPaint;
     private final int mDividerMargin;
     private final int mDividerHeight;
-    private final NotificationManager mNotificationManager;
 
     public GroupNotificationViewHolder(View view) {
         super(view);
@@ -52,8 +50,6 @@ public class GroupNotificationViewHolder extends RecyclerView.ViewHolder {
 
         mToggleButton = view.findViewById(R.id.toggle_button);
         mNotificationListView = view.findViewById(R.id.notification_list);
-        mNotificationManager =
-                (NotificationManager) mContext.getSystemService(Context.NOTIFICATION_SERVICE);
 
         int carAccentColor = mContext.getColor(R.color.car_body2);
         mExpandDrawable = mContext.getDrawable(R.drawable.expand_more);
