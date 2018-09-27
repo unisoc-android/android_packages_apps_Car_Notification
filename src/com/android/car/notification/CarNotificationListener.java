@@ -16,16 +16,15 @@
 package com.android.car.notification;
 
 import android.annotation.Nullable;
-import android.car.Car;
-import android.car.CarNotConnectedException;
-import android.car.drivingstate.CarUxRestrictions;
-import android.car.drivingstate.CarUxRestrictionsManager;
 import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
-import android.content.ServiceConnection;
 import android.os.Binder;
+import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
+import android.os.RemoteException;
+import android.os.UserHandle;
 import android.service.notification.NotificationListenerService;
 import android.service.notification.StatusBarNotification;
 import android.util.Log;
@@ -39,56 +38,42 @@ import java.util.Objects;
  * NotificationListenerService that fetches all notifications from system.
  */
 public class CarNotificationListener extends NotificationListenerService {
-    private static final String TAG = "CarNotListener";
-
+    private static final String TAG = "CarNotificationListener";
     static final String ACTION_LOCAL_BINDING = "local_binding";
     static final int NOTIFY_NOTIFICATION_ADDED = 1;
     static final int NOTIFY_NOTIFICATIONS_CHANGED = 2;
     /** Temporary {@link Ranking} object that serves as a reused value holder */
     final private Ranking mTemporaryRanking = new Ranking();
 
-    private CarNotificationCenterActivity.LocalHandler mHandler;
+    private Handler mHandler;
     private RankingMap mRankingMap;
     private CarHeadsUpNotificationManager mHeadsUpManager;
-    private Car mCar;
-    private CarUxRestrictions mCarUxRestrictions;
     private List<StatusBarNotification> mNotifications = new ArrayList<>();
 
-    private ServiceConnection mCarConnectionListener = new ServiceConnection() {
-        @Override
-        public void onServiceConnected(ComponentName name, IBinder service) {
-            try {
-                CarUxRestrictionsManager manager = (CarUxRestrictionsManager) mCar.getCarManager(
-                        Car.CAR_UX_RESTRICTION_SERVICE);
-
-                mCarUxRestrictions = manager.getCurrentCarUxRestrictions();
-                manager.registerListener(restrictionInfo -> mCarUxRestrictions = restrictionInfo);
-            } catch (CarNotConnectedException e) {
-                Log.e(TAG, "Car not connected in CarHeadsUpNotificationManager", e);
-            }
+    /**
+     * Call this if to register this service as a system service. This is useful if the notification
+     * service is being used as a lib instead of a standalone app. The standalone app version has
+     * a manifest entry that will have the same effect.
+     *
+     * @param context Context required for registering the service.
+     */
+    public void registerAsSystemService(Context context) {
+        try {
+            registerAsSystemService(context,
+                    new ComponentName(context.getPackageName(), getClass().getCanonicalName()),
+                    UserHandle.USER_ALL);
+            // Note: The first call to CarHeadsUpNotificationManager.getInstance will build the
+            // UI thus we do it here to be sure it's ready.
+            mHeadsUpManager = CarHeadsUpNotificationManager.getInstance(context);
+        } catch (RemoteException e) {
+            Log.e(TAG, "Unable to register notification listener", e);
         }
-
-        @Override
-        public void onServiceDisconnected(ComponentName name) {
-            Log.e(TAG, "Car service disconnected unexpectedly");
-        }
-    };
+    }
 
     @Override
     public void onCreate() {
         super.onCreate();
         mHeadsUpManager = CarHeadsUpNotificationManager.getInstance(getApplicationContext());
-        mCar = Car.createCar(this, mCarConnectionListener);
-        if (mCar != null) {
-            mCar.connect();
-        }
-    }
-
-    @Override
-    public void onDestroy() {
-        if (mCar != null) {
-            mCar.disconnect();
-        }
     }
 
     @Override
@@ -151,13 +136,6 @@ public class CarNotificationListener extends NotificationListenerService {
         return mNotifications;
     }
 
-    /**
-     * Get the current car UX restrictions.
-     */
-    public CarUxRestrictions getCarUxRestrictions() {
-        return mCarUxRestrictions;
-    }
-
     @Override
     public RankingMap getCurrentRanking() {
         return mRankingMap;
@@ -173,7 +151,7 @@ public class CarNotificationListener extends NotificationListenerService {
     public void onListenerDisconnected() {
     }
 
-    public void setHandler(CarNotificationCenterActivity.LocalHandler handler) {
+    public void setHandler(Handler handler) {
         mHandler = handler;
     }
 
@@ -187,7 +165,7 @@ public class CarNotificationListener extends NotificationListenerService {
     }
 
     private void onNotificationAdded(StatusBarNotification sbn) {
-        mHeadsUpManager.maybeShowHeadsUp(mCarUxRestrictions, sbn, getCurrentRanking());
+        mHeadsUpManager.maybeShowHeadsUp(sbn, getCurrentRanking());
 
         if (mHandler == null) {
             return;

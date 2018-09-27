@@ -353,7 +353,7 @@ public class CarNotificationViewAdapter extends RecyclerView.Adapter<RecyclerVie
     /**
      * Gets the current {@link CarUxRestrictions}.
      */
-    public CarUxRestrictions getCarUxRestrictions() {
+    CarUxRestrictions getCarUxRestrictions() {
         return mCarUxRestrictions;
     }
 

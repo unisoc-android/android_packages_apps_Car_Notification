@@ -16,14 +16,15 @@
 package com.android.car.notification;
 
 import android.app.Notification;
+import android.car.CarNotConnectedException;
 import android.car.drivingstate.CarUxRestrictions;
+import android.car.drivingstate.CarUxRestrictionsManager;
 import android.content.Context;
-import android.content.pm.ApplicationInfo;
-import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.service.notification.NotificationListenerService;
 import android.service.notification.StatusBarNotification;
 import android.text.TextUtils;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 
@@ -37,18 +38,16 @@ import java.util.TreeMap;
 /**
  * Manager that groups and ranks the notifications in the notification center.
  */
-class PreprocessingManager {
+public class PreprocessingManager {
+    private static final String TAG = "PreprocessingManager";
     private static final String SYSTEM_PACKAGE_NAME = "android";
     private static PreprocessingManager mInstance;
     private final String mEllipsizedString;
-    private final Context mContext;
-    private final PackageManager mPackageManager;
     private final boolean mEnableMediaNotification;
     private final boolean mEnableOngoingNotification;
+    private CarUxRestrictionsManager mUxRestrictionsManager;
 
     private PreprocessingManager(Context context) {
-        mContext = context.getApplicationContext();
-        mPackageManager = context.getPackageManager();
         mEllipsizedString = context.getString(R.string.ellipsized_string);
         mEnableMediaNotification =
                 context.getResources().getBoolean(R.bool.config_showMediaNotification);
@@ -66,17 +65,15 @@ class PreprocessingManager {
     /**
      * Process the given notifications.
      *
-     * @param notifications the notifications to be processed.
      * @param rankingMap    the ranking map for the notifications.
      * @return the processed notifications in a new list.
      */
     public List<NotificationGroup> process(
-            CarUxRestrictions carUxRestrictions,
             @NonNull List<StatusBarNotification> notifications,
             @NonNull NotificationListenerService.RankingMap rankingMap) {
 
         return new ArrayList<>(
-                rank(group(optimizeForDriving(carUxRestrictions, filter(notifications))), rankingMap));
+                rank(group(optimizeForDriving(filter(notifications))), rankingMap));
     }
 
     /**
@@ -101,9 +98,9 @@ class PreprocessingManager {
      * optimization is required.
      */
     private List<StatusBarNotification> optimizeForDriving(
-            CarUxRestrictions carUxRestrictions, List<StatusBarNotification> notifications) {
+            List<StatusBarNotification> notifications) {
         notifications.forEach(
-                notification -> notification = optimizeForDriving(carUxRestrictions, notification));
+                notification -> notification = optimizeForDriving(notification));
         return notifications;
     }
 
@@ -112,8 +109,8 @@ class PreprocessingManager {
      * Currently only trimming texts that have visual effects in car.
      * Operation is done on the original notification object passed in; no new object is created.
      */
-    StatusBarNotification optimizeForDriving(
-            CarUxRestrictions carUxRestrictions, StatusBarNotification notification) {
+    StatusBarNotification optimizeForDriving(StatusBarNotification notification) {
+        CarUxRestrictions carUxRestrictions = getCurrentUxRestrictions();
         int maxStringLength = carUxRestrictions != null
                 ? carUxRestrictions.getMaxRestrictedStringLength()
                 : Integer.MAX_VALUE;
@@ -177,6 +174,23 @@ class PreprocessingManager {
 
         Collections.sort(notifications, new NotificationComparator(rankingMap));
         return notifications;
+    }
+
+    public void setCarUxRestrictionsManager(CarUxRestrictionsManager manager) {
+        mUxRestrictionsManager = manager;
+    }
+
+    private CarUxRestrictions getCurrentUxRestrictions() {
+        if (mUxRestrictionsManager == null) {
+            return null;
+        }
+
+        try {
+            return mUxRestrictionsManager.getCurrentCarUxRestrictions();
+        } catch (CarNotConnectedException e) {
+            Log.e(TAG, "Failed to get UxRestrictions thus running unrestricted", e);
+            return null;
+        }
     }
 
     private static class NotificationComparator implements Comparator<NotificationGroup> {
