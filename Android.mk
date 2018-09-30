@@ -48,4 +48,31 @@ LOCAL_JAVA_LIBRARIES += android.car
 
 include $(BUILD_PACKAGE)
 
+# As Lib
+include $(CLEAR_VARS)
+LOCAL_MODULE := CarNotificationLib
+LOCAL_SRC_FILES := $(call all-java-files-under, src)
+
+LOCAL_RESOURCE_DIR := $(LOCAL_PATH)/res
+
+LOCAL_PRIVATE_PLATFORM_APIS := true
+
+LOCAL_CERTIFICATE := platform
+
+LOCAL_MODULE_TAGS := optional
+
+LOCAL_PRIVILEGED_MODULE := true
+
+LOCAL_USE_AAPT2 := true
+LOCAL_PROGUARD_ENABLED := disabled
+
+LOCAL_DEX_PREOPT := false
+
+LOCAL_STATIC_ANDROID_LIBRARIES += \
+    androidx.car_car \
+    androidx.palette_palette \
+
+LOCAL_JAVA_LIBRARIES += android.car
+include $(BUILD_STATIC_JAVA_LIBRARY)
+
 endif

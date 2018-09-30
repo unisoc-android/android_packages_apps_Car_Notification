@@ -14,9 +14,10 @@
     See the License for the specific language governing permissions and
     limitations under the License.
 -->
-<RelativeLayout
+<com.android.car.notification.CarNotificationView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/notification_view"
     android:background="@color/background_color"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
@@ -68,4 +69,5 @@
         app:itemSpacing="@dimen/car_padding_2"
         app:showPagedListViewDivider="false"
         app:gutter="both" />
-</RelativeLayout>
+
+</com.android.car.notification.CarNotificationView>
