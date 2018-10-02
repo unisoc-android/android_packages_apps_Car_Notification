@@ -94,7 +94,7 @@ class CarNotificationDiff extends DiffUtil.Callback {
             return false;
         }
 
-        if (!sameNotificationUniqueIdentifiers(
+        if (!sameNotificationKey(
                 oldItem.getGroupHeaderNotification(), newItem.getGroupHeaderNotification())) {
             return false;
         }
@@ -105,7 +105,7 @@ class CarNotificationDiff extends DiffUtil.Callback {
         for (int i = 0; i < oldItem.getChildCount(); i++) {
             StatusBarNotification oldNotification = oldNotifications.get(i);
             StatusBarNotification newNotification = newNotifications.get(i);
-            if (!sameNotificationUniqueIdentifiers(oldNotification, newNotification)) {
+            if (!sameNotificationKey(oldNotification, newNotification)) {
                 return false;
             }
         }
@@ -115,27 +115,18 @@ class CarNotificationDiff extends DiffUtil.Callback {
 
     /**
      * Shallow comparison for {@link StatusBarNotification}: only comparing the unique IDs.
-     * <p> Two status bar notifications are considered to have the same ID if they have the same:
-     * <ol>
-     * <li> Id
-     * <li> Package name
-     * <li> Targeted user
-     * <li> Tag
-     * </ol>
+     *
+     * <p> Returns true if two notifications have the same key.
      */
-    static boolean sameNotificationUniqueIdentifiers(
+    static boolean sameNotificationKey(
             StatusBarNotification oldItem, StatusBarNotification newItem) {
-
         if (oldItem == newItem) {
             return true;
         }
 
         return oldItem != null
                 && newItem != null
-                && oldItem.getId() == newItem.getId()
-                && oldItem.getPackageName().equals(newItem.getPackageName())
-                && oldItem.getUser().equals(newItem.getUser())
-                && Objects.equals(oldItem.getTag(), newItem.getTag());
+                && Objects.equals(oldItem.getKey(), newItem.getKey());
     }
 
     /**
