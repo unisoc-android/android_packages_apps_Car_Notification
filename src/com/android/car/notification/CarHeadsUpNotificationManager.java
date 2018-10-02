@@ -18,10 +18,12 @@ package com.android.car.notification;
 import android.app.KeyguardManager;
 import android.app.Notification;
 import android.app.NotificationManager;
+import android.car.userlib.CarUserManagerHelper;
 import android.content.Context;
 import android.graphics.PixelFormat;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.RemoteException;
 import android.service.notification.NotificationListenerService;
 import android.service.notification.StatusBarNotification;
 import android.view.Gravity;
@@ -30,6 +32,8 @@ import android.view.View;
 import android.view.ViewTreeObserver;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
+
+import androidx.coordinatorlayout.widget.CoordinatorLayout;
 
 /**
  * Notification Manager for heads-up notifications in car.
@@ -42,8 +46,10 @@ public class CarHeadsUpNotificationManager {
     private final long mDuration;
     private final long mEnterAnimationDuration;
     private final int mScrimHeightBelowNotification;
+    private final CarUserManagerHelper mCarUserManagerHelper;
     private final KeyguardManager mKeyguardManager;
     private final PreprocessingManager mPreprocessingManager;
+    private final NotificationManager mNotificationManager;
     private final WindowManager mWindowManager;
     private final LayoutInflater mInflater;
     private final Handler mTimer;
@@ -61,8 +67,11 @@ public class CarHeadsUpNotificationManager {
                 mContext.getResources().getInteger(R.integer.headsup_enter_duration_ms);
         mScrimHeightBelowNotification = mContext.getResources().getDimensionPixelOffset(
                 R.dimen.headsup_scrim_height_below_notification);
+        mCarUserManagerHelper = new CarUserManagerHelper(context);
         mKeyguardManager = (KeyguardManager) context.getSystemService(Context.KEYGUARD_SERVICE);
         mPreprocessingManager = PreprocessingManager.getInstance(context);
+        mNotificationManager =
+                (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         mWindowManager =
                 (WindowManager) mContext.getSystemService(Context.WINDOW_SERVICE);
         mInflater = LayoutInflater.from(mContext);
@@ -85,7 +94,7 @@ public class CarHeadsUpNotificationManager {
         mWindowManager.addView(mScrimView, scrimParams);
 
         WindowManager.LayoutParams wrapperParams = new WindowManager.LayoutParams(
-                WindowManager.LayoutParams.WRAP_CONTENT,
+                WindowManager.LayoutParams.MATCH_PARENT,
                 WindowManager.LayoutParams.WRAP_CONTENT,
                 // This type allows covering status bar and receiving touch input
                 WindowManager.LayoutParams.TYPE_SYSTEM_ERROR,
@@ -153,10 +162,6 @@ public class CarHeadsUpNotificationManager {
                 break;
             }
         }
-        // To prevent the default animation from showing
-        // setting the notification view as invisible until the animator actually kicks in
-        // TODO: Remove the default animation
-        notificationView.setVisibility(View.INVISIBLE);
 
         // Get the height of the notification view after onLayout()
         // in order to set the height of the scrim view and do animations
@@ -168,7 +173,6 @@ public class CarHeadsUpNotificationManager {
                         mScrimView.setY(0 - notificationHeight - mScrimHeightBelowNotification);
                         notificationView.setY(0 - notificationHeight);
 
-                        notificationView.setVisibility(View.VISIBLE);
                         notificationView.animate()
                                 .y(0f)
                                 .setDuration(mEnterAnimationDuration);
@@ -187,11 +191,47 @@ public class CarHeadsUpNotificationManager {
                     }
                 });
 
+
+        // Add swipe gesture
+        ((CoordinatorLayout.LayoutParams) notificationView.findViewById(R.id.column_card_view)
+                .getLayoutParams()).setBehavior(createSwipeDismissBehavior(statusBarNotification));
+
         // Remove heads-up notifications after a timer
-        mTimer.postDelayed(() -> {
-            mScrimView.setVisibility(View.GONE);
-            mWrapper.removeAllViews();
-        }, mDuration);
+        mTimer.postDelayed(() -> clearViews(), mDuration);
+    }
+
+    /**
+     * Creates a {@link SwipeDismissBehavior} that supports swiping on horizontal directions.
+     */
+    private SwipeDismissBehavior createSwipeDismissBehavior(StatusBarNotification notification) {
+        SwipeDismissBehavior<View> behavior = new SwipeDismissBehavior<>();
+        behavior.setSwipeDirection(SwipeDismissBehavior.SWIPE_DIRECTION_ANY);
+        behavior.setListener(
+                new SwipeDismissBehavior.OnDismissListener() {
+                    @Override
+                    public void onDismiss(View view) {
+                        if (CarNotificationItemTouchHelper.isCancelable(
+                                notification.getNotification())) {
+                            try {
+                                mNotificationManager.getService().cancelNotificationWithTag(
+                                        notification.getPackageName(),
+                                        notification.getTag(),
+                                        notification.getId(),
+                                        mCarUserManagerHelper.getCurrentForegroundUserId());
+                            } catch (RemoteException e) {
+                                throw e.rethrowFromSystemServer();
+                            }
+                        }
+                        clearViews();
+                        mTimer.removeCallbacksAndMessages(null);
+                    }
+                });
+        return behavior;
+    }
+
+    private void clearViews() {
+        mScrimView.setVisibility(View.GONE);
+        mWrapper.removeAllViews();
     }
 
     /**

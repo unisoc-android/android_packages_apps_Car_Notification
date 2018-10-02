@@ -41,10 +41,13 @@ LOCAL_DEX_PREOPT := false
 
 LOCAL_STATIC_ANDROID_LIBRARIES += \
     androidx.car_car \
-    androidx.palette_palette \
+    androidx.palette_palette
 
+LOCAL_STATIC_JAVA_LIBRARIES += \
+    android.car.user
 
-LOCAL_JAVA_LIBRARIES += android.car
+LOCAL_JAVA_LIBRARIES += \
+    android.car
 
 include $(BUILD_PACKAGE)
 
@@ -72,7 +75,12 @@ LOCAL_STATIC_ANDROID_LIBRARIES += \
     androidx.car_car \
     androidx.palette_palette \
 
-LOCAL_JAVA_LIBRARIES += android.car
+LOCAL_STATIC_JAVA_LIBRARIES += \
+    android.car.user
+
+LOCAL_JAVA_LIBRARIES += \
+    android.car
+
 include $(BUILD_STATIC_JAVA_LIBRARY)
 
 endif

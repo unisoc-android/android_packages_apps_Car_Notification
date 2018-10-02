@@ -16,9 +16,9 @@
 
 package com.android.car.notification;
 
-import android.app.ActivityManager;
 import android.app.Notification;
 import android.app.NotificationManager;
+import android.car.userlib.CarUserManagerHelper;
 import android.content.Context;
 import android.os.RemoteException;
 import android.service.notification.StatusBarNotification;
@@ -32,6 +32,7 @@ import androidx.recyclerview.widget.RecyclerView;
 class CarNotificationItemTouchHelper extends ItemTouchHelper.SimpleCallback {
 
     private final CarNotificationViewAdapter mAdapter;
+    private final CarUserManagerHelper mCarUserManagerHelper;
     private final NotificationManager mNotificationManager;
 
     public CarNotificationItemTouchHelper(
@@ -40,6 +41,7 @@ class CarNotificationItemTouchHelper extends ItemTouchHelper.SimpleCallback {
         super(ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT,
                 ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT);
         mAdapter = adapter;
+        mCarUserManagerHelper = new CarUserManagerHelper(context);
         mNotificationManager =
                 (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
     }
@@ -69,7 +71,7 @@ class CarNotificationItemTouchHelper extends ItemTouchHelper.SimpleCallback {
                         notification.getPackageName(),
                         notification.getTag(),
                         notification.getId(),
-                        ActivityManager.getCurrentUser());
+                        mCarUserManagerHelper.getCurrentForegroundUserId());
             } catch (RemoteException e) {
                 throw e.rethrowFromSystemServer();
             }
