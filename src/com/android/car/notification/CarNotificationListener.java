@@ -85,7 +85,7 @@ public class CarNotificationListener extends NotificationListenerService {
     @Override
     public void onNotificationPosted(StatusBarNotification sbn, RankingMap rankingMap) {
         mNotifications.removeIf(notification ->
-                CarNotificationDiff.sameNotificationUniqueIdentifiers(notification, sbn));
+                CarNotificationDiff.sameNotificationKey(notification, sbn));
         mNotifications.add(sbn);
         mRankingMap = rankingMap;
         onNotificationAdded(sbn);
@@ -94,7 +94,7 @@ public class CarNotificationListener extends NotificationListenerService {
     @Override
     public void onNotificationRemoved(StatusBarNotification sbn) {
         mNotifications.removeIf(notification ->
-                CarNotificationDiff.sameNotificationUniqueIdentifiers(notification, sbn));
+                CarNotificationDiff.sameNotificationKey(notification, sbn));
         onNotificationChanged();
     }
 

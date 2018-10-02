@@ -55,6 +55,7 @@ public class CarHeadsUpNotificationManager {
     private final Handler mTimer;
     private final View mScrimView;
     private final FrameLayout mWrapper;
+    private StatusBarNotification mVisibleNotification;
 
     private CarHeadsUpNotificationManager(Context context) {
         mContext = context.getApplicationContext();
@@ -163,6 +164,12 @@ public class CarHeadsUpNotificationManager {
             }
         }
 
+        // Show animations only when a different notification comes in.
+        // i.e. an update of the previous heads-up notification will not have animations.
+        boolean shouldShowAnimation = !CarNotificationDiff.sameNotificationKey(
+                mVisibleNotification, statusBarNotification);
+        mVisibleNotification = statusBarNotification;
+
         // Get the height of the notification view after onLayout()
         // in order to set the height of the scrim view and do animations
         notificationView.getViewTreeObserver().addOnGlobalLayoutListener(
@@ -170,23 +177,24 @@ public class CarHeadsUpNotificationManager {
                     @Override
                     public void onGlobalLayout() {
                         int notificationHeight = notificationView.getHeight();
-                        mScrimView.setY(0 - notificationHeight - mScrimHeightBelowNotification);
-                        notificationView.setY(0 - notificationHeight);
-
-                        notificationView.animate()
-                                .y(0f)
-                                .setDuration(mEnterAnimationDuration);
-
                         WindowManager.LayoutParams scrimParams =
                                 (WindowManager.LayoutParams) mScrimView.getLayoutParams();
                         scrimParams.height = notificationHeight + mScrimHeightBelowNotification;
                         mWindowManager.updateViewLayout(mScrimView, scrimParams);
 
-                        mScrimView.setVisibility(View.VISIBLE);
-                        mScrimView.animate()
-                                .y(0f)
-                                .setDuration(mEnterAnimationDuration);
+                        if (shouldShowAnimation) {
+                            mScrimView.setY(0 - notificationHeight - mScrimHeightBelowNotification);
+                            notificationView.setY(0 - notificationHeight);
 
+                            notificationView.animate()
+                                    .y(0f)
+                                    .setDuration(mEnterAnimationDuration);
+
+                            mScrimView.setVisibility(View.VISIBLE);
+                            mScrimView.animate()
+                                    .y(0f)
+                                    .setDuration(mEnterAnimationDuration);
+                        }
                         notificationView.getViewTreeObserver().removeOnGlobalLayoutListener(this);
                     }
                 });
@@ -207,29 +215,27 @@ public class CarHeadsUpNotificationManager {
         SwipeDismissBehavior<View> behavior = new SwipeDismissBehavior<>();
         behavior.setSwipeDirection(SwipeDismissBehavior.SWIPE_DIRECTION_ANY);
         behavior.setListener(
-                new SwipeDismissBehavior.OnDismissListener() {
-                    @Override
-                    public void onDismiss(View view) {
-                        if (CarNotificationItemTouchHelper.isCancelable(
-                                notification.getNotification())) {
-                            try {
-                                mNotificationManager.getService().cancelNotificationWithTag(
-                                        notification.getPackageName(),
-                                        notification.getTag(),
-                                        notification.getId(),
-                                        mCarUserManagerHelper.getCurrentForegroundUserId());
-                            } catch (RemoteException e) {
-                                throw e.rethrowFromSystemServer();
-                            }
+                view -> {
+                    if (CarNotificationItemTouchHelper.isCancelable(
+                            notification.getNotification())) {
+                        try {
+                            mNotificationManager.getService().cancelNotificationWithTag(
+                                    notification.getPackageName(),
+                                    notification.getTag(),
+                                    notification.getId(),
+                                    mCarUserManagerHelper.getCurrentForegroundUserId());
+                        } catch (RemoteException e) {
+                            throw e.rethrowFromSystemServer();
                         }
-                        clearViews();
-                        mTimer.removeCallbacksAndMessages(null);
                     }
+                    clearViews();
+                    mTimer.removeCallbacksAndMessages(null);
                 });
         return behavior;
     }
 
     private void clearViews() {
+        mVisibleNotification = null;
         mScrimView.setVisibility(View.GONE);
         mWrapper.removeAllViews();
     }
