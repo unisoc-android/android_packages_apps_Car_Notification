@@ -9,6 +9,7 @@ import android.widget.RelativeLayout;
 import androidx.car.widget.PagedListView;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.recyclerview.widget.SimpleItemAnimator;
 
 import java.util.List;
 
@@ -38,6 +39,8 @@ public class CarNotificationView extends RelativeLayout {
         PagedListView listView = findViewById(R.id.notifications);
         mAdapter = new CarNotificationViewAdapter(mContext,/* isGroupNotificationAdapter= */ false);
         listView.setAdapter(mAdapter);
+        ((SimpleItemAnimator) listView.getRecyclerView().getItemAnimator())
+                .setSupportsChangeAnimations(false);
 
         new ItemTouchHelper(
                 new CarNotificationItemTouchHelper(mContext, mAdapter) {

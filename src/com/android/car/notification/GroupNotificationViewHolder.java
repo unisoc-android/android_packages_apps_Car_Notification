@@ -25,6 +25,7 @@ import android.widget.Button;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.recyclerview.widget.SimpleItemAnimator;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -65,6 +66,8 @@ public class GroupNotificationViewHolder extends RecyclerView.ViewHolder {
 
         mNotificationListView.setLayoutManager(new LinearLayoutManager(mContext));
         mNotificationListView.addItemDecoration(new GroupedNotificationItemDecoration());
+        ((SimpleItemAnimator) mNotificationListView.getItemAnimator())
+                .setSupportsChangeAnimations(false);
         mNotificationListView.setNestedScrollingEnabled(false);
         mAdapter = new CarNotificationViewAdapter(mContext, /* isGroupNotificationAdapter= */ true);
         mNotificationListView.setAdapter(mAdapter);
