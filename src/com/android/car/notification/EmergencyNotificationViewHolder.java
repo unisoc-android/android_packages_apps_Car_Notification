@@ -77,15 +77,6 @@ public class EmergencyNotificationViewHolder extends RecyclerView.ViewHolder {
             });
         }
 
-        if (notification.bigContentView != null) {
-            View view = notification.bigContentView.apply(mContext, /* parent= */ mBigContentView);
-            mBigContentView.setVisibility(View.VISIBLE);
-            mBigContentView.addView(view);
-            // If a notification came with a custom content view,
-            // do not bind anything else other than the custom view.
-            return;
-        }
-
         mHeaderView.bind(statusBarNotification, /* primaryColor= */ null);
         mActionsView.bind(statusBarNotification, /* isInGroup= */ false);
 
@@ -121,9 +112,5 @@ public class EmergencyNotificationViewHolder extends RecyclerView.ViewHolder {
 
         mContentTextView.setText(null);
         mContentTextView.setVisibility(View.GONE);
-
-        mHeaderView.reset();
-
-        mActionsView.reset();
     }
 }

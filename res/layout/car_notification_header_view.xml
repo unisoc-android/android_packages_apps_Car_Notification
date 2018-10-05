@@ -20,7 +20,16 @@
         android:layout_width="@dimen/car_secondary_icon_size"
         android:layout_height="@dimen/car_secondary_icon_size"
         android:layout_gravity="center_vertical"
-        android:tint="@color/notification_small_icon_tint"
         android:scaleType="fitCenter"/>
+
+    <TextView
+        android:id="@+id/header_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:paddingStart="@dimen/car_padding_3"
+        android:maxLines="1"
+        android:ellipsize="end"
+        android:textAppearance="@style/NotificationHeaderText"/>
 </merge>
 

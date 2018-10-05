@@ -115,9 +115,5 @@ public class ProgressNotificationViewHolder extends RecyclerView.ViewHolder {
 
         mProgressBarView.setProgress(0);
         mProgressBarView.setVisibility(View.GONE);
-
-        mHeaderView.reset();
-
-        mActionsView.reset();
     }
 }

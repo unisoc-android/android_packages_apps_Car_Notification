@@ -19,62 +19,48 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
-    <!-- Needed so that the child views can be stacked -->
-    <FrameLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
-
-        <ImageView
-            android:id="@+id/album_art"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:scaleType="centerCrop"/>
-
-        <View
-            android:id="@+id/color_overlay"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:alpha="0.8"/>
-    </FrameLayout>
-
     <com.android.car.notification.CarNotificationHeaderView
-        android:id="@+id/header"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:id="@+id/notification_header"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/header_height"
         android:layout_alignParentTop="true"
-        android:layout_alignParentEnd="true"
-        android:layout_marginStart="@dimen/car_padding_4"
-        android:layout_marginTop="@dimen/car_padding_3"
+        android:layout_alignParentStart="true"
+        android:layout_marginStart="@dimen/car_keyline_1"
         android:layout_marginEnd="@dimen/car_keyline_1"/>
 
     <TextView
-        android:id="@+id/title"
+        android:id="@+id/notification_title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentTop="true"
-        android:layout_toStartOf="@+id/header"
+        android:layout_below="@id/notification_header"
         android:layout_marginStart="@dimen/car_keyline_1"
         android:layout_marginBottom="@dimen/car_padding_0"
-        android:paddingTop="@dimen/car_padding_3"
         style="@style/NotificationTitleText"/>
 
     <TextView
-        android:id="@+id/content"
+        android:id="@+id/notification_text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentStart="true"
-        android:layout_below="@id/title"
-        android:layout_toStartOf="@+id/header"
+        android:layout_below="@id/notification_title"
         android:layout_marginStart="@dimen/car_keyline_1"
         android:layout_marginBottom="@dimen/car_padding_3"
         android:textAppearance="@style/TextAppearance.Car.Body3"/>
+
+    <ImageButton
+        android:id="@+id/album_art"
+        android:layout_width="@dimen/car_touch_target_size"
+        android:layout_height="@dimen/car_touch_target_size"
+        android:layout_alignParentEnd="true"
+        android:layout_below="@id/notification_header"
+        android:layout_marginStart="@dimen/car_padding_4"
+        android:layout_marginEnd="@dimen/car_keyline_1"/>
 
     <LinearLayout
         android:id="@+id/action_bar"
         android:layout_width="match_parent"
         android:layout_height="@dimen/car_card_action_bar_height"
-        android:layout_below="@+id/content"
+        android:layout_below="@+id/notification_text"
         android:gravity="center_vertical">
 
         <ImageButton
