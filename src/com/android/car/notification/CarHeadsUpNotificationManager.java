@@ -33,8 +33,6 @@ import android.view.ViewTreeObserver;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
 
-import androidx.coordinatorlayout.widget.CoordinatorLayout;
-
 /**
  * Notification Manager for heads-up notifications in car.
  */
@@ -199,39 +197,28 @@ public class CarHeadsUpNotificationManager {
                     }
                 });
 
-
-        // Add swipe gesture
-        ((CoordinatorLayout.LayoutParams) notificationView.findViewById(R.id.column_card_view)
-                .getLayoutParams()).setBehavior(createSwipeDismissBehavior(statusBarNotification));
-
         // Remove heads-up notifications after a timer
         mTimer.postDelayed(() -> clearViews(), mDuration);
-    }
 
-    /**
-     * Creates a {@link SwipeDismissBehavior} that supports swiping on horizontal directions.
-     */
-    private SwipeDismissBehavior createSwipeDismissBehavior(StatusBarNotification notification) {
-        SwipeDismissBehavior<View> behavior = new SwipeDismissBehavior<>();
-        behavior.setSwipeDirection(SwipeDismissBehavior.SWIPE_DIRECTION_ANY);
-        behavior.setListener(
-                view -> {
-                    if (CarNotificationItemTouchHelper.isCancelable(
-                            notification.getNotification())) {
-                        try {
-                            mNotificationManager.getService().cancelNotificationWithTag(
-                                    notification.getPackageName(),
-                                    notification.getTag(),
-                                    notification.getId(),
-                                    mCarUserManagerHelper.getCurrentForegroundUserId());
-                        } catch (RemoteException e) {
-                            throw e.rethrowFromSystemServer();
-                        }
-                    }
-                    clearViews();
-                    mTimer.removeCallbacksAndMessages(null);
-                });
-        return behavior;
+        // Add swipe gesture
+        notificationView.setOnTouchListener(
+                new HeadsUpNotificationOnTouchListener(notificationView,
+                        () -> {
+                            if (CarNotificationItemTouchHelper.isCancelable(
+                                    statusBarNotification.getNotification())) {
+                                try {
+                                    mNotificationManager.getService().cancelNotificationWithTag(
+                                            statusBarNotification.getPackageName(),
+                                            statusBarNotification.getTag(),
+                                            statusBarNotification.getId(),
+                                            mCarUserManagerHelper.getCurrentForegroundUserId());
+                                } catch (RemoteException e) {
+                                    throw e.rethrowFromSystemServer();
+                                }
+                            }
+                            clearViews();
+                            mTimer.removeCallbacksAndMessages(null);
+                        }));
     }
 
     private void clearViews() {
