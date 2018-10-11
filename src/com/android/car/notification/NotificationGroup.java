@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Data structure representing a notification card in car.
@@ -50,19 +51,29 @@ class NotificationGroup {
     }
 
     void addNotification(StatusBarNotification statusBarNotification) {
-        assertSameGroupKey(PreprocessingManager.getGroupKey(statusBarNotification));
+        assertSameGroupKey(statusBarNotification.getGroupKey());
         mNotifications.add(statusBarNotification);
-        // Sort the child notifications by the group key
-        // If a group key is not supplied, sort by the posted time in the descending order
-        Collections.sort(
-                mNotifications,
-                Comparator.comparing(StatusBarNotification::getGroupKey, String::compareTo)
-                        .thenComparing((left, right)
-                                -> left.getPostTime() < right.getPostTime() ? 1 : -1));
+
+        // Sort the child notifications by the sort key
+        // If a sort key is not supplied, sort by the posted time in the descending order
+        Comparator<StatusBarNotification> comparator = ((Comparator<StatusBarNotification>)
+                (left, right) -> {
+                    if (left.getNotification().getSortKey() == null
+                            || right.getNotification().getSortKey() == null) {
+                        return 0;
+                    }
+                    return left.getNotification().getSortKey().compareTo(
+                            right.getNotification().getSortKey());
+                })
+                .thenComparing(
+                        (left, right)
+                                -> left.getPostTime() < right.getPostTime() ? 1 : -1);
+
+        Collections.sort(mNotifications, comparator);
     }
 
     void setGroupHeaderNotification(StatusBarNotification groupHeaderNotification) {
-        assertSameGroupKey(PreprocessingManager.getGroupKey(groupHeaderNotification));
+        assertSameGroupKey(groupHeaderNotification.getGroupKey());
         // There exists a group summary notification
         if (mGroupHeaderNotification != null) {
             mNotifications.add(groupHeaderNotification);
@@ -122,7 +133,7 @@ class NotificationGroup {
     List<String> generateChildTitles() {
         List<String> titles = new ArrayList<>();
 
-        for(StatusBarNotification notification : mNotifications) {
+        for (StatusBarNotification notification : mNotifications) {
             Bundle extras = notification.getNotification().extras;
             if (extras.containsKey(Notification.EXTRA_TITLE)) {
                 titles.add(extras.getString(Notification.EXTRA_TITLE));

@@ -40,7 +40,6 @@ import java.util.TreeMap;
  */
 public class PreprocessingManager {
     private static final String TAG = "PreprocessingManager";
-    private static final String SYSTEM_PACKAGE_NAME = "android";
     private static PreprocessingManager mInstance;
     private final String mEllipsizedString;
     private final boolean mEnableMediaNotification;
@@ -147,7 +146,7 @@ public class PreprocessingManager {
             StatusBarNotification statusBarNotification = list.get(i);
             Notification notification = statusBarNotification.getNotification();
 
-            String groupKey = getGroupKey(statusBarNotification);
+            String groupKey = statusBarNotification.getGroupKey();
             if (!groupedNotifications.containsKey(groupKey)) {
                 NotificationGroup notificationGroup = new NotificationGroup();
                 groupedNotifications.put(groupKey, notificationGroup);
@@ -212,26 +211,5 @@ public class PreprocessingManager {
 
             return leftRanking.getRank() - rightRanking.getRank();
         }
-    }
-
-    /**
-     * Helper method that generates a unique identifier for each grouped notification.
-     */
-    static String getGroupKey(StatusBarNotification statusBarNotification) {
-        String groupKey = statusBarNotification.getGroup();
-        String category = statusBarNotification.getNotification().category;
-        boolean isEmergency = Notification.CATEGORY_CAR_EMERGENCY.equals(category);
-        boolean isMedia = Notification.CATEGORY_TRANSPORT.equals(category);
-        boolean isSystem = SYSTEM_PACKAGE_NAME.equals(statusBarNotification.getPackageName());
-
-        if (groupKey == null || isEmergency || isMedia || isSystem) {
-            // If a notification is not part of a group, use a unique identifier as the group key
-            groupKey = statusBarNotification.getKey();
-        } else {
-            // Append the package name to the group key,
-            // in case it is the default override group key (same for every package)
-            groupKey += statusBarNotification.getPackageName();
-        }
-        return groupKey;
     }
 }
