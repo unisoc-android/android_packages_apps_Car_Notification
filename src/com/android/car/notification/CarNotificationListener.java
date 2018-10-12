@@ -73,7 +73,7 @@ public class CarNotificationListener extends NotificationListenerService {
     @Override
     public void onCreate() {
         super.onCreate();
-        mHeadsUpManager = CarHeadsUpNotificationManager.getInstance(getApplicationContext());
+        mHeadsUpManager = CarHeadsUpNotificationManager.getInstance(this);
     }
 
     @Override

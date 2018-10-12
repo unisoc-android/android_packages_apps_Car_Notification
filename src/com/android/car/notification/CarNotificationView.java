@@ -1,6 +1,7 @@
 package com.android.car.notification;
 
 import android.car.drivingstate.CarUxRestrictions;
+import android.car.drivingstate.CarUxRestrictionsManager;
 import android.content.Context;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -20,7 +21,8 @@ import java.util.List;
  * It does some extra setup in the onFinishInflate method because it may not get used from an
  * activity where one would normally attach RecyclerViews
  */
-public class CarNotificationView extends RelativeLayout {
+public class CarNotificationView extends RelativeLayout
+        implements CarUxRestrictionsManager.OnUxRestrictionsChangedListener {
 
     private CarNotificationViewAdapter mAdapter;
     private Context mContext;
@@ -64,16 +66,14 @@ public class CarNotificationView extends RelativeLayout {
     }
 
     /**
-     * Sets the current {@link CarUxRestrictions}.
-     */
-    public void setCarUxRestrictions(CarUxRestrictions carUxRestrictions) {
-        mAdapter.setCarUxRestrictions(carUxRestrictions);
-    }
-
-    /**
      * Updates notifications and update views.
      */
     public void setNotifications(List<NotificationGroup> notifications) {
         mAdapter.setNotifications(notifications);
+    }
+
+    @Override
+    public void onUxRestrictionsChanged(CarUxRestrictions restrictionInfo) {
+        mAdapter.setCarUxRestrictions(restrictionInfo);
     }
 }
