@@ -23,5 +23,7 @@
     <color name="emergency_action_bar_background_color">#A81314</color>
     <color name="action_bar_color">@color/car_card_action_bar</color>
     <color name="action_button_text_color">@color/car_body1_light</color>
-    <color name="header_text_color">@color/car_body2</color>
+    <color name="default_primary_text_color">@color/car_body1_light</color>
+    <color name="default_secondary_text_color">@color/car_body3_light</color>
+    <color name="header_text_color">@color/car_body2_light</color>
 </resources>

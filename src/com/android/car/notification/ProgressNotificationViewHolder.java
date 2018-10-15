@@ -17,13 +17,12 @@ package com.android.car.notification;
 
 import android.app.Notification;
 import android.app.PendingIntent;
+import android.graphics.drawable.Icon;
 import android.os.Bundle;
 import android.service.notification.StatusBarNotification;
-import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.ProgressBar;
-import android.widget.TextView;
 
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -34,9 +33,8 @@ import androidx.recyclerview.widget.RecyclerView;
 public class ProgressNotificationViewHolder extends RecyclerView.ViewHolder {
     private static final String TAG = "car_notification_basic";
     private final CarNotificationHeaderView mHeaderView;
+    private final CarNotificationBodyView mBodyView;
     private final CarNotificationActionsView mActionsView;
-    private final TextView mTitleTextView;
-    private final TextView mContentTextView;
     private final ProgressBar mProgressBarView;
     private final View mParentView;
 
@@ -44,9 +42,8 @@ public class ProgressNotificationViewHolder extends RecyclerView.ViewHolder {
         super(view);
         mParentView = view;
         mHeaderView = view.findViewById(R.id.notification_header);
+        mBodyView = view.findViewById(R.id.notification_body);
         mActionsView = view.findViewById(R.id.notification_actions);
-        mTitleTextView = view.findViewById(R.id.notification_title);
-        mContentTextView = view.findViewById(R.id.notification_text);
         mProgressBarView = view.findViewById(R.id.progress_bar);
     }
 
@@ -79,16 +76,9 @@ public class ProgressNotificationViewHolder extends RecyclerView.ViewHolder {
 
         Bundle extraData = notification.extras;
         CharSequence title = extraData.getCharSequence(Notification.EXTRA_TITLE);
-        if (!TextUtils.isEmpty(title)) {
-            mTitleTextView.setVisibility(View.VISIBLE);
-            mTitleTextView.setText(title);
-        }
-
         CharSequence text = extraData.getCharSequence(Notification.EXTRA_TEXT);
-        if (!TextUtils.isEmpty(text)) {
-            mContentTextView.setVisibility(View.VISIBLE);
-            mContentTextView.setText(text);
-        }
+        Icon icon = notification.getLargeIcon();
+        mBodyView.bind(title, text, icon);
 
         mProgressBarView.setVisibility(View.VISIBLE);
         boolean isIndeterminate = extraData.getBoolean(
@@ -106,12 +96,6 @@ public class ProgressNotificationViewHolder extends RecyclerView.ViewHolder {
     private void reset() {
         mParentView.setClickable(false);
         mParentView.setOnClickListener(null);
-
-        mTitleTextView.setText(null);
-        mTitleTextView.setVisibility(View.GONE);
-
-        mContentTextView.setText(null);
-        mContentTextView.setVisibility(View.GONE);
 
         mProgressBarView.setProgress(0);
         mProgressBarView.setVisibility(View.GONE);
