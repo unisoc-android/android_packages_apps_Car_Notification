@@ -110,7 +110,5 @@ public class GroupSummaryNotificationViewHolder extends RecyclerView.ViewHolder 
 
         mUnshownCountView.setText(null);
         mUnshownCountView.setVisibility(View.GONE);
-
-        mHeaderView.reset();
     }
 }

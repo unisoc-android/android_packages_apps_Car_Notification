@@ -64,7 +64,7 @@ public class CarNotificationActionsView extends RelativeLayout {
     }
 
     private void init(Context context) {
-        mCarActionBarColor = context.getResources().getColor(R.color.notification_action_bar_color);
+        mCarActionBarColor = context.getResources().getColor(R.color.action_bar_color);
         mCarCardColor = context.getResources().getColor(R.color.car_card);
         inflate(context, R.layout.car_notification_actions_view, /* root= */ this);
     }
@@ -117,7 +117,7 @@ public class CarNotificationActionsView extends RelativeLayout {
     /**
      * Resets the notification actions empty for recycling.
      */
-    void reset() {
+    private void reset() {
         setVisibility(View.GONE);
         mActionsView.setBackgroundColor(mCarActionBarColor);
         for (Button button : mActionButtons) {

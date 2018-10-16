@@ -23,6 +23,8 @@
     <!-- The title displayed in notification center activity -->
     <string name="notifications">Notifications</string>
     <string name="ellipsized_string">&#8230;</string>
+    <!-- The separator fot notification header text fields. -->
+    <string name="header_text_separator" translatable="false">&#160;&#8226;&#160;</string>
     <string name="expand">Expand</string>
     <string name="collapse">Collapse</string>
     <!-- Text indicating the number of the unshown notifications in the group summary -->

@@ -137,10 +137,6 @@ public class MessageNotificationViewHolder extends RecyclerView.ViewHolder {
         mParentView.setClickable(false);
         mParentView.setOnClickListener(null);
 
-        mHeaderView.reset();
-
-        mActionsView.reset();
-
         mSenderNameView.setVisibility(View.GONE);
         mSenderNameView.setText(null);
 

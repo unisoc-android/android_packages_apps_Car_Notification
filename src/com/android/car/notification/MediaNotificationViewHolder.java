@@ -30,6 +30,7 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.car.widget.ColumnCardView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
@@ -46,21 +47,21 @@ public class MediaNotificationViewHolder extends RecyclerView.ViewHolder {
     private final TextView mTitleTextView;
     private final TextView mContentTextView;
     private final View mParentView;
+    private final ColumnCardView mCardView;
     private final ImageView mAlbumArtView;
     private final List<ImageButton> mButtons;
-    private final View mColorOverlayView;
     private final View mActionBarView;
 
     public MediaNotificationViewHolder(View view) {
         super(view);
         mContext = view.getContext();
         mParentView = view;
+        mCardView = view.findViewById(R.id.column_card_view);
         mAlbumArtView = view.findViewById(R.id.album_art);
-        mColorOverlayView = view.findViewById(R.id.color_overlay);
         mActionBarView = view.findViewById(R.id.action_bar);
-        mHeaderView = view.findViewById(R.id.header);
-        mTitleTextView = view.findViewById(R.id.title);
-        mContentTextView = view.findViewById(R.id.content);
+        mHeaderView = view.findViewById(R.id.notification_header);
+        mTitleTextView = view.findViewById(R.id.notification_title);
+        mContentTextView = view.findViewById(R.id.notification_text);
         mButtons = new ArrayList<>();
         mButtons.add(view.findViewById(R.id.action_1));
         mButtons.add(view.findViewById(R.id.action_2));
@@ -100,7 +101,7 @@ public class MediaNotificationViewHolder extends RecyclerView.ViewHolder {
         int averageColor = processor.processNotification(notification, builder);
         int primaryColor = builder.getPrimaryTextColor();
 
-        mColorOverlayView.setBackgroundColor(averageColor);
+        mCardView.setCardBackgroundColor(averageColor);
         mActionBarView.setBackgroundColor(averageColor);
 
         // header
@@ -169,8 +170,6 @@ public class MediaNotificationViewHolder extends RecyclerView.ViewHolder {
         mContentTextView.setVisibility(View.GONE);
 
         mAlbumArtView.setImageIcon(null);
-
-        mHeaderView.reset();
 
         mButtons.forEach(button -> {
             button.setImageDrawable(null);
