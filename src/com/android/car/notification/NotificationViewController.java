@@ -14,19 +14,22 @@ import android.util.Log;
 public class NotificationViewController {
 
     private static final String TAG = "NotificationViewControl";
-    private CarNotificationView mCarNotificationView;
-    private PreprocessingManager mPreprocessingManager;
-    private CarNotificationListener mCarNotificationListener;
+    private final CarNotificationView mCarNotificationView;
+    private final PreprocessingManager mPreprocessingManager;
+    private final CarNotificationListener mCarNotificationListener;
+    private final CarHeadsUpNotificationManager mCarHeadsUpNotificationManager;
     private CarUxRestrictionsManager mCarUxRestrictionsManager;
     private NotificationUpdateHandler mNotificationUpdateHandler = new NotificationUpdateHandler();
 
     public NotificationViewController(CarNotificationView carNotificationView,
             PreprocessingManager preprocessingManager,
             CarNotificationListener carNotificationListener,
+            CarHeadsUpNotificationManager carHeadsUpNotificationManager,
             CarUxRestrictionsManager carUxRestrictionsManager) {
         mCarNotificationView = carNotificationView;
         mPreprocessingManager = preprocessingManager;
         mCarNotificationListener = carNotificationListener;
+        mCarHeadsUpNotificationManager = carHeadsUpNotificationManager;
         mCarUxRestrictionsManager = carUxRestrictionsManager;
     }
 
@@ -45,8 +48,15 @@ public class NotificationViewController {
         mCarNotificationListener.setHandler(mNotificationUpdateHandler);
         try {
             if (mCarUxRestrictionsManager != null) {
-                mCarUxRestrictionsManager.registerListener(restrictionInfo ->
-                        mCarNotificationView.setCarUxRestrictions(restrictionInfo));
+                CarUxRestrictions currentRestrictions =
+                        mCarUxRestrictionsManager.getCurrentCarUxRestrictions();
+                mCarNotificationView.onUxRestrictionsChanged(currentRestrictions);
+                mCarHeadsUpNotificationManager.onUxRestrictionsChanged(currentRestrictions);
+
+                mCarUxRestrictionsManager.registerListener(restrictionInfo -> {
+                        mCarNotificationView.onUxRestrictionsChanged(restrictionInfo);
+                        mCarHeadsUpNotificationManager.onUxRestrictionsChanged(restrictionInfo);
+                });
             }
         } catch (CarNotConnectedException e) {
             Log.e(TAG, "Car not connected", e);

@@ -80,6 +80,8 @@ public class BasicNotificationViewHolder extends RecyclerView.ViewHolder {
             View view = notification.bigContentView.apply(mContext, /* parent= */ mBigContentView);
             mBigContentView.setVisibility(View.VISIBLE);
             mBigContentView.addView(view);
+            mHeaderView.setVisibility(View.GONE);
+            mActionsView.setVisibility(View.GONE);
             // If a notification came with a custom content view,
             // do not bind anything else other than the custom view.
             return;
@@ -98,7 +100,7 @@ public class BasicNotificationViewHolder extends RecyclerView.ViewHolder {
         CharSequence text = extraData.getCharSequence(Notification.EXTRA_TEXT);
         if (!TextUtils.isEmpty(text)) {
             mContentTextView.setVisibility(View.VISIBLE);
-            mContentTextView.setText(text);
+            mContentTextView.setText(text.toString()); // clear spannables and only use the text
         }
     }
 
@@ -117,9 +119,5 @@ public class BasicNotificationViewHolder extends RecyclerView.ViewHolder {
 
         mContentTextView.setText(null);
         mContentTextView.setVisibility(View.GONE);
-
-        mHeaderView.reset();
-
-        mActionsView.reset();
     }
 }

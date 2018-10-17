@@ -53,12 +53,6 @@
         android:text="@string/notifications"
         android:textAppearance="@style/TextAppearance.Car.Body1.Medium"/>
 
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/car_list_divider_height"
-        android:layout_alignBottom="@id/exit_button_container"
-        android:background="@color/car_list_divider"/>
-
     <androidx.car.widget.PagedListView
         android:id="@+id/notifications"
         android:layout_width="match_parent"

@@ -16,7 +16,6 @@
 package com.android.car.notification;
 
 import android.app.Activity;
-import android.car.drivingstate.CarUxRestrictionsManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -41,12 +40,12 @@ public class CarNotificationCenterActivity extends Activity {
         public void onServiceConnected(ComponentName className, IBinder binder) {
             mNotificationListener = ((CarNotificationListener.LocalBinder) binder).getService();
             NotificationApplication app = (NotificationApplication) getApplication();
-            CarUxRestrictionsManager manager = app.getCarUxRestrictionsManager();
             mNotificationViewController =
                     new NotificationViewController(mCarNotificationView,
                             mPreprocessingManager,
                             mNotificationListener,
-                            manager);
+                            CarHeadsUpNotificationManager.getInstance(getApplicationContext()),
+                            app.getCarUxRestrictionsManager());
             mNotificationViewController.enable();
             mNotificationListenerBound = true;
         }

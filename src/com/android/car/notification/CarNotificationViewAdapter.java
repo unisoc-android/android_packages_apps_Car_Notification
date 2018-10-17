@@ -154,8 +154,8 @@ public class CarNotificationViewAdapter extends RecyclerView.Adapter<RecyclerVie
             case NotificationViewType.MESSAGE_IN_GROUP:
             case NotificationViewType.MESSAGE: {
                 StatusBarNotification notification = notificationGroup.getSingleNotification();
-                ((MessageNotificationViewHolder) holder)
-                        .bind(notification, /* isInGroup= */ mIsGroupNotificationAdapter);
+                ((MessageNotificationViewHolder) holder).bind(
+                        notification, mIsGroupNotificationAdapter, shouldRestrictMessagePreview());
                 break;
             }
             case NotificationViewType.MEDIA: {
@@ -355,6 +355,16 @@ public class CarNotificationViewAdapter extends RecyclerView.Adapter<RecyclerVie
      */
     CarUxRestrictions getCarUxRestrictions() {
         return mCarUxRestrictions;
+    }
+
+    /**
+     * Helper method that determines whether a notification is a messaging notification and
+     * should have restricted content (no message preview).
+     */
+    private boolean shouldRestrictMessagePreview() {
+        return mCarUxRestrictions != null
+                && (mCarUxRestrictions.getActiveRestrictions()
+                & CarUxRestrictions.UX_RESTRICTIONS_NO_TEXT_MESSAGE) != 0;
     }
 
     /**

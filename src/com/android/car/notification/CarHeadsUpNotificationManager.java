@@ -18,6 +18,8 @@ package com.android.car.notification;
 import android.app.KeyguardManager;
 import android.app.Notification;
 import android.app.NotificationManager;
+import android.car.drivingstate.CarUxRestrictions;
+import android.car.drivingstate.CarUxRestrictionsManager;
 import android.car.userlib.CarUserManagerHelper;
 import android.content.Context;
 import android.graphics.PixelFormat;
@@ -36,7 +38,8 @@ import android.widget.FrameLayout;
 /**
  * Notification Manager for heads-up notifications in car.
  */
-public class CarHeadsUpNotificationManager {
+public class CarHeadsUpNotificationManager
+        implements CarUxRestrictionsManager.OnUxRestrictionsChangedListener {
     private static CarHeadsUpNotificationManager sManager;
     private final Context mContext;
     private final boolean mEnableMediaNotification;
@@ -54,6 +57,7 @@ public class CarHeadsUpNotificationManager {
     private final View mScrimView;
     private final FrameLayout mWrapper;
     private StatusBarNotification mVisibleNotification;
+    private boolean mShouldRestrictMessagePreview;
 
     private CarHeadsUpNotificationManager(Context context) {
         mContext = context.getApplicationContext();
@@ -140,7 +144,10 @@ public class CarHeadsUpNotificationManager {
                         R.layout.message_headsup_notification_template, mWrapper);
                 MessageNotificationViewHolder holder =
                         new MessageNotificationViewHolder(notificationView);
-                holder.bind(statusBarNotification, /* isInGroup= */ false);
+                holder.bind(
+                        statusBarNotification,
+                        /* isInGroup= */ false,
+                        mShouldRestrictMessagePreview);
                 break;
             }
             case NotificationViewType.INBOX_HEADSUP: {
@@ -319,5 +326,12 @@ public class CarHeadsUpNotificationManager {
             sManager = new CarHeadsUpNotificationManager(context);
         }
         return sManager;
+    }
+
+    @Override
+    public void onUxRestrictionsChanged(CarUxRestrictions restrictions) {
+        mShouldRestrictMessagePreview =
+                (restrictions.getActiveRestrictions()
+                        & CarUxRestrictions.UX_RESTRICTIONS_NO_TEXT_MESSAGE) != 0;
     }
 }

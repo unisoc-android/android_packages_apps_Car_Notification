@@ -101,9 +101,5 @@ public class InboxNotificationViewHolder extends RecyclerView.ViewHolder {
 
         mContentTextView.setText(null);
         mContentTextView.setVisibility(View.GONE);
-
-        mHeaderView.reset();
-
-        mActionsView.reset();
     }
 }
