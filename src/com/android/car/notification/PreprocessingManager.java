@@ -44,7 +44,7 @@ public class PreprocessingManager {
     private final String mEllipsizedString;
     private final boolean mEnableMediaNotification;
     private final boolean mEnableOngoingNotification;
-    private CarUxRestrictionsManager mUxRestrictionsManager;
+    private CarUxRestrictionManagerWrapper mUxRestrictionsManager;
 
     private PreprocessingManager(Context context) {
         mEllipsizedString = context.getString(R.string.ellipsized_string);
@@ -175,7 +175,7 @@ public class PreprocessingManager {
         return notifications;
     }
 
-    public void setCarUxRestrictionsManager(CarUxRestrictionsManager manager) {
+    public void setCarUxRestrictionManagerWrapper(CarUxRestrictionManagerWrapper manager) {
         mUxRestrictionsManager = manager;
     }
 
