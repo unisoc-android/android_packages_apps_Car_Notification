@@ -32,9 +32,6 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * Notification header view that contains the issuer app icon and name, and extra information.
  */
@@ -42,38 +39,35 @@ public class CarNotificationHeaderView extends LinearLayout {
 
     private static final String TAG = "car_notification_header";
 
-    private PackageManager mPackageManager;
+    private final PackageManager mPackageManager;
+    private final int mDefaultTextColor;
+    private final String mSeparatorText;
+
     private ImageView mIconView;
     private TextView mHeaderTextView;
-    private int mDefaultTextColor;
-    private String mSeparatorText;
+
+    {
+        mPackageManager = getContext().getPackageManager();
+        mDefaultTextColor = getContext().getColor(R.color.header_text_color);
+        mSeparatorText = getContext().getString(R.string.header_text_separator);
+        inflate(getContext(), R.layout.car_notification_header_view, this);
+    }
 
     public CarNotificationHeaderView(Context context) {
         super(context);
-        init(context);
     }
 
     public CarNotificationHeaderView(Context context, AttributeSet attrs) {
         super(context, attrs);
-        init(context);
     }
 
     public CarNotificationHeaderView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-        init(context);
     }
 
     public CarNotificationHeaderView(Context context, AttributeSet attrs, int defStyleAttr,
             int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
-        init(context);
-    }
-
-    private void init(Context context) {
-        mPackageManager = context.getPackageManager();
-        mDefaultTextColor = context.getColor(R.color.header_text_color);
-        mSeparatorText = context.getString(R.string.header_text_separator);
-        inflate(context, R.layout.car_notification_header_view, this);
     }
 
     @Override

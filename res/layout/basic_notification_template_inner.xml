@@ -37,32 +37,17 @@
             android:layout_marginStart="@dimen/car_keyline_1"
             android:layout_marginEnd="@dimen/car_keyline_1"/>
 
-        <TextView
-            android:id="@+id/notification_title"
+        <com.android.car.notification.CarNotificationBodyView
+            android:id="@+id/notification_body"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@id/notification_header"
-            android:layout_marginStart="@dimen/car_keyline_1"
-            android:layout_marginEnd="@dimen/car_keyline_1"
-            android:layout_marginBottom="@dimen/car_padding_0"
-            style="@style/NotificationTitleText"/>
-
-        <TextView
-            android:id="@+id/notification_text"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignParentStart="true"
-            android:layout_below="@id/notification_title"
-            android:layout_marginStart="@dimen/car_keyline_1"
-            android:layout_marginEnd="@dimen/car_keyline_1"
-            android:layout_marginBottom="@dimen/car_padding_3"
-            android:textAppearance="@style/TextAppearance.Car.Body3"/>
+            android:layout_below="@id/notification_header"/>
 
         <com.android.car.notification.CarNotificationActionsView
             android:id="@+id/notification_actions"
             android:layout_width="match_parent"
             android:layout_height="@dimen/action_bar_height"
-            android:layout_below="@id/notification_text"/>
+            android:layout_below="@id/notification_body"/>
     </RelativeLayout>
 
 </FrameLayout>
