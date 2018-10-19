@@ -72,7 +72,7 @@ public class GroupNotificationViewHolder extends RecyclerView.ViewHolder {
         mAdapter = new CarNotificationViewAdapter(mContext, /* isGroupNotificationAdapter= */ true);
         mNotificationListView.setAdapter(mAdapter);
 
-        new ItemTouchHelper(new CarNotificationItemTouchHelper(mContext, mAdapter))
+        new ItemTouchHelper(new CarNotificationItemTouchHelper(mAdapter))
                 .attachToRecyclerView(mNotificationListView);
     }
 

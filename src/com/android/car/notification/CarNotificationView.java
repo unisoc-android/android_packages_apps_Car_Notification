@@ -4,7 +4,6 @@ import android.car.drivingstate.CarUxRestrictions;
 import android.car.drivingstate.CarUxRestrictionsManager;
 import android.content.Context;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.widget.RelativeLayout;
 
 import androidx.car.widget.PagedListView;
@@ -45,7 +44,7 @@ public class CarNotificationView extends RelativeLayout
                 .setSupportsChangeAnimations(false);
 
         new ItemTouchHelper(
-                new CarNotificationItemTouchHelper(mContext, mAdapter) {
+                new CarNotificationItemTouchHelper(mAdapter) {
                     @Override
                     public int getSwipeDirs(RecyclerView recyclerView,
                             RecyclerView.ViewHolder viewHolder) {

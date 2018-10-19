@@ -17,15 +17,17 @@
 -->
 
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-        android:sharedUserId="android.uid.system"
         package="com.android.car.notification">
     <uses-sdk
         android:minSdkVersion="27"
         android:targetSdkVersion="27"/>
-    <!-- Permission to show system alert window for heads-up notifications -->
-    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW"/>
+    <!-- Permission to show display overlay window for heads-up notifications -->
+    <uses-permission android:name="android.permission.INTERNAL_SYSTEM_WINDOW" />
     <!-- Permission to get the current user id to cancel a notification -->
     <uses-permission android:name="android.permission.INTERACT_ACROSS_USERS"/>
+    <!--Permission to talk to the Status bar service which proxies the calls to remove
+        notifications to the notification service -->
+    <uses-permission android:name="android.permission.STATUS_BAR_SERVICE" />
 
     <application android:label="@string/application_label"
                  android:name=".NotificationApplication">
