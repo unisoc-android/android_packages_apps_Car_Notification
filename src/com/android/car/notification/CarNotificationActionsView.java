@@ -37,40 +37,39 @@ public class CarNotificationActionsView extends RelativeLayout {
     // Maximum 3 actions
     // https://developer.android.com/reference/android/app/Notification.Builder.html#addAction
     private static final int MAX_NUM_ACTIONS = 3;
+
+    private final int mCarActionBarColor;
+    private final int mCarCardColor;
+
     private final List<Button> mActionButtons = new ArrayList<>();
     private View mActionsView;
-    private int mCarActionBarColor;
-    private int mCarCardColor;
+
+    {
+        mCarActionBarColor = getContext().getResources().getColor(R.color.action_bar_color);
+        mCarCardColor = getContext().getResources().getColor(R.color.car_card);
+        inflate(getContext(), R.layout.car_notification_actions_view, /* root= */ this);
+    }
 
     public CarNotificationActionsView(Context context) {
         super(context);
-        init(context);
     }
 
     public CarNotificationActionsView(Context context, AttributeSet attrs) {
         super(context, attrs);
-        init(context);
     }
 
     public CarNotificationActionsView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-        init(context);
     }
 
     public CarNotificationActionsView(Context context, AttributeSet attrs, int defStyleAttr,
             int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
-        init(context);
-    }
-
-    private void init(Context context) {
-        mCarActionBarColor = context.getResources().getColor(R.color.action_bar_color);
-        mCarCardColor = context.getResources().getColor(R.color.car_card);
-        inflate(context, R.layout.car_notification_actions_view, /* root= */ this);
     }
 
     @Override
     protected void onFinishInflate() {
+        super.onFinishInflate();
         mActionsView = findViewById(R.id.notification_actions);
         mActionButtons.add(findViewById(R.id.action_1));
         mActionButtons.add(findViewById(R.id.action_2));
@@ -100,7 +99,8 @@ public class CarNotificationActionsView extends RelativeLayout {
             Notification.Action action = actions[i];
             Button button = mActionButtons.get(i);
             button.setVisibility(View.VISIBLE);
-            button.setText(action.title);
+            // clear spannables and only use the text
+            button.setText(action.title.toString());
 
             if (action.actionIntent != null) {
                 button.setOnClickListener(v -> {

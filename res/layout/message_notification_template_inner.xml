@@ -28,40 +28,16 @@
         android:layout_marginStart="@dimen/car_keyline_1"
         android:layout_marginEnd="@dimen/car_keyline_1"/>
 
-    <TextView
-        android:id="@+id/sender_name"
+    <com.android.car.notification.CarNotificationBodyView
+        android:id="@+id/notification_body"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/notification_header"
-        android:layout_toStartOf="@id/sender_avatar"
-        android:layout_marginStart="@dimen/car_keyline_1"
-        android:layout_marginBottom="@dimen/car_padding_0"
-        style="@style/NotificationTitleText"/>
-
-    <TextView
-        android:id="@+id/conversation_title"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/sender_name"
-        android:layout_toStartOf="@id/sender_avatar"
-        android:layout_marginStart="@dimen/car_keyline_1"
-        android:textAppearance="@style/TextAppearance.Car.Body3"/>
-
-    <ImageButton
-        android:id="@+id/sender_avatar"
-        android:layout_width="@dimen/car_touch_target_size"
-        android:layout_height="@dimen/car_touch_target_size"
-        android:layout_alignParentEnd="true"
-        android:layout_below="@id/notification_header"
-        android:layout_marginStart="@dimen/car_padding_4"
-        android:layout_marginEnd="@dimen/car_keyline_1"
-        style="@style/AvatarIcon"/>
+        android:layout_below="@id/notification_header"/>
 
     <com.android.car.notification.CarNotificationActionsView
         android:id="@+id/notification_actions"
         android:layout_width="match_parent"
         android:layout_height="@dimen/car_card_action_bar_height"
-        android:layout_below="@id/conversation_title"
-        android:layout_marginTop="@dimen/car_padding_3"/>
+        android:layout_below="@id/notification_body"/>
 
 </RelativeLayout>

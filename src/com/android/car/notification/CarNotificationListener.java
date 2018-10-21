@@ -56,8 +56,10 @@ public class CarNotificationListener extends NotificationListenerService {
      * a manifest entry that will have the same effect.
      *
      * @param context Context required for registering the service.
+     * @param carUxRestrictionManagerWrapper
      */
-    public void registerAsSystemService(Context context) {
+    public void registerAsSystemService(Context context,
+            CarUxRestrictionManagerWrapper carUxRestrictionManagerWrapper) {
         try {
             registerAsSystemService(context,
                     new ComponentName(context.getPackageName(), getClass().getCanonicalName()),
@@ -65,6 +67,7 @@ public class CarNotificationListener extends NotificationListenerService {
             // Note: The first call to CarHeadsUpNotificationManager.getInstance will build the
             // UI thus we do it here to be sure it's ready.
             mHeadsUpManager = CarHeadsUpNotificationManager.getInstance(context);
+            carUxRestrictionManagerWrapper.setCarHeadsUpNotificationManager(mHeadsUpManager);
         } catch (RemoteException e) {
             Log.e(TAG, "Unable to register notification listener", e);
         }
@@ -74,6 +77,9 @@ public class CarNotificationListener extends NotificationListenerService {
     public void onCreate() {
         super.onCreate();
         mHeadsUpManager = CarHeadsUpNotificationManager.getInstance(this);
+        NotificationApplication app = (NotificationApplication) getApplication();
+        app.getCarUxRestrictionWrapper().setCarHeadsUpNotificationManager(mHeadsUpManager);
+
     }
 
     @Override

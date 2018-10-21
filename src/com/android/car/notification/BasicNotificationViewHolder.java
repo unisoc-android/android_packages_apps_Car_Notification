@@ -18,13 +18,12 @@ package com.android.car.notification;
 import android.app.Notification;
 import android.app.PendingIntent;
 import android.content.Context;
+import android.graphics.drawable.Icon;
 import android.os.Bundle;
 import android.service.notification.StatusBarNotification;
-import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.FrameLayout;
-import android.widget.TextView;
 
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -35,9 +34,8 @@ public class BasicNotificationViewHolder extends RecyclerView.ViewHolder {
     private static final String TAG = "car_notification_basic";
     private final Context mContext;
     private final CarNotificationHeaderView mHeaderView;
+    private final CarNotificationBodyView mBodyView;
     private final CarNotificationActionsView mActionsView;
-    private final TextView mTitleTextView;
-    private final TextView mContentTextView;
     private final View mParentView;
     private final FrameLayout mBigContentView;
 
@@ -46,9 +44,8 @@ public class BasicNotificationViewHolder extends RecyclerView.ViewHolder {
         mContext = view.getContext();
         mParentView = view;
         mHeaderView = view.findViewById(R.id.notification_header);
+        mBodyView = view.findViewById(R.id.notification_body);
         mActionsView = view.findViewById(R.id.notification_actions);
-        mTitleTextView = view.findViewById(R.id.notification_title);
-        mContentTextView = view.findViewById(R.id.notification_text);
         mBigContentView = view.findViewById(R.id.big_content_view);
     }
 
@@ -81,6 +78,7 @@ public class BasicNotificationViewHolder extends RecyclerView.ViewHolder {
             mBigContentView.setVisibility(View.VISIBLE);
             mBigContentView.addView(view);
             mHeaderView.setVisibility(View.GONE);
+            mBodyView.setVisibility(View.GONE);
             mActionsView.setVisibility(View.GONE);
             // If a notification came with a custom content view,
             // do not bind anything else other than the custom view.
@@ -91,17 +89,11 @@ public class BasicNotificationViewHolder extends RecyclerView.ViewHolder {
         mActionsView.bind(statusBarNotification, isInGroup);
 
         Bundle extraData = notification.extras;
-        CharSequence title = extraData.getCharSequence(Notification.EXTRA_TITLE);
-        if (!TextUtils.isEmpty(title)) {
-            mTitleTextView.setVisibility(View.VISIBLE);
-            mTitleTextView.setText(title);
-        }
 
+        CharSequence title = extraData.getCharSequence(Notification.EXTRA_TITLE);
         CharSequence text = extraData.getCharSequence(Notification.EXTRA_TEXT);
-        if (!TextUtils.isEmpty(text)) {
-            mContentTextView.setVisibility(View.VISIBLE);
-            mContentTextView.setText(text.toString()); // clear spannables and only use the text
-        }
+        Icon icon = notification.getLargeIcon();
+        mBodyView.bind(title, text, icon);
     }
 
     /**
@@ -113,11 +105,5 @@ public class BasicNotificationViewHolder extends RecyclerView.ViewHolder {
 
         mBigContentView.removeAllViews();
         mBigContentView.setVisibility(View.GONE);
-
-        mTitleTextView.setText(null);
-        mTitleTextView.setVisibility(View.GONE);
-
-        mContentTextView.setText(null);
-        mContentTextView.setVisibility(View.GONE);
     }
 }

@@ -2,7 +2,6 @@ package com.android.car.notification;
 
 import android.car.CarNotConnectedException;
 import android.car.drivingstate.CarUxRestrictions;
-import android.car.drivingstate.CarUxRestrictionsManager;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
@@ -17,28 +16,17 @@ public class NotificationViewController {
     private final CarNotificationView mCarNotificationView;
     private final PreprocessingManager mPreprocessingManager;
     private final CarNotificationListener mCarNotificationListener;
-    private final CarHeadsUpNotificationManager mCarHeadsUpNotificationManager;
-    private CarUxRestrictionsManager mCarUxRestrictionsManager;
+    private CarUxRestrictionManagerWrapper mUxResitrictionListener;
     private NotificationUpdateHandler mNotificationUpdateHandler = new NotificationUpdateHandler();
 
     public NotificationViewController(CarNotificationView carNotificationView,
             PreprocessingManager preprocessingManager,
             CarNotificationListener carNotificationListener,
-            CarHeadsUpNotificationManager carHeadsUpNotificationManager,
-            CarUxRestrictionsManager carUxRestrictionsManager) {
+            CarUxRestrictionManagerWrapper uxResitrictionListener) {
         mCarNotificationView = carNotificationView;
         mPreprocessingManager = preprocessingManager;
         mCarNotificationListener = carNotificationListener;
-        mCarHeadsUpNotificationManager = carHeadsUpNotificationManager;
-        mCarUxRestrictionsManager = carUxRestrictionsManager;
-    }
-
-    /**
-     * Set the Ux restriction manager. This is needed if it was not ready at the time of creation.
-     */
-    public void setCarUxRestrictionsManager(
-            CarUxRestrictionsManager carUxRestrictionsManager) {
-        mCarUxRestrictionsManager = carUxRestrictionsManager;
+        mUxResitrictionListener = uxResitrictionListener;
     }
 
     /**
@@ -46,18 +34,11 @@ public class NotificationViewController {
      */
     public void enable() {
         mCarNotificationListener.setHandler(mNotificationUpdateHandler);
+        mUxResitrictionListener.setCarNotificationView(mCarNotificationView);
         try {
-            if (mCarUxRestrictionsManager != null) {
-                CarUxRestrictions currentRestrictions =
-                        mCarUxRestrictionsManager.getCurrentCarUxRestrictions();
-                mCarNotificationView.onUxRestrictionsChanged(currentRestrictions);
-                mCarHeadsUpNotificationManager.onUxRestrictionsChanged(currentRestrictions);
-
-                mCarUxRestrictionsManager.registerListener(restrictionInfo -> {
-                        mCarNotificationView.onUxRestrictionsChanged(restrictionInfo);
-                        mCarHeadsUpNotificationManager.onUxRestrictionsChanged(restrictionInfo);
-                });
-            }
+            CarUxRestrictions currentRestrictions =
+                    mUxResitrictionListener.getCurrentCarUxRestrictions();
+            mCarNotificationView.onUxRestrictionsChanged(currentRestrictions);
         } catch (CarNotConnectedException e) {
             Log.e(TAG, "Car not connected", e);
         }
@@ -69,13 +50,7 @@ public class NotificationViewController {
      */
     public void disable() {
         mCarNotificationListener.setHandler(null);
-        try {
-            if (mCarUxRestrictionsManager != null) {
-                mCarUxRestrictionsManager.unregisterListener();
-            }
-        } catch (CarNotConnectedException e) {
-            Log.e(TAG, "Car not connected", e);
-        }
+        mUxResitrictionListener.setCarNotificationView(null);
     }
 
 

@@ -21,14 +21,12 @@ import android.app.Notification;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.graphics.drawable.Drawable;
+import android.graphics.drawable.Icon;
 import android.os.Bundle;
 import android.service.notification.StatusBarNotification;
-import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
-import android.widget.ImageView;
-import android.widget.TextView;
 
 import androidx.car.widget.ColumnCardView;
 import androidx.recyclerview.widget.RecyclerView;
@@ -44,11 +42,9 @@ public class MediaNotificationViewHolder extends RecyclerView.ViewHolder {
     private static final int MAX_NUM_ACTIONS = 5;
     private final Context mContext;
     private final CarNotificationHeaderView mHeaderView;
-    private final TextView mTitleTextView;
-    private final TextView mContentTextView;
+    private final CarNotificationBodyView mBodyView;
     private final View mParentView;
     private final ColumnCardView mCardView;
-    private final ImageView mAlbumArtView;
     private final List<ImageButton> mButtons;
     private final View mActionBarView;
 
@@ -57,11 +53,9 @@ public class MediaNotificationViewHolder extends RecyclerView.ViewHolder {
         mContext = view.getContext();
         mParentView = view;
         mCardView = view.findViewById(R.id.column_card_view);
-        mAlbumArtView = view.findViewById(R.id.album_art);
-        mActionBarView = view.findViewById(R.id.action_bar);
         mHeaderView = view.findViewById(R.id.notification_header);
-        mTitleTextView = view.findViewById(R.id.notification_title);
-        mContentTextView = view.findViewById(R.id.notification_text);
+        mBodyView = view.findViewById(R.id.notification_body);
+        mActionBarView = view.findViewById(R.id.action_bar);
         mButtons = new ArrayList<>();
         mButtons.add(view.findViewById(R.id.action_1));
         mButtons.add(view.findViewById(R.id.action_2));
@@ -107,27 +101,14 @@ public class MediaNotificationViewHolder extends RecyclerView.ViewHolder {
         // header
         mHeaderView.bind(statusBarNotification, primaryColor);
 
-        // album art
-        if (notification.getLargeIcon() != null) {
-            mAlbumArtView.setImageIcon(notification.getLargeIcon());
-        }
-
-        // title
+        // body
         Bundle extraData = notification.extras;
         CharSequence title = extraData.getCharSequence(Notification.EXTRA_TITLE);
-        if (!TextUtils.isEmpty(title)) {
-            mTitleTextView.setVisibility(View.VISIBLE);
-            mTitleTextView.setText(title);
-            mTitleTextView.setTextColor(primaryColor);
-        }
-
-        // artist
         CharSequence text = extraData.getCharSequence(Notification.EXTRA_TEXT);
-        if (!TextUtils.isEmpty(text)) {
-            mContentTextView.setVisibility(View.VISIBLE);
-            mContentTextView.setText(text);
-            mContentTextView.setTextColor(builder.getSecondaryTextColor());
-        }
+        Icon icon = notification.getLargeIcon();
+        mBodyView.bind(title, text, icon);
+        mBodyView.setPrimaryTextColor(primaryColor);
+        mBodyView.setSecondaryTextColor(builder.getSecondaryTextColor());
 
         // action buttons
         Notification.Action[] actions = notification.actions;
@@ -162,14 +143,6 @@ public class MediaNotificationViewHolder extends RecyclerView.ViewHolder {
     private void reset() {
         mParentView.setClickable(false);
         mParentView.setOnClickListener(null);
-
-        mTitleTextView.setText(null);
-        mTitleTextView.setVisibility(View.GONE);
-
-        mContentTextView.setText(null);
-        mContentTextView.setVisibility(View.GONE);
-
-        mAlbumArtView.setImageIcon(null);
 
         mButtons.forEach(button -> {
             button.setImageDrawable(null);
