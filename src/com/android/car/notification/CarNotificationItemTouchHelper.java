@@ -17,14 +17,17 @@
 package com.android.car.notification;
 
 import android.app.Notification;
-import android.app.NotificationManager;
-import android.car.userlib.CarUserManagerHelper;
 import android.content.Context;
 import android.os.RemoteException;
+import android.os.ServiceManager;
+import android.service.notification.NotificationStats;
 import android.service.notification.StatusBarNotification;
 
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.android.internal.statusbar.IStatusBarService;
+import com.android.internal.statusbar.NotificationVisibility;
 
 /**
  * Touch helper for notification cards that controls swipe to dismiss.
@@ -32,18 +35,15 @@ import androidx.recyclerview.widget.RecyclerView;
 class CarNotificationItemTouchHelper extends ItemTouchHelper.SimpleCallback {
 
     private final CarNotificationViewAdapter mAdapter;
-    private final CarUserManagerHelper mCarUserManagerHelper;
-    private final NotificationManager mNotificationManager;
+    private final IStatusBarService mBarService;
 
     public CarNotificationItemTouchHelper(
-            Context context,
             CarNotificationViewAdapter adapter) {
         super(ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT,
                 ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT);
         mAdapter = adapter;
-        mCarUserManagerHelper = new CarUserManagerHelper(context);
-        mNotificationManager =
-                (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+        mBarService = IStatusBarService.Stub.asInterface(
+                ServiceManager.getService(Context.STATUS_BAR_SERVICE));
     }
 
     @Override
@@ -67,11 +67,19 @@ class CarNotificationItemTouchHelper extends ItemTouchHelper.SimpleCallback {
 
         if (isCancelable(notification.getNotification())) {
             try {
-                mNotificationManager.getService().cancelNotificationWithTag(
+                // rank and count is used for logging and is not need at this time thus -1
+                NotificationVisibility notificationVisibility = NotificationVisibility.obtain(
+                        notification.getKey(), /* rank */-1, /* count */-1, /* visible */true);
+                mBarService.onNotificationClear(
                         notification.getPackageName(),
                         notification.getTag(),
                         notification.getId(),
-                        mCarUserManagerHelper.getCurrentForegroundUserId());
+                        notification.getUser().getIdentifier(),
+                        notification.getKey(),
+                        NotificationStats.DISMISSAL_SHADE,
+                        NotificationStats.DISMISS_SENTIMENT_NEUTRAL,
+                        notificationVisibility
+                );
             } catch (RemoteException e) {
                 throw e.rethrowFromSystemServer();
             }
