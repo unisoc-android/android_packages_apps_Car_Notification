@@ -25,21 +25,23 @@ import android.util.Log;
 import android.view.View;
 import android.widget.FrameLayout;
 
-import androidx.recyclerview.widget.RecyclerView;
 
 import com.android.car.notification.R;
-
 /**
  * Basic notification view template that displays a minimal notification.
  */
-public class BasicNotificationViewHolder extends RecyclerView.ViewHolder {
+public class BasicNotificationViewHolder extends CarNotificationBaseViewHolder {
+
     private static final String TAG = "car_notification_basic";
+
     private final Context mContext;
     private final CarNotificationHeaderView mHeaderView;
     private final CarNotificationBodyView mBodyView;
     private final CarNotificationActionsView mActionsView;
     private final View mParentView;
     private final FrameLayout mBigContentView;
+
+    private StatusBarNotification mStatusBarNotification;
 
     public BasicNotificationViewHolder(View view) {
         super(view);
@@ -63,10 +65,11 @@ public class BasicNotificationViewHolder extends RecyclerView.ViewHolder {
             return;
         }
 
+        mStatusBarNotification = statusBarNotification;
         Notification notification = statusBarNotification.getNotification();
 
         if (notification.contentIntent != null) {
-            mParentView.setOnClickListener(v -> {
+            itemView.setOnClickListener(v -> {
                 try {
                     notification.contentIntent.send();
                 } catch (PendingIntent.CanceledException e) {
@@ -98,13 +101,17 @@ public class BasicNotificationViewHolder extends RecyclerView.ViewHolder {
         mBodyView.bind(title, text, icon);
     }
 
+    @Override
+    public StatusBarNotification getStatusBarNotification() {
+        return mStatusBarNotification;
+    }
+
     /**
      * Resets the basic notification view empty for recycling.
      */
-    private void reset() {
-        mParentView.setClickable(false);
-        mParentView.setOnClickListener(null);
-
+    @Override
+    void reset() {
+        super.reset();
         mBigContentView.removeAllViews();
         mBigContentView.setVisibility(View.GONE);
     }

@@ -28,8 +28,6 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 
-import androidx.recyclerview.widget.RecyclerView;
-
 import java.util.List;
 
 import com.android.car.notification.R;
@@ -37,13 +35,14 @@ import com.android.car.notification.R;
 /**
  * Messaging notification template that displays a messaging notification and a voice reply button.
  */
-public class MessageNotificationViewHolder extends RecyclerView.ViewHolder {
+public class MessageNotificationViewHolder extends CarNotificationBaseViewHolder {
     private static final String TAG = "car_notification_messaging";
     private final Context mContext;
     private final CarNotificationHeaderView mHeaderView;
     private final CarNotificationBodyView mBodyView;
     private final CarNotificationActionsView mActionsView;
     private final View mParentView;
+    private StatusBarNotification mStatusBarNotification;
 
     public MessageNotificationViewHolder(View view) {
         super(view);
@@ -71,6 +70,8 @@ public class MessageNotificationViewHolder extends RecyclerView.ViewHolder {
         if (statusBarNotification == null) {
             return;
         }
+        mStatusBarNotification = statusBarNotification;
+
         mHeaderView.bind(statusBarNotification, /* primaryColor= */ null);
         mActionsView.bind(statusBarNotification, isInGroup);
 
@@ -140,8 +141,15 @@ public class MessageNotificationViewHolder extends RecyclerView.ViewHolder {
     /**
      * Resets the messaging notification view empty for recycling.
      */
-    private void reset() {
+    @Override
+    void reset() {
+        super.reset();
         mParentView.setClickable(false);
         mParentView.setOnClickListener(null);
+    }
+
+    @Override
+    public StatusBarNotification getStatusBarNotification() {
+        return mStatusBarNotification;
     }
 }
