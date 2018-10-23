@@ -20,13 +20,14 @@ import android.app.Notification;
 import android.app.NotificationManager;
 import android.car.drivingstate.CarUxRestrictions;
 import android.car.drivingstate.CarUxRestrictionsManager;
-import android.car.userlib.CarUserManagerHelper;
 import android.content.Context;
 import android.graphics.PixelFormat;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.RemoteException;
+import android.os.ServiceManager;
 import android.service.notification.NotificationListenerService;
+import android.service.notification.NotificationStats;
 import android.service.notification.StatusBarNotification;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -39,6 +40,8 @@ import com.android.car.notification.template.BasicNotificationViewHolder;
 import com.android.car.notification.template.EmergencyNotificationViewHolder;
 import com.android.car.notification.template.InboxNotificationViewHolder;
 import com.android.car.notification.template.MessageNotificationViewHolder;
+import com.android.internal.statusbar.IStatusBarService;
+import com.android.internal.statusbar.NotificationVisibility;
 
 /**
  * Notification Manager for heads-up notifications in car.
@@ -47,15 +50,14 @@ public class CarHeadsUpNotificationManager
         implements CarUxRestrictionsManager.OnUxRestrictionsChangedListener {
     private static CarHeadsUpNotificationManager sManager;
     private final Context mContext;
+    private final IStatusBarService mBarService;
     private final boolean mEnableMediaNotification;
     private final boolean mEnableOngoingNotification;
     private final long mDuration;
     private final long mEnterAnimationDuration;
     private final int mScrimHeightBelowNotification;
-    private final CarUserManagerHelper mCarUserManagerHelper;
     private final KeyguardManager mKeyguardManager;
     private final PreprocessingManager mPreprocessingManager;
-    private final NotificationManager mNotificationManager;
     private final WindowManager mWindowManager;
     private final LayoutInflater mInflater;
     private final Handler mTimer;
@@ -66,6 +68,8 @@ public class CarHeadsUpNotificationManager
 
     private CarHeadsUpNotificationManager(Context context) {
         mContext = context.getApplicationContext();
+        mBarService = IStatusBarService.Stub.asInterface(
+                ServiceManager.getService(Context.STATUS_BAR_SERVICE));
         mEnableMediaNotification =
                 context.getResources().getBoolean(R.bool.config_showMediaNotification);
         mEnableOngoingNotification =
@@ -75,11 +79,8 @@ public class CarHeadsUpNotificationManager
                 mContext.getResources().getInteger(R.integer.headsup_enter_duration_ms);
         mScrimHeightBelowNotification = mContext.getResources().getDimensionPixelOffset(
                 R.dimen.headsup_scrim_height_below_notification);
-        mCarUserManagerHelper = new CarUserManagerHelper(context);
         mKeyguardManager = (KeyguardManager) context.getSystemService(Context.KEYGUARD_SERVICE);
         mPreprocessingManager = PreprocessingManager.getInstance(context);
-        mNotificationManager =
-                (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         mWindowManager =
                 (WindowManager) mContext.getSystemService(Context.WINDOW_SERVICE);
         mInflater = LayoutInflater.from(mContext);
@@ -216,17 +217,33 @@ public class CarHeadsUpNotificationManager
         notificationView.setOnTouchListener(
                 new HeadsUpNotificationOnTouchListener(notificationView,
                         () -> {
-                            if (CarNotificationItemTouchHelper.isCancelable(
-                                    statusBarNotification.getNotification())) {
-                                try {
-                                    mNotificationManager.getService().cancelNotificationWithTag(
-                                            statusBarNotification.getPackageName(),
-                                            statusBarNotification.getTag(),
-                                            statusBarNotification.getId(),
-                                            mCarUserManagerHelper.getCurrentForegroundUserId());
-                                } catch (RemoteException e) {
-                                    throw e.rethrowFromSystemServer();
-                                }
+                            boolean isDismissible = (statusBarNotification.getNotification().flags
+                                    & (Notification.FLAG_FOREGROUND_SERVICE
+                                    | Notification.FLAG_ONGOING_EVENT)) == 0;
+                            if (!isDismissible) {
+                                return;
+                            }
+                            try {
+                                // rank and count is used for logging and is not need at this
+                                // time thus -1
+                                NotificationVisibility notificationVisibility =
+                                        NotificationVisibility.obtain(
+                                                statusBarNotification.getKey(),
+                                                /* rank= */ -1,
+                                                /* count= */ -1,
+                                                /* visible= */ true);
+                                mBarService.onNotificationClear(
+                                        statusBarNotification.getPackageName(),
+                                        statusBarNotification.getTag(),
+                                        statusBarNotification.getId(),
+                                        statusBarNotification.getUser().getIdentifier(),
+                                        statusBarNotification.getKey(),
+                                        NotificationStats.DISMISSAL_SHADE,
+                                        notificationVisibility
+                                );
+
+                            } catch (RemoteException e) {
+                                throw e.rethrowFromSystemServer();
                             }
                             clearViews();
                             mTimer.removeCallbacksAndMessages(null);

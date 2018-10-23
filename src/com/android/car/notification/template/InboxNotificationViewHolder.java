@@ -24,20 +24,19 @@ import android.service.notification.StatusBarNotification;
 import android.util.Log;
 import android.view.View;
 
-import androidx.recyclerview.widget.RecyclerView;
 
 import com.android.car.notification.R;
-
 /**
  * Inbox notification view template that
  * displays a {@link android.app.Notification.InboxStyle} notification.
  */
-public class InboxNotificationViewHolder extends RecyclerView.ViewHolder {
+public class InboxNotificationViewHolder extends CarNotificationBaseViewHolder {
     private static final String TAG = "car_notification_inbox";
     private final CarNotificationHeaderView mHeaderView;
     private final CarNotificationBodyView mBodyView;
     private final CarNotificationActionsView mActionsView;
     private final View mParentView;
+    private StatusBarNotification mStatusBarNotification;
 
     public InboxNotificationViewHolder(View view) {
         super(view);
@@ -59,6 +58,7 @@ public class InboxNotificationViewHolder extends RecyclerView.ViewHolder {
             return;
         }
 
+        mStatusBarNotification = statusBarNotification;
         Notification notification = statusBarNotification.getNotification();
 
         if (notification.contentIntent != null) {
@@ -84,8 +84,15 @@ public class InboxNotificationViewHolder extends RecyclerView.ViewHolder {
     /**
      * Resets the inbox notification view empty for recycling.
      */
-    private void reset() {
+    @Override
+    void reset() {
+        super.reset();
         mParentView.setClickable(false);
         mParentView.setOnClickListener(null);
+    }
+
+    @Override
+    public StatusBarNotification getStatusBarNotification() {
+        return mStatusBarNotification;
     }
 }

@@ -20,4 +20,11 @@
     <dimen name="notification_card_radius">@dimen/car_radius_2</dimen>
     <dimen name="media_action_icon_size">@dimen/car_primary_icon_size</dimen>
     <dimen name="headsup_scrim_height_below_notification">164dp</dimen>
+
+    <!-- Swipe Animation -->
+    <item name="error_factor_multiplier" format="float" type="dimen">1.2</item>
+    <item name="fling_percentage_of_width_to_dismiss" format="float" type="dimen">0.05</item>
+    <item name="percentage_of_width_to_dismiss" format="float" type="dimen">0.40</item>
+    <item name="max_percentage_of_width_with_resistance" format="float" type="dimen">0.4</item>
+    <dimen name="touch_slop">20dp</dimen>
 </resources>
