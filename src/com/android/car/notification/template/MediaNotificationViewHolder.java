@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.android.car.notification;
+package com.android.car.notification.template;
 
 import android.annotation.Nullable;
 import android.app.Notification;
@@ -33,6 +33,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import com.android.car.notification.R;
 
 /**
  * Media notification view template that displays a media notification with controls.

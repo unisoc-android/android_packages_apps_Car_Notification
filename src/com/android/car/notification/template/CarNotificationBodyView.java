@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.android.car.notification;
+package com.android.car.notification.template;
 
 import android.annotation.ColorInt;
 import android.annotation.Nullable;
@@ -26,6 +26,8 @@ import android.view.View;
 import android.widget.ImageButton;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+
+import com.android.car.notification.R;
 
 /**
  * Common notification body that consists of a title line, a content text line, and an image icon on

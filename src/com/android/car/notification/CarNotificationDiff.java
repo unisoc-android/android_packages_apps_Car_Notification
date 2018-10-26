@@ -95,7 +95,7 @@ class CarNotificationDiff extends DiffUtil.Callback {
         }
 
         if (!sameNotificationKey(
-                oldItem.getGroupHeaderNotification(), newItem.getGroupHeaderNotification())) {
+                oldItem.getGroupSummaryNotification(), newItem.getGroupSummaryNotification())) {
             return false;
         }
 
@@ -142,7 +142,7 @@ class CarNotificationDiff extends DiffUtil.Callback {
         NotificationGroup newItem = mNewList.get(newItemPosition);
 
         if (!sameNotificationContent(
-                oldItem.getGroupHeaderNotification(), newItem.getGroupHeaderNotification())) {
+                oldItem.getGroupSummaryNotification(), newItem.getGroupSummaryNotification())) {
             return false;
         }
 

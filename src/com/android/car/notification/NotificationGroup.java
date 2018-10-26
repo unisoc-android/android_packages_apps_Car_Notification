@@ -18,8 +18,6 @@ package com.android.car.notification;
 import android.annotation.NonNull;
 import android.annotation.Nullable;
 import android.app.Notification;
-import android.content.pm.ApplicationInfo;
-import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.service.notification.StatusBarNotification;
 
@@ -27,30 +25,26 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Objects;
 
 /**
  * Data structure representing a notification card in car.
  * A notification group can hold either:
  * <ol>
- * <li>One notification with no group header</li>
- * <li>One group header with no child notifications</li>
- * <li>A group of notifications with a group header notification</li>
+ * <li>One notification with no group summary notification</li>
+ * <li>One group summary notification with no child notifications</li>
+ * <li>A group of notifications with a group summary notification</li>
  * </ol>
  */
-class NotificationGroup {
+public class NotificationGroup {
 
     private String mGroupKey;
     private final List<StatusBarNotification> mNotifications = new ArrayList<>();
     @Nullable
     private List<String> mChildTitles;
     @Nullable
-    private StatusBarNotification mGroupHeaderNotification;
+    private StatusBarNotification mGroupSummaryNotification;
 
-    NotificationGroup() {
-    }
-
-    void addNotification(StatusBarNotification statusBarNotification) {
+    public void addNotification(StatusBarNotification statusBarNotification) {
         assertSameGroupKey(statusBarNotification.getGroupKey());
         mNotifications.add(statusBarNotification);
 
@@ -72,50 +66,65 @@ class NotificationGroup {
         Collections.sort(mNotifications, comparator);
     }
 
-    void setGroupHeaderNotification(StatusBarNotification groupHeaderNotification) {
-        assertSameGroupKey(groupHeaderNotification.getGroupKey());
+    void setGroupSummaryNotification(StatusBarNotification groupSummaryNotification) {
+        assertSameGroupKey(groupSummaryNotification.getGroupKey());
         // There exists a group summary notification
-        if (mGroupHeaderNotification != null) {
-            mNotifications.add(groupHeaderNotification);
+        if (mGroupSummaryNotification != null) {
+            mNotifications.add(groupSummaryNotification);
             return;
         }
-        mGroupHeaderNotification = groupHeaderNotification;
+        mGroupSummaryNotification = groupSummaryNotification;
     }
 
     void setGroupKey(@NonNull String groupKey) {
         mGroupKey = groupKey;
     }
 
-    @NonNull
-    String getGroupKey() {
+    /**
+     * Returns the group key of this notification group. When this group contains only one
+     * notification, it is the key of the notification.
+     *
+     * <p> {@code null} will be returned if the group key has not been set yet.
+     */
+    @Nullable
+    public String getGroupKey() {
         return mGroupKey;
     }
 
-    int getChildCount() {
+    /**
+     * Returns the count of how many child notifications (excluding the group summary notification)
+     * this notification group has.
+     */
+    public int getChildCount() {
         return mNotifications.size();
     }
 
     /**
-     * Returns true when it has a group header and >1 child notifications
+     * Returns true when it has a group summary notification and >1 child notifications
      */
-    boolean isGroup() {
-        return mGroupHeaderNotification != null && getChildCount() > 1;
+    public boolean isGroup() {
+        return mGroupSummaryNotification != null && getChildCount() > 1;
     }
 
-    @NonNull
-    List<StatusBarNotification> getChildNotifications() {
+    /**
+     * Returns the list of the child notifications.
+     */
+    public List<StatusBarNotification> getChildNotifications() {
         return mNotifications;
     }
 
+    /**
+     * Returns the group summary notification.
+     */
     @Nullable
-    StatusBarNotification getGroupHeaderNotification() {
-        return mGroupHeaderNotification;
+    public StatusBarNotification getGroupSummaryNotification() {
+        return mGroupSummaryNotification;
     }
 
     /**
      * Sets the list of child notification titles.
      */
-    void setChildTitles(List<String> childTitles) {
+    public void setChildTitles(List<String> childTitles) {
         mChildTitles = childTitles;
     }
 
@@ -123,14 +132,14 @@ class NotificationGroup {
      * Returns the list of child notification titles.
      */
     @Nullable
-    List<String> getChildTitles() {
+    public List<String> getChildTitles() {
         return mChildTitles;
     }
 
     /**
      * Generates the list of the child notification titles for a group summary notification.
      */
-    List<String> generateChildTitles() {
+    public List<String> generateChildTitles() {
         List<String> titles = new ArrayList<>();
 
         for (StatusBarNotification notification : mNotifications) {
@@ -160,28 +169,26 @@ class NotificationGroup {
      * Returns a single notification that represents this NotificationGroup:
      *
      * <p> If the NotificationGroup is a valid grouped notification or has no child notifications,
-     * the group header notification is returned.
+     * the group summary notification is returned.
      *
      * <p> If the NotificationGroup has only 1 child notification,
-     * or has more than 1 child notifications without a valid group header,
+     * or has more than 1 child notifications without a valid group summary,
      * the first child notification is returned.
      *
      * @return the notification that represents this NotificationGroup
      */
-    @NonNull
-    StatusBarNotification getSingleNotification() {
+    public StatusBarNotification getSingleNotification() {
         if (isGroup() || getChildCount() == 0) {
-            return getGroupHeaderNotification();
+            return getGroupSummaryNotification();
 
         } else {
             return mNotifications.get(0);
         }
     }
 
-    @NonNull
     StatusBarNotification getNotificationForSorting() {
-        if (mGroupHeaderNotification != null) {
-            return getGroupHeaderNotification();
+        if (mGroupSummaryNotification != null) {
+            return getGroupSummaryNotification();
         }
         return getSingleNotification();
     }

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.android.car.notification;
+package com.android.car.notification.template;
 
 import android.app.Notification;
 import android.app.PendingIntent;
@@ -26,6 +26,8 @@ import android.view.View;
 import android.widget.FrameLayout;
 
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.android.car.notification.R;
 
 /**
  * Basic notification view template that displays a minimal notification.

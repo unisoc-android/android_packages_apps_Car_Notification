@@ -28,6 +28,15 @@ import android.view.ViewGroup;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.android.car.notification.template.BasicNotificationViewHolder;
+import com.android.car.notification.template.EmergencyNotificationViewHolder;
+import com.android.car.notification.template.GroupNotificationViewHolder;
+import com.android.car.notification.template.GroupSummaryNotificationViewHolder;
+import com.android.car.notification.template.InboxNotificationViewHolder;
+import com.android.car.notification.template.MediaNotificationViewHolder;
+import com.android.car.notification.template.MessageNotificationViewHolder;
+import com.android.car.notification.template.ProgressNotificationViewHolder;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -288,7 +297,7 @@ public class CarNotificationViewAdapter extends RecyclerView.Adapter<RecyclerVie
      * @param groupKey   the unique identifier of a {@link NotificationGroup}
      * @param isExpanded whether the group notification should be expanded.
      */
-    void setExpanded(String groupKey, boolean isExpanded) {
+    public void setExpanded(String groupKey, boolean isExpanded) {
         if (isExpanded(groupKey) == isExpanded) {
             return;
         }
@@ -353,7 +362,7 @@ public class CarNotificationViewAdapter extends RecyclerView.Adapter<RecyclerVie
     /**
      * Gets the current {@link CarUxRestrictions}.
      */
-    CarUxRestrictions getCarUxRestrictions() {
+    public CarUxRestrictions getCarUxRestrictions() {
         return mCarUxRestrictions;
     }
 
