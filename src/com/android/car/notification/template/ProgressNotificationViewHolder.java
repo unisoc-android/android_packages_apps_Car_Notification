@@ -17,15 +17,14 @@ package com.android.car.notification.template;
 
 import android.annotation.ColorInt;
 import android.app.Notification;
-import android.app.PendingIntent;
 import android.content.res.ColorStateList;
 import android.graphics.drawable.Icon;
 import android.os.Bundle;
 import android.service.notification.StatusBarNotification;
-import android.util.Log;
 import android.view.View;
 import android.widget.ProgressBar;
 
+import com.android.car.notification.NotificationClickHandlerFactory;
 import com.android.car.notification.R;
 import com.android.car.theme.Themes;
 
@@ -39,12 +38,14 @@ public class ProgressNotificationViewHolder extends CarNotificationBaseViewHolde
     private final CarNotificationBodyView mBodyView;
     private final CarNotificationActionsView mActionsView;
     private final ProgressBar mProgressBarView;
+    private NotificationClickHandlerFactory mClickHandlerFactory;
     private final View mParentView;
     @ColorInt
     private final int mCardBackgroundColor;
     private StatusBarNotification mStatusBarNotification;
 
-    public ProgressNotificationViewHolder(View view) {
+    public ProgressNotificationViewHolder(View view,
+            NotificationClickHandlerFactory clickHandlerFactory) {
         super(view);
         mParentView = view;
         mHeaderView = view.findViewById(R.id.notification_header);
@@ -52,6 +53,7 @@ public class ProgressNotificationViewHolder extends CarNotificationBaseViewHolde
         mActionsView = view.findViewById(R.id.notification_actions);
         mProgressBarView = view.findViewById(R.id.progress_bar);
         mCardBackgroundColor = Themes.getAttrColor(view.getContext(), android.R.attr.colorPrimary);
+        mClickHandlerFactory = clickHandlerFactory;
     }
 
     /**
@@ -62,7 +64,7 @@ public class ProgressNotificationViewHolder extends CarNotificationBaseViewHolde
         reset();
         bindBody(statusBarNotification);
         mHeaderView.bind(statusBarNotification, isInGroup);
-        mActionsView.bind(statusBarNotification, isInGroup);
+        mActionsView.bind(mClickHandlerFactory, statusBarNotification, isInGroup);
     }
 
     /**
@@ -72,15 +74,7 @@ public class ProgressNotificationViewHolder extends CarNotificationBaseViewHolde
         mStatusBarNotification = statusBarNotification;
         Notification notification = statusBarNotification.getNotification();
 
-        if (notification.contentIntent != null) {
-            mParentView.setOnClickListener(v -> {
-                try {
-                    notification.contentIntent.send();
-                } catch (PendingIntent.CanceledException e) {
-                    Log.e(TAG, "Cannot send pendingIntent in action button");
-                }
-            });
-        }
+        mParentView.setOnClickListener(mClickHandlerFactory.getClickHandler(statusBarNotification));
 
         Bundle extraData = notification.extras;
         CharSequence title = extraData.getCharSequence(Notification.EXTRA_TITLE);

@@ -45,7 +45,8 @@ LOCAL_STATIC_ANDROID_LIBRARIES += \
     car-theme-lib \
 
 LOCAL_STATIC_JAVA_LIBRARIES += \
-    android.car.userlib
+    android.car.userlib \
+    androidx-constraintlayout_constraintlayout-solver
 
 LOCAL_JAVA_LIBRARIES += \
     android.car
@@ -74,11 +75,13 @@ LOCAL_DEX_PREOPT := false
 
 LOCAL_STATIC_ANDROID_LIBRARIES += \
     androidx.car_car \
+    androidx-constraintlayout_constraintlayout \
     androidx.palette_palette \
     car-theme-lib \
 
 LOCAL_STATIC_JAVA_LIBRARIES += \
-    android.car.userlib
+    android.car.userlib \
+    androidx-constraintlayout_constraintlayout-solver
 
 LOCAL_JAVA_LIBRARIES += \
     android.car

@@ -66,6 +66,7 @@ public class CarHeadsUpNotificationManager
     private StatusBarNotification mVisibleNotification;
     private boolean mShouldRestrictMessagePreview;
     private boolean mIsShowingHeadsUpNotification;
+    private NotificationClickHandlerFactory mClickHandlerFactory;
 
     private CarHeadsUpNotificationManager(Context context) {
         mContext = context.getApplicationContext();
@@ -142,7 +143,7 @@ public class CarHeadsUpNotificationManager
                 notificationView = mInflater.inflate(
                         R.layout.car_emergency_headsup_notification_template, mWrapper);
                 EmergencyNotificationViewHolder holder =
-                        new EmergencyNotificationViewHolder(notificationView);
+                        new EmergencyNotificationViewHolder(notificationView, mClickHandlerFactory);
                 holder.bind(statusBarNotification, /* isInGroup= */ false);
                 break;
             }
@@ -152,7 +153,7 @@ public class CarHeadsUpNotificationManager
                 // Using the basic view holder because they share the same view binding logic
                 // OEMs should create view holders if needed
                 BasicNotificationViewHolder holder =
-                        new BasicNotificationViewHolder(notificationView);
+                        new BasicNotificationViewHolder(notificationView, mClickHandlerFactory);
                 holder.bind(statusBarNotification, /* isInGroup= */ false);
                 break;
             }
@@ -162,7 +163,7 @@ public class CarHeadsUpNotificationManager
                 // Using the basic view holder because they share the same view binding logic
                 // OEMs should create view holders if needed
                 BasicNotificationViewHolder holder =
-                        new BasicNotificationViewHolder(notificationView);
+                        new BasicNotificationViewHolder(notificationView, mClickHandlerFactory);
                 holder.bind(statusBarNotification, /* isInGroup= */ false);
                 break;
             }
@@ -170,7 +171,7 @@ public class CarHeadsUpNotificationManager
                 notificationView = mInflater.inflate(
                         R.layout.message_headsup_notification_template, mWrapper);
                 MessageNotificationViewHolder holder =
-                        new MessageNotificationViewHolder(notificationView);
+                        new MessageNotificationViewHolder(notificationView, mClickHandlerFactory);
                 if (mShouldRestrictMessagePreview) {
                     holder.bindRestricted(statusBarNotification, /* isInGroup= */ false);
                 } else {
@@ -182,7 +183,7 @@ public class CarHeadsUpNotificationManager
                 notificationView = mInflater.inflate(
                         R.layout.inbox_headsup_notification_template, mWrapper);
                 InboxNotificationViewHolder holder =
-                        new InboxNotificationViewHolder(notificationView);
+                        new InboxNotificationViewHolder(notificationView, mClickHandlerFactory);
                 holder.bind(statusBarNotification, /* isInGroup= */ false);
                 break;
             }
@@ -191,7 +192,7 @@ public class CarHeadsUpNotificationManager
                 notificationView = mInflater.inflate(
                         R.layout.basic_headsup_notification_template, mWrapper);
                 BasicNotificationViewHolder holder =
-                        new BasicNotificationViewHolder(notificationView);
+                        new BasicNotificationViewHolder(notificationView, mClickHandlerFactory);
                 holder.bind(statusBarNotification, /* isInGroup= */ false);
                 break;
             }
@@ -376,12 +377,17 @@ public class CarHeadsUpNotificationManager
     }
 
     /**
-     * Get CarHeadsUpNotificationManager instance.
+     * Gets CarHeadsUpNotificationManager instance.
+     *
+     * @param context The {@link Context} of the application
+     * @param clickHandlerFactory used to generate onClickListeners
      */
-    public static CarHeadsUpNotificationManager getInstance(Context context) {
+    public static CarHeadsUpNotificationManager getInstance(Context context,
+            NotificationClickHandlerFactory clickHandlerFactory) {
         if (sManager == null) {
             sManager = new CarHeadsUpNotificationManager(context);
         }
+        sManager.setClickHandlerFactory(clickHandlerFactory);
         return sManager;
     }
 
@@ -390,5 +396,14 @@ public class CarHeadsUpNotificationManager
         mShouldRestrictMessagePreview =
                 (restrictions.getActiveRestrictions()
                         & CarUxRestrictions.UX_RESTRICTIONS_NO_TEXT_MESSAGE) != 0;
+    }
+
+    /**
+     * Sets the source of {@link View.OnClickListener}
+     *
+     * @param clickHandlerFactory used to generate onClickListeners
+     */
+    private void setClickHandlerFactory(NotificationClickHandlerFactory clickHandlerFactory) {
+        mClickHandlerFactory = clickHandlerFactory;
     }
 }

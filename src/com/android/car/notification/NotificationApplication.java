@@ -21,9 +21,13 @@ import android.car.Car;
 import android.car.CarNotConnectedException;
 import android.car.drivingstate.CarUxRestrictionsManager;
 import android.content.ComponentName;
+import android.content.Context;
 import android.content.ServiceConnection;
 import android.os.IBinder;
+import android.os.ServiceManager;
 import android.util.Log;
+
+import com.android.internal.statusbar.IStatusBarService;
 
 /**
  * Application class that makes connections to the car service api so components can share these
@@ -32,6 +36,7 @@ import android.util.Log;
 public class NotificationApplication extends Application {
     private static final String TAG = "NotificationApplication";
     private Car mCar;
+    private NotificationClickHandlerFactory mClickHandlerFactory;
 
     private CarUxRestrictionManagerWrapper mCarUxRestrictionManagerWrapper =
             new CarUxRestrictionManagerWrapper();
@@ -71,5 +76,17 @@ public class NotificationApplication extends Application {
         super.onCreate();
         mCar = Car.createCar(this, mCarConnectionListener);
         mCar.connect();
+        mClickHandlerFactory = new NotificationClickHandlerFactory(
+                IStatusBarService.Stub.asInterface(
+                        ServiceManager.getService(Context.STATUS_BAR_SERVICE)),
+                /* callback= */null);
+    }
+
+    /**
+     * Returns the NotificationClickHandlerFactory used to generate click OnClickListeners
+     * for the notifications
+     */
+    public NotificationClickHandlerFactory getClickHandlerFactory() {
+        return mClickHandlerFactory;
     }
 }
