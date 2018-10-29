@@ -14,13 +14,15 @@
  * limitations under the License
  */
 
-package com.android.car.notification;
+package com.android.car.notification.template;
 
 import android.annotation.ColorInt;
 import android.annotation.FloatRange;
 import android.annotation.IntRange;
 import android.annotation.NonNull;
 import android.graphics.Color;
+
+import com.android.car.notification.R;
 
 /**
  * Helper class to determine if a color is a light color.

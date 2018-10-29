@@ -32,7 +32,7 @@ import com.android.internal.statusbar.NotificationVisibility;
 /**
  * Touch helper for notification cards that controls swipe to dismiss.
  */
-class CarNotificationItemTouchHelper extends ItemTouchHelper.SimpleCallback {
+public class CarNotificationItemTouchHelper extends ItemTouchHelper.SimpleCallback {
 
     private final CarNotificationViewAdapter mAdapter;
     private final IStatusBarService mBarService;
@@ -62,7 +62,7 @@ class CarNotificationItemTouchHelper extends ItemTouchHelper.SimpleCallback {
 
         StatusBarNotification notification =
                 notificationGroup.isGroup()
-                        ? notificationGroup.getGroupHeaderNotification()
+                        ? notificationGroup.getGroupSummaryNotification()
                         : notificationGroup.getSingleNotification();
 
         if (isCancelable(notification.getNotification())) {

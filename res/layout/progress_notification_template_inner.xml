@@ -19,7 +19,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
-    <com.android.car.notification.CarNotificationHeaderView
+    <com.android.car.notification.template.CarNotificationHeaderView
         android:id="@+id/notification_header"
         android:layout_width="match_parent"
         android:layout_height="@dimen/header_height"
@@ -28,7 +28,7 @@
         android:layout_marginStart="@dimen/car_keyline_1"
         android:layout_marginEnd="@dimen/car_keyline_1"/>
 
-    <com.android.car.notification.CarNotificationBodyView
+    <com.android.car.notification.template.CarNotificationBodyView
         android:id="@+id/notification_body"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -45,7 +45,7 @@
         android:layout_marginBottom="@dimen/car_padding_3"
         style="@style/Widget.Car.ProgressBar.Horizontal"/>
 
-    <com.android.car.notification.CarNotificationActionsView
+    <com.android.car.notification.template.CarNotificationActionsView
         android:id="@+id/notification_actions"
         android:layout_width="match_parent"
         android:layout_height="@dimen/car_card_action_bar_height"

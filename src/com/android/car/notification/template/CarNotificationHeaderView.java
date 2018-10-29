@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.android.car.notification;
+package com.android.car.notification.template;
 
 import android.annotation.Nullable;
 import android.app.Notification;
@@ -31,6 +31,8 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+
+import com.android.car.notification.R;
 
 /**
  * Notification header view that contains the issuer app icon and name, and extra information.

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.android.car.notification;
+package com.android.car.notification.template;
 
 import android.content.Context;
 import android.graphics.Canvas;
@@ -27,8 +27,14 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.SimpleItemAnimator;
 
+import com.android.car.notification.CarNotificationItemTouchHelper;
+import com.android.car.notification.CarNotificationViewAdapter;
+
 import java.util.ArrayList;
 import java.util.List;
+
+import com.android.car.notification.NotificationGroup;
+import com.android.car.notification.R;
 
 /**
  * ViewHolder that binds a list of notifications as a grouped notification.
@@ -101,12 +107,13 @@ public class GroupNotificationViewHolder extends RecyclerView.ViewHolder {
                 list.add(notificationGroup);
             });
         } else {
-            // only show group header
+            // only show group summary notification
             NotificationGroup newGroup = new NotificationGroup();
-            newGroup.addNotification(group.getGroupHeaderNotification());
-            // If the group header is automatically generated, it does not contain a summary of
-            // the titles of the child notifications. Therefore, we generate a list of
-            // the child notification titles from the parent notification group, and pass them on.
+            newGroup.addNotification(group.getGroupSummaryNotification());
+            // If the group summary notification is automatically generated,
+            // it does not contain a summary of the titles of the child notifications.
+            // Therefore, we generate a list of the child notification titles from
+            // the parent notification group, and pass them on.
             newGroup.setChildTitles(group.generateChildTitles());
             list.add(newGroup);
         }

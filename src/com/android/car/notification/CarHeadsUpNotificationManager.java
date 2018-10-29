@@ -35,6 +35,11 @@ import android.view.ViewTreeObserver;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
 
+import com.android.car.notification.template.BasicNotificationViewHolder;
+import com.android.car.notification.template.EmergencyNotificationViewHolder;
+import com.android.car.notification.template.InboxNotificationViewHolder;
+import com.android.car.notification.template.MessageNotificationViewHolder;
+
 /**
  * Notification Manager for heads-up notifications in car.
  */
