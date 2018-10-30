@@ -18,7 +18,6 @@ package com.android.car.notification;
 import android.app.Notification;
 import android.car.CarNotConnectedException;
 import android.car.drivingstate.CarUxRestrictions;
-import android.car.drivingstate.CarUxRestrictionsManager;
 import android.content.Context;
 import android.os.Bundle;
 import android.service.notification.NotificationListenerService;
@@ -153,7 +152,7 @@ public class PreprocessingManager {
             }
             if (notification.isGroupSummary()) {
                 groupedNotifications.get(groupKey)
-                        .setGroupHeaderNotification(statusBarNotification);
+                        .setGroupSummaryNotification(statusBarNotification);
             } else {
                 groupedNotifications.get(groupKey).addNotification(statusBarNotification);
             }

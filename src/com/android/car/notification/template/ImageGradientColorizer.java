@@ -14,7 +14,7 @@
  * limitations under the License
  */
 
-package com.android.car.notification;
+package com.android.car.notification.template;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -27,6 +27,8 @@ import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
 import android.graphics.Shader;
 import android.graphics.drawable.Drawable;
+
+import com.android.car.notification.R;
 
 /**
  * A utility class to colorize bitmaps with a color gradient and a special blending mode.

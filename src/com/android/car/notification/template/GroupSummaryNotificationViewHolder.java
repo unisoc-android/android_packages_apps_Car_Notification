@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.android.car.notification;
+package com.android.car.notification.template;
 
 import android.app.Notification;
 import android.app.PendingIntent;
@@ -28,8 +28,12 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.List;
 
+import com.android.car.notification.NotificationGroup;
+import com.android.car.notification.R;
+
 /**
- * Group summary notification view template that displays an automatically generated group header.
+ * Group summary notification view template that displays an automatically generated
+ * group summary notification.
  */
 public class GroupSummaryNotificationViewHolder extends RecyclerView.ViewHolder {
     private static final String TAG = "car_notif_group_summary";

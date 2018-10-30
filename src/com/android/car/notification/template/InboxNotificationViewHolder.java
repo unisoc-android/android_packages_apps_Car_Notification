@@ -13,11 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.android.car.notification;
+package com.android.car.notification.template;
 
+import android.annotation.Nullable;
 import android.app.Notification;
 import android.app.PendingIntent;
-import android.content.Context;
 import android.graphics.drawable.Icon;
 import android.os.Bundle;
 import android.service.notification.StatusBarNotification;
@@ -26,34 +26,34 @@ import android.view.View;
 
 import androidx.recyclerview.widget.RecyclerView;
 
-/**
- * Notification view template that displays a car emergency notification.
- */
-public class EmergencyNotificationViewHolder extends RecyclerView.ViewHolder {
-    private static final String TAG = "car_emergency";
-    private final Context mContext;
-    private final CarNotificationHeaderView mHeaderView;
-    private final CarNotificationActionsView mActionsView;
-    private final CarNotificationBodyView mBodyView;
-    private final View mParentView;
-    private final int mEmergencyActionBarColor;
+import com.android.car.notification.R;
 
-    public EmergencyNotificationViewHolder(View view) {
+/**
+ * Inbox notification view template that
+ * displays a {@link android.app.Notification.InboxStyle} notification.
+ */
+public class InboxNotificationViewHolder extends RecyclerView.ViewHolder {
+    private static final String TAG = "car_notification_inbox";
+    private final CarNotificationHeaderView mHeaderView;
+    private final CarNotificationBodyView mBodyView;
+    private final CarNotificationActionsView mActionsView;
+    private final View mParentView;
+
+    public InboxNotificationViewHolder(View view) {
         super(view);
-        mContext = view.getContext();
         mParentView = view;
         mHeaderView = view.findViewById(R.id.notification_header);
         mBodyView = view.findViewById(R.id.notification_body);
         mActionsView = view.findViewById(R.id.notification_actions);
-        mEmergencyActionBarColor = mContext.getColor(R.color.emergency_action_bar_background_color);
     }
 
     /**
-     * Binds a {@link StatusBarNotification} to a car emergency notification template.
+     * Binds a {@link StatusBarNotification} to an inbox style car notification template.
      *
      * @param statusBarNotification passing {@code null} clears the view.
+     * @param isInGroup whether this notification card is part of a group.
      */
-    public void bind(StatusBarNotification statusBarNotification) {
+    public void bind(@Nullable StatusBarNotification statusBarNotification, boolean isInGroup) {
         reset();
         if (statusBarNotification == null) {
             return;
@@ -72,20 +72,17 @@ public class EmergencyNotificationViewHolder extends RecyclerView.ViewHolder {
         }
 
         mHeaderView.bind(statusBarNotification, /* primaryColor= */ null);
-        mActionsView.bind(statusBarNotification, /* isInGroup= */ false);
-
-        // Override the car action bar color that was set in CarNotificationActionsView.bind()
-        mActionsView.setBackgroundColor(mEmergencyActionBarColor);
+        mActionsView.bind(statusBarNotification, isInGroup);
 
         Bundle extraData = notification.extras;
-        CharSequence title = extraData.getCharSequence(Notification.EXTRA_TITLE);
-        CharSequence text = extraData.getCharSequence(Notification.EXTRA_TEXT);
+        CharSequence title = extraData.getCharSequence(Notification.EXTRA_TITLE_BIG);
+        CharSequence text = extraData.getCharSequence(Notification.EXTRA_SUMMARY_TEXT);
         Icon icon = notification.getLargeIcon();
         mBodyView.bind(title, text, icon);
     }
 
     /**
-     * Resets the basic notification view empty for recycling.
+     * Resets the inbox notification view empty for recycling.
      */
     private void reset() {
         mParentView.setClickable(false);
