@@ -16,7 +16,6 @@
 package com.android.car.notification;
 
 import android.annotation.IntDef;
-import android.app.Notification;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -36,8 +35,13 @@ import java.lang.annotation.RetentionPolicy;
         NotificationViewType.INBOX,
         NotificationViewType.INBOX_HEADSUP,
         NotificationViewType.INBOX_IN_GROUP,
-        NotificationViewType.EMERGENCY,
-        NotificationViewType.EMERGENCY_HEADSUP,
+        NotificationViewType.CAR_EMERGENCY,
+        NotificationViewType.CAR_EMERGENCY_HEADSUP,
+        NotificationViewType.CAR_WARNING,
+        NotificationViewType.CAR_WARNING_HEADSUP,
+        NotificationViewType.CAR_INFORMATION,
+        NotificationViewType.CAR_INFORMATION_HEADSUP,
+        NotificationViewType.CAR_INFORMATION_IN_GROUP,
         NotificationViewType.MEDIA
 })
 @Retention(RetentionPolicy.SOURCE)
@@ -62,8 +66,15 @@ import java.lang.annotation.RetentionPolicy;
     int INBOX_HEADSUP = 13;
     int INBOX_IN_GROUP = 14;
 
-    int EMERGENCY = 15;
-    int EMERGENCY_HEADSUP = 16;
+    int CAR_EMERGENCY = 15;
+    int CAR_EMERGENCY_HEADSUP = 16;
 
-    int MEDIA = 17;
+    int CAR_WARNING = 17;
+    int CAR_WARNING_HEADSUP = 18;
+
+    int CAR_INFORMATION = 19;
+    int CAR_INFORMATION_HEADSUP = 20;
+    int CAR_INFORMATION_IN_GROUP = 21;
+
+    int MEDIA = 22;
 }
