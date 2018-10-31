@@ -88,10 +88,31 @@ public class CarNotificationViewAdapter extends RecyclerView.Adapter<RecyclerVie
                         .inflate(R.layout.group_summary_notification_template, parent, false);
                 viewHolder = new GroupSummaryNotificationViewHolder(view);
                 break;
-            case NotificationViewType.EMERGENCY:
+            case NotificationViewType.CAR_EMERGENCY:
                 view = mInflater.inflate(
-                        R.layout.emergency_notification_template, parent, false);
+                        R.layout.car_emergency_notification_template, parent, false);
                 viewHolder = new EmergencyNotificationViewHolder(view);
+                break;
+            case NotificationViewType.CAR_WARNING:
+                view = mInflater.inflate(
+                        R.layout.car_warning_notification_template, parent, false);
+                // Using the basic view holder because they share the same view binding logic
+                // OEMs should create view holders if needed
+                viewHolder = new BasicNotificationViewHolder(view);
+                break;
+            case NotificationViewType.CAR_INFORMATION:
+                view = mInflater.inflate(
+                        R.layout.car_information_notification_template, parent, false);
+                // Using the basic view holder because they share the same view binding logic
+                // OEMs should create view holders if needed
+                viewHolder = new BasicNotificationViewHolder(view);
+                break;
+            case NotificationViewType.CAR_INFORMATION_IN_GROUP:
+                view = mInflater.inflate(
+                        R.layout.car_information_notification_template_inner, parent, false);
+                // Using the basic view holder because they share the same view binding logic
+                // OEMs should create view holders if needed
+                viewHolder = new BasicNotificationViewHolder(view);
                 break;
             case NotificationViewType.MESSAGE_IN_GROUP:
                 view = mInflater.inflate(
@@ -155,7 +176,7 @@ public class CarNotificationViewAdapter extends RecyclerView.Adapter<RecyclerVie
             case NotificationViewType.GROUP_SUMMARY:
                 ((GroupSummaryNotificationViewHolder) holder).bind(notificationGroup);
                 break;
-            case NotificationViewType.EMERGENCY: {
+            case NotificationViewType.CAR_EMERGENCY: {
                 StatusBarNotification notification = notificationGroup.getSingleNotification();
                 ((EmergencyNotificationViewHolder) holder).bind(notification);
                 break;
@@ -186,6 +207,9 @@ public class CarNotificationViewAdapter extends RecyclerView.Adapter<RecyclerVie
                         .bind(notification, /* isInGroup= */ mIsGroupNotificationAdapter);
                 break;
             }
+            case NotificationViewType.CAR_WARNING:
+            case NotificationViewType.CAR_INFORMATION:
+            case NotificationViewType.CAR_INFORMATION_IN_GROUP:
             case NotificationViewType.BASIC_IN_GROUP:
             case NotificationViewType.BASIC:
             default: {
@@ -213,17 +237,23 @@ public class CarNotificationViewAdapter extends RecyclerView.Adapter<RecyclerVie
                 notificationGroup.getSingleNotification().getNotification();
         Bundle extras = notification.extras;
 
-        // car emergency
-        boolean isEmergency = Notification.CATEGORY_CAR_EMERGENCY.equals(notification.category);
-        if (isEmergency) {
-            return NotificationViewType.EMERGENCY;
-        }
-
-        // messaging
-        boolean isMessage = Notification.CATEGORY_MESSAGE.equals(notification.category);
-        if (isMessage) {
-            return mIsGroupNotificationAdapter
-                    ? NotificationViewType.MESSAGE_IN_GROUP : NotificationViewType.MESSAGE;
+        String category = notification.category;
+        if (category != null) {
+            switch (category) {
+                case Notification.CATEGORY_CAR_EMERGENCY:
+                    return NotificationViewType.CAR_EMERGENCY;
+                case Notification.CATEGORY_CAR_WARNING:
+                    return NotificationViewType.CAR_WARNING;
+                case Notification.CATEGORY_CAR_INFORMATION:
+                    return mIsGroupNotificationAdapter
+                            ? NotificationViewType.CAR_INFORMATION_IN_GROUP
+                            : NotificationViewType.CAR_INFORMATION;
+                case Notification.CATEGORY_MESSAGE:
+                    return mIsGroupNotificationAdapter
+                            ? NotificationViewType.MESSAGE_IN_GROUP : NotificationViewType.MESSAGE;
+                default:
+                    break;
+            }
         }
 
         // media
@@ -270,7 +300,7 @@ public class CarNotificationViewAdapter extends RecyclerView.Adapter<RecyclerVie
             Log.i(TAG, "Big picture style is not supported as a car notification");
         }
 
-        // basic, big text, big picture, car warning and car information
+        // basic, big text, big picture
         return mIsGroupNotificationAdapter
                 ? NotificationViewType.BASIC_IN_GROUP : NotificationViewType.BASIC;
     }
