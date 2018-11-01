@@ -24,8 +24,6 @@ import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
-import androidx.recyclerview.widget.RecyclerView;
-
 import java.util.List;
 
 import com.android.car.notification.NotificationGroup;
@@ -35,7 +33,7 @@ import com.android.car.notification.R;
  * Group summary notification view template that displays an automatically generated
  * group summary notification.
  */
-public class GroupSummaryNotificationViewHolder extends RecyclerView.ViewHolder {
+public class GroupSummaryNotificationViewHolder extends CarNotificationBaseViewHolder {
     private static final String TAG = "car_notif_group_summary";
     private final CarNotificationHeaderView mHeaderView;
     private final TextView mTitle1View;
@@ -43,6 +41,7 @@ public class GroupSummaryNotificationViewHolder extends RecyclerView.ViewHolder 
     private final TextView mUnshownCountView;
     private final View mParentView;
     private final Context mContext;
+    private StatusBarNotification mStatusBarNotification;
 
     /**
      * Constructor of the GroupSummaryNotificationViewHolder with a group summary template view.
@@ -65,8 +64,8 @@ public class GroupSummaryNotificationViewHolder extends RecyclerView.ViewHolder 
     public void bind(NotificationGroup notificationGroup) {
         reset();
 
-        StatusBarNotification statusBarNotification = notificationGroup.getSingleNotification();
-        Notification notification = statusBarNotification.getNotification();
+        mStatusBarNotification = notificationGroup.getSingleNotification();
+        Notification notification = mStatusBarNotification.getNotification();
 
         if (notification.contentIntent != null) {
             mParentView.setOnClickListener(v -> {
@@ -78,7 +77,7 @@ public class GroupSummaryNotificationViewHolder extends RecyclerView.ViewHolder 
             });
         }
 
-        mHeaderView.bind(statusBarNotification, /* primaryColor= */ null);
+        mHeaderView.bind(mStatusBarNotification, /* primaryColor= */ null);
 
         List<String> titles = notificationGroup.getChildTitles();
         if (titles != null && !titles.isEmpty()) {
@@ -102,7 +101,10 @@ public class GroupSummaryNotificationViewHolder extends RecyclerView.ViewHolder 
     /**
      * Resets the notification view empty for recycling.
      */
-    private void reset() {
+    @Override
+    void reset() {
+        super.reset();
+
         mParentView.setClickable(false);
         mParentView.setOnClickListener(null);
 
@@ -114,5 +116,10 @@ public class GroupSummaryNotificationViewHolder extends RecyclerView.ViewHolder 
 
         mUnshownCountView.setText(null);
         mUnshownCountView.setVisibility(View.GONE);
+    }
+
+    @Override
+    public StatusBarNotification getStatusBarNotification() {
+        return mStatusBarNotification;
     }
 }

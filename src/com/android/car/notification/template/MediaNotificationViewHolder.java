@@ -29,7 +29,6 @@ import android.view.View;
 import android.widget.ImageButton;
 
 import androidx.car.widget.ColumnCardView;
-import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,7 +38,7 @@ import com.android.car.notification.R;
 /**
  * Media notification view template that displays a media notification with controls.
  */
-public class MediaNotificationViewHolder extends RecyclerView.ViewHolder {
+public class MediaNotificationViewHolder extends CarNotificationBaseViewHolder {
     private static final String TAG = "car_notification_media";
     private static final int MAX_NUM_ACTIONS = 5;
     private final Context mContext;
@@ -49,6 +48,7 @@ public class MediaNotificationViewHolder extends RecyclerView.ViewHolder {
     private final ColumnCardView mCardView;
     private final List<ImageButton> mButtons;
     private final View mActionBarView;
+    private StatusBarNotification mStatusBarNotification;
 
     public MediaNotificationViewHolder(View view) {
         super(view);
@@ -77,6 +77,7 @@ public class MediaNotificationViewHolder extends RecyclerView.ViewHolder {
             return;
         }
 
+        mStatusBarNotification = statusBarNotification;
         Notification notification = statusBarNotification.getNotification();
 
         if (notification.contentIntent != null) {
@@ -142,7 +143,10 @@ public class MediaNotificationViewHolder extends RecyclerView.ViewHolder {
     /**
      * Resets the basic notification view empty for recycling.
      */
-    private void reset() {
+    @Override
+    void reset() {
+        super.reset();
+
         mParentView.setClickable(false);
         mParentView.setOnClickListener(null);
 
@@ -150,5 +154,10 @@ public class MediaNotificationViewHolder extends RecyclerView.ViewHolder {
             button.setImageDrawable(null);
             button.setVisibility(View.GONE);
         });
+    }
+
+    @Override
+    public StatusBarNotification getStatusBarNotification() {
+        return mStatusBarNotification;
     }
 }

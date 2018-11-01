@@ -33,7 +33,7 @@ public class CarNotificationView extends RelativeLayout
     }
 
     /**
-     * Attaches the CarNotificationViewAdapter and CarNotificationItemTouchHelper to the
+     * Attaches the CarNotificationViewAdapter and CarNotificationItemTouchListener to the
      * notification list.
      */
     @Override
@@ -44,26 +44,8 @@ public class CarNotificationView extends RelativeLayout
         listView.setAdapter(mAdapter);
         ((SimpleItemAnimator) listView.getRecyclerView().getItemAnimator())
                 .setSupportsChangeAnimations(false);
-
-        new ItemTouchHelper(
-                new CarNotificationItemTouchHelper(mAdapter) {
-                    @Override
-                    public int getSwipeDirs(RecyclerView recyclerView,
-                            RecyclerView.ViewHolder viewHolder) {
-                        if (viewHolder instanceof GroupNotificationViewHolder) {
-                            String groupKey =
-                                    mAdapter.getNotificationAtPosition(
-                                            viewHolder.getAdapterPosition()).getGroupKey();
-                            // disable swiping for expanded group notifications, so that the child
-                            // recycler view can receive the touch event
-                            if (mAdapter.isExpanded(groupKey)) {
-                                return 0;
-                            }
-                        }
-                        return super.getSwipeDirs(recyclerView, viewHolder);
-                    }
-                })
-                .attachToRecyclerView(listView.getRecyclerView());
+        listView.getRecyclerView().addOnItemTouchListener(
+                new CarNotificationItemTouchListener(mContext));
     }
 
     /**

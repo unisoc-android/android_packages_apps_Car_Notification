@@ -24,21 +24,20 @@ import android.util.Log;
 import android.view.View;
 import android.widget.ProgressBar;
 
-import androidx.recyclerview.widget.RecyclerView;
 
 import com.android.car.notification.R;
-
 /**
  * Basic notification view template that displays a progress bar notification.
  * This template is only used in notification center and never as a heads-up notification.
  */
-public class ProgressNotificationViewHolder extends RecyclerView.ViewHolder {
+public class ProgressNotificationViewHolder extends CarNotificationBaseViewHolder {
     private static final String TAG = "car_notification_basic";
     private final CarNotificationHeaderView mHeaderView;
     private final CarNotificationBodyView mBodyView;
     private final CarNotificationActionsView mActionsView;
     private final ProgressBar mProgressBarView;
     private final View mParentView;
+    private StatusBarNotification mStatusBarNotification;
 
     public ProgressNotificationViewHolder(View view) {
         super(view);
@@ -61,6 +60,7 @@ public class ProgressNotificationViewHolder extends RecyclerView.ViewHolder {
             return;
         }
 
+        mStatusBarNotification = statusBarNotification;
         Notification notification = statusBarNotification.getNotification();
 
         if (notification.contentIntent != null) {
@@ -95,11 +95,19 @@ public class ProgressNotificationViewHolder extends RecyclerView.ViewHolder {
     /**
      * Resets the basic notification view empty for recycling.
      */
-    private void reset() {
+    @Override
+    void reset() {
+        super.reset();
+
         mParentView.setClickable(false);
         mParentView.setOnClickListener(null);
 
         mProgressBarView.setProgress(0);
         mProgressBarView.setVisibility(View.GONE);
+    }
+
+    @Override
+    public StatusBarNotification getStatusBarNotification() {
+        return mStatusBarNotification;
     }
 }

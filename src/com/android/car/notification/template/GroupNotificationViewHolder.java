@@ -19,27 +19,26 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.drawable.Drawable;
+import android.service.notification.StatusBarNotification;
 import android.view.View;
 import android.widget.Button;
 
-import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.SimpleItemAnimator;
 
-import com.android.car.notification.CarNotificationItemTouchHelper;
+import com.android.car.notification.CarNotificationItemTouchListener;
 import com.android.car.notification.CarNotificationViewAdapter;
+import com.android.car.notification.NotificationGroup;
+import com.android.car.notification.R;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import com.android.car.notification.NotificationGroup;
-import com.android.car.notification.R;
-
 /**
  * ViewHolder that binds a list of notifications as a grouped notification.
  */
-public class GroupNotificationViewHolder extends RecyclerView.ViewHolder {
+public class GroupNotificationViewHolder extends CarNotificationBaseViewHolder {
     private static final String TAG = "car_notification_group";
     private final Context mContext;
     private final Button mToggleButton;
@@ -50,6 +49,7 @@ public class GroupNotificationViewHolder extends RecyclerView.ViewHolder {
     private final Paint mPaint;
     private final int mDividerMargin;
     private final int mDividerHeight;
+    private StatusBarNotification mStatusBarNotification;
 
     public GroupNotificationViewHolder(View view) {
         super(view);
@@ -75,15 +75,16 @@ public class GroupNotificationViewHolder extends RecyclerView.ViewHolder {
         ((SimpleItemAnimator) mNotificationListView.getItemAnimator())
                 .setSupportsChangeAnimations(false);
         mNotificationListView.setNestedScrollingEnabled(false);
+        mNotificationListView.addOnItemTouchListener(
+                new CarNotificationItemTouchListener(view.getContext()));
         mAdapter = new CarNotificationViewAdapter(mContext, /* isGroupNotificationAdapter= */ true);
         mNotificationListView.setAdapter(mAdapter);
-
-        new ItemTouchHelper(new CarNotificationItemTouchHelper(mAdapter))
-                .attachToRecyclerView(mNotificationListView);
     }
 
     public void bind(
             NotificationGroup group, CarNotificationViewAdapter parentAdapter, boolean isExpanded) {
+
+        mStatusBarNotification = group.getGroupSummaryNotification();
 
         mAdapter.setCarUxRestrictions(parentAdapter.getCarUxRestrictions());
 
@@ -160,5 +161,14 @@ public class GroupNotificationViewHolder extends RecyclerView.ViewHolder {
 
             c.drawRect(left, top, right, bottom, mPaint);
         }
+    }
+
+    @Override
+    public StatusBarNotification getStatusBarNotification() {
+        return mStatusBarNotification;
+    }
+
+    @Override
+    void reset() {
     }
 }

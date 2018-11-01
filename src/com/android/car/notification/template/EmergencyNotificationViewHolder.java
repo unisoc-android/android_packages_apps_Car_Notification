@@ -24,14 +24,12 @@ import android.service.notification.StatusBarNotification;
 import android.util.Log;
 import android.view.View;
 
-import androidx.recyclerview.widget.RecyclerView;
 
 import com.android.car.notification.R;
-
 /**
  * Notification view template that displays a car emergency notification.
  */
-public class EmergencyNotificationViewHolder extends RecyclerView.ViewHolder {
+public class EmergencyNotificationViewHolder extends CarNotificationBaseViewHolder {
     private static final String TAG = "car_emergency";
     private final Context mContext;
     private final CarNotificationHeaderView mHeaderView;
@@ -39,6 +37,7 @@ public class EmergencyNotificationViewHolder extends RecyclerView.ViewHolder {
     private final CarNotificationBodyView mBodyView;
     private final View mParentView;
     private final int mEmergencyActionBarColor;
+    private StatusBarNotification mStatusBarNotification;
 
     public EmergencyNotificationViewHolder(View view) {
         super(view);
@@ -61,6 +60,7 @@ public class EmergencyNotificationViewHolder extends RecyclerView.ViewHolder {
             return;
         }
 
+        mStatusBarNotification = statusBarNotification;
         Notification notification = statusBarNotification.getNotification();
 
         if (notification.contentIntent != null) {
@@ -89,8 +89,15 @@ public class EmergencyNotificationViewHolder extends RecyclerView.ViewHolder {
     /**
      * Resets the basic notification view empty for recycling.
      */
-    private void reset() {
+    @Override
+    void reset() {
+        super.reset();
         mParentView.setClickable(false);
         mParentView.setOnClickListener(null);
+    }
+
+    @Override
+    public StatusBarNotification getStatusBarNotification() {
+        return mStatusBarNotification;
     }
 }
