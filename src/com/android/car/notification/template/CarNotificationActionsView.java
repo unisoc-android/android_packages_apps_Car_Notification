@@ -17,6 +17,7 @@ package com.android.car.notification.template;
 
 import android.app.Notification;
 import android.app.PendingIntent;
+import android.app.UiModeManager;
 import android.content.Context;
 import android.service.notification.StatusBarNotification;
 import android.util.AttributeSet;
@@ -41,16 +42,11 @@ public class CarNotificationActionsView extends RelativeLayout {
     private static final int MAX_NUM_ACTIONS = 3;
 
     private final int mCarActionBarColor;
-    private final int mCarCardColor;
+    private final int mCardBackgroundColor;
+    private final int mDefaultTextColor;
 
     private final List<Button> mActionButtons = new ArrayList<>();
     private View mActionsView;
-
-    {
-        mCarActionBarColor = getContext().getResources().getColor(R.color.action_bar_color);
-        mCarCardColor = getContext().getResources().getColor(R.color.car_card);
-        inflate(getContext(), R.layout.car_notification_actions_view, /* root= */ this);
-    }
 
     public CarNotificationActionsView(Context context) {
         super(context);
@@ -67,6 +63,13 @@ public class CarNotificationActionsView extends RelativeLayout {
     public CarNotificationActionsView(Context context, AttributeSet attrs, int defStyleAttr,
             int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
+    }
+
+    {
+        mCarActionBarColor = getContext().getColor(R.color.action_bar_color);
+        mCardBackgroundColor = getContext().getColor(R.color.notification_card_background);
+        mDefaultTextColor = getContext().getColor(R.color.header_text_color);
+        inflate(getContext(), R.layout.car_notification_actions_view, /* root= */ this);
     }
 
     @Override
@@ -94,7 +97,7 @@ public class CarNotificationActionsView extends RelativeLayout {
         }
 
         setVisibility(View.VISIBLE);
-        mActionsView.setBackgroundColor(isInGroup ? mCarCardColor : mCarActionBarColor);
+        mActionsView.setBackgroundColor(isInGroup ? mCardBackgroundColor : mCarActionBarColor);
 
         int length = Math.min(actions.length, MAX_NUM_ACTIONS);
         for (int i = 0; i < length; i++) {
@@ -103,6 +106,11 @@ public class CarNotificationActionsView extends RelativeLayout {
             button.setVisibility(View.VISIBLE);
             // clear spannables and only use the text
             button.setText(action.title.toString());
+            if (notification.color != Notification.COLOR_DEFAULT) {
+                int calculatedColor = NotificationColorUtil.resolveContrastColor(
+                        getContext(), notification.color, mCardBackgroundColor);
+                button.setTextColor(calculatedColor);
+            }
 
             if (action.actionIntent != null) {
                 button.setOnClickListener(v -> {
@@ -125,6 +133,7 @@ public class CarNotificationActionsView extends RelativeLayout {
         for (Button button : mActionButtons) {
             button.setVisibility(View.GONE);
             button.setText(null);
+            button.setTextColor(mDefaultTextColor);
             button.setCompoundDrawables(null, null, null, null);
             button.setOnClickListener(null);
         }

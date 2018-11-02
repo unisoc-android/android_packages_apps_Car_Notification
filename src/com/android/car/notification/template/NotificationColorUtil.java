@@ -17,112 +17,138 @@
 package com.android.car.notification.template;
 
 import android.annotation.ColorInt;
-import android.annotation.FloatRange;
-import android.annotation.IntRange;
-import android.annotation.NonNull;
+import android.app.Notification;
+import android.content.Context;
 import android.graphics.Color;
 
 import com.android.car.notification.R;
+import com.android.internal.graphics.ColorUtils;
 
 /**
- * Helper class to determine if a color is a light color.
- *
- * Forked from com.android.internal.util.NotificationColorUtil.
- * Only kept isColorLight() and its referenced code.
+ * Helper class to determine if a color is a light color and find a foreground color that has enough
+ * contrast than the background color.
  */
 public class NotificationColorUtil {
+    private static final int MAX_FIND_COLOR_STEPS = 15;
+    private static final double MIN_COLOR_CONTRAST = 0.00001;
+    private static final double MIN_CONTRAST_RATIO = 4.5;
+    private static final double MIN_LIGHTNESS = 0;
+    private static final float MAX_LIGHTNESS = 1;
+    private static final float LIGHT_COLOR_LUMINANCE_THRESHOLD = 0.5f;
 
-    public static double calculateLuminance(int backgroundColor) {
-        return ColorUtilsFromCompat.calculateLuminance(backgroundColor);
-    }
-
-    public static boolean isColorLight(int backgroundColor) {
-        return calculateLuminance(backgroundColor) > 0.5f;
+    private NotificationColorUtil() {
     }
 
     /**
-     * Framework copy of functions needed from android.support.v4.graphics.ColorUtils.
+     * Resolves a Notification's color such that it has enough contrast to be used as the
+     * color for the Notification's action and header text.
+     *
+     * @param notificationColor the color of the notification or {@link Notification#COLOR_DEFAULT}
+     * @param backgroundColor   the background color to ensure the contrast against.
+     * @return a color of the same hue as {@code notificationColor} with enough contrast against
+     * the backgrounds.
      */
-    private static class ColorUtilsFromCompat {
+    public static int resolveContrastColor(
+            Context context, @ColorInt int notificationColor, @ColorInt int backgroundColor) {
+        if (notificationColor == Notification.COLOR_DEFAULT) {
+            return context.getColor(R.color.default_primary_text_color);
+        }
+        return getContrastedForegroundColor(notificationColor, backgroundColor, MIN_CONTRAST_RATIO);
+    }
 
-        private static final ThreadLocal<double[]> TEMP_ARRAY = new ThreadLocal<>();
+    /**
+     * Returns true if a color is considered a light color.
+     */
+    public static boolean isColorLight(int backgroundColor) {
+        return Color.luminance(backgroundColor) > LIGHT_COLOR_LUMINANCE_THRESHOLD;
+    }
 
-        private ColorUtilsFromCompat() {}
-
-        /**
-         * Returns the luminance of a color as a float between {@code 0.0} and {@code 1.0}.
-         * <p>Defined as the Y component in the XYZ representation of {@code color}.</p>
-         */
-        @FloatRange(from = 0.0, to = 1.0)
-        public static double calculateLuminance(@ColorInt int color) {
-            final double[] result = getTempDouble3Array();
-            colorToXYZ(color, result);
-            // Luminance is the Y component
-            return result[1] / 100;
+    /**
+     * Finds a suitable color such that there's enough contrast.
+     *
+     * @param foregroundColor  the color to start searching from.
+     * @param backgroundColor  the color to ensure contrast against. Assumed to be lighter than
+     *                         {@param foregroundColor}
+     * @param minContrastRatio the minimum contrast ratio required.
+     * @return a color with the same hue as {@param foregroundColor}, potentially darkened to
+     * meet the contrast ratio.
+     */
+    private static int findContrastColorAgainstLightBackground(
+            @ColorInt int foregroundColor, @ColorInt int backgroundColor, double minContrastRatio) {
+        if (ColorUtils.calculateContrast(foregroundColor, backgroundColor) >= minContrastRatio) {
+            return foregroundColor;
         }
 
-        /**
-         * Convert the ARGB color to it's CIE XYZ representative components.
-         *
-         * <p>The resulting XYZ representation will use the D65 illuminant and the CIE
-         * 2° Standard Observer (1931).</p>
-         *
-         * <ul>
-         * <li>outXyz[0] is X [0 ...95.047)</li>
-         * <li>outXyz[1] is Y [0...100)</li>
-         * <li>outXyz[2] is Z [0...108.883)</li>
-         * </ul>
-         *
-         * @param color  the ARGB color to convert. The alpha component is ignored
-         * @param outXyz 3-element array which holds the resulting LAB components
-         */
-        public static void colorToXYZ(@ColorInt int color, @NonNull double[] outXyz) {
-            RGBToXYZ(Color.red(color), Color.green(color), Color.blue(color), outXyz);
-        }
+        double[] lab = new double[3];
+        ColorUtils.colorToLAB(foregroundColor, lab);
 
-        /**
-         * Convert RGB components to it's CIE XYZ representative components.
-         *
-         * <p>The resulting XYZ representation will use the D65 illuminant and the CIE
-         * 2° Standard Observer (1931).</p>
-         *
-         * <ul>
-         * <li>outXyz[0] is X [0 ...95.047)</li>
-         * <li>outXyz[1] is Y [0...100)</li>
-         * <li>outXyz[2] is Z [0...108.883)</li>
-         * </ul>
-         *
-         * @param r      red component value [0..255]
-         * @param g      green component value [0..255]
-         * @param b      blue component value [0..255]
-         * @param outXyz 3-element array which holds the resulting XYZ components
-         */
-        public static void RGBToXYZ(@IntRange(from = 0x0, to = 0xFF) int r,
-                @IntRange(from = 0x0, to = 0xFF) int g, @IntRange(from = 0x0, to = 0xFF) int b,
-                @NonNull double[] outXyz) {
-            if (outXyz.length != 3) {
-                throw new IllegalArgumentException("outXyz must have a length of 3.");
+        double low = MIN_LIGHTNESS;
+        double high = lab[0];
+        double a = lab[1];
+        double b = lab[2];
+        for (int i = 0; i < MAX_FIND_COLOR_STEPS && high - low > MIN_COLOR_CONTRAST; i++) {
+            double l = (low + high) / 2;
+            foregroundColor = ColorUtils.LABToColor(l, a, b);
+            if (ColorUtils.calculateContrast(foregroundColor, backgroundColor) > minContrastRatio) {
+                low = l;
+            } else {
+                high = l;
             }
+        }
+        return ColorUtils.LABToColor(low, a, b);
+    }
 
-            double sr = r / 255.0;
-            sr = sr < 0.04045 ? sr / 12.92 : Math.pow((sr + 0.055) / 1.055, 2.4);
-            double sg = g / 255.0;
-            sg = sg < 0.04045 ? sg / 12.92 : Math.pow((sg + 0.055) / 1.055, 2.4);
-            double sb = b / 255.0;
-            sb = sb < 0.04045 ? sb / 12.92 : Math.pow((sb + 0.055) / 1.055, 2.4);
-
-            outXyz[0] = 100 * (sr * 0.4124 + sg * 0.3576 + sb * 0.1805);
-            outXyz[1] = 100 * (sr * 0.2126 + sg * 0.7152 + sb * 0.0722);
-            outXyz[2] = 100 * (sr * 0.0193 + sg * 0.1192 + sb * 0.9505);
+    /**
+     * Finds a suitable color such that there's enough contrast.
+     *
+     * @param foregroundColor  the foregroundColor to start searching from.
+     * @param backgroundColor  the foregroundColor to ensure contrast against. Assumed to be
+     *                         darker than {@param foregroundColor}
+     * @param minContrastRatio the minimum contrast ratio required.
+     * @return a foregroundColor with the same hue as {@param foregroundColor}, potentially
+     * lightened to meet the contrast ratio.
+     */
+    private static int findContrastColorAgainstDarkBackground(
+            @ColorInt int foregroundColor, @ColorInt int backgroundColor, double minContrastRatio) {
+        if (ColorUtils.calculateContrast(foregroundColor, backgroundColor) >= minContrastRatio) {
+            return foregroundColor;
         }
 
-        public static double[] getTempDouble3Array() {
-            double[] result = TEMP_ARRAY.get();
-            if (result == null) {
-                result = new double[3];
-                TEMP_ARRAY.set(result);
+        float[] hsl = new float[3];
+        ColorUtils.colorToHSL(foregroundColor, hsl);
+
+        float low = hsl[2];
+        float high = MAX_LIGHTNESS;
+        for (int i = 0; i < MAX_FIND_COLOR_STEPS && high - low > MIN_COLOR_CONTRAST; i++) {
+            float l = (low + high) / 2;
+            hsl[2] = l;
+            foregroundColor = ColorUtils.HSLToColor(hsl);
+            if (ColorUtils.calculateContrast(foregroundColor, backgroundColor)
+                    > minContrastRatio) {
+                high = l;
+            } else {
+                low = l;
             }
-            return result;
         }
+        return foregroundColor;
+    }
+
+    /**
+     * Finds a foregroundColor with sufficient contrast over backgroundColor that has the same or
+     * darker hue as the original foregroundColor.
+     *
+     * @param foregroundColor  the foregroundColor to start searching from
+     * @param backgroundColor  the foregroundColor to ensure contrast against
+     * @param minContrastRatio the minimum contrast ratio required
+     */
+    private static int getContrastedForegroundColor(
+            @ColorInt int foregroundColor, @ColorInt int backgroundColor, double minContrastRatio) {
+        boolean isBackgroundDarker =
+                Color.luminance(foregroundColor) > Color.luminance(backgroundColor);
+        return isBackgroundDarker
+                ? findContrastColorAgainstDarkBackground(
+                        foregroundColor, backgroundColor, minContrastRatio)
+                : findContrastColorAgainstLightBackground(
+                        foregroundColor, backgroundColor, minContrastRatio);
     }
 }
