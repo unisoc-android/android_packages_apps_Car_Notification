@@ -102,6 +102,8 @@ public class CarHeadsUpNotificationManager
         mScrimView.setVisibility(View.GONE);
         mWindowManager.addView(mScrimView, scrimParams);
 
+        int topMargin = mContext.getResources().getDimensionPixelOffset(
+                R.dimen.headsup_notification_top_margin);
         WindowManager.LayoutParams wrapperParams = new WindowManager.LayoutParams(
                 WindowManager.LayoutParams.MATCH_PARENT,
                 WindowManager.LayoutParams.WRAP_CONTENT,
@@ -112,8 +114,7 @@ public class CarHeadsUpNotificationManager
                 PixelFormat.TRANSLUCENT);
         wrapperParams.gravity = Gravity.TOP;
         mWrapper = new FrameLayout(mContext);
-        mWrapper.setPadding(
-                0, mContext.getResources().getDimensionPixelOffset(R.dimen.car_padding_1), 0, 0);
+        mWrapper.setPadding(0, topMargin, 0, 0);
         mWindowManager.addView(mWrapper, wrapperParams);
     }
 

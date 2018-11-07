@@ -15,5 +15,5 @@
     limitations under the License.
 -->
 <resources>
-    <color name="background_color">@color/car_grey_1000</color>
+    <attr name="action_bar_color" format="color" />
 </resources>

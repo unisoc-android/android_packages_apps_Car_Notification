@@ -29,7 +29,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
         app:columnSpan="@integer/notification_headsup_column_number"
-        app:cardBackgroundColor="@color/car_card"
+        app:cardBackgroundColor="?android:attr/colorPrimary"
         app:cardCornerRadius="@dimen/notification_card_radius">
 
         <include

@@ -22,6 +22,7 @@ import android.content.Context;
 import android.graphics.Color;
 
 import com.android.car.notification.R;
+import com.android.car.theme.Themes;
 import com.android.internal.graphics.ColorUtils;
 
 /**
@@ -43,16 +44,12 @@ public class NotificationColorUtil {
      * Resolves a Notification's color such that it has enough contrast to be used as the
      * color for the Notification's action and header text.
      *
-     * @param notificationColor the color of the notification or {@link Notification#COLOR_DEFAULT}
-     * @param backgroundColor   the background color to ensure the contrast against.
+     * @param backgroundColor the background color to ensure the contrast against.
      * @return a color of the same hue as {@code notificationColor} with enough contrast against
      * the backgrounds.
      */
     public static int resolveContrastColor(
-            Context context, @ColorInt int notificationColor, @ColorInt int backgroundColor) {
-        if (notificationColor == Notification.COLOR_DEFAULT) {
-            return context.getColor(R.color.default_primary_text_color);
-        }
+            @ColorInt int notificationColor, @ColorInt int backgroundColor) {
         return getContrastedForegroundColor(notificationColor, backgroundColor, MIN_CONTRAST_RATIO);
     }
 

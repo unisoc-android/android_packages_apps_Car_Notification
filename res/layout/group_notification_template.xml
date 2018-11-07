@@ -28,7 +28,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
         app:columnSpan="@integer/notification_center_column_number"
-        app:cardBackgroundColor="@color/car_card"
+        app:cardBackgroundColor="?android:attr/colorPrimary"
         app:cardCornerRadius="@dimen/notification_card_radius">
 
         <RelativeLayout
@@ -43,15 +43,14 @@
             <FrameLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/notification_list"
-                android:background="@color/car_card_action_bar">
+                android:layout_below="@id/notification_list">
 
                 <Button
                     android:id="@+id/toggle_button"
                     android:layout_width="wrap_content"
-                    android:layout_height="@dimen/car_card_action_bar_height"
+                    android:layout_height="@dimen/notification_card_action_bar_height"
                     android:layout_centerVertical="true"
-                    android:layout_marginStart="@dimen/car_keyline_1"
+                    android:layout_marginStart="@dimen/card_start_margin"
                     style="@style/NotificationActionButton"/>
             </FrameLayout>
 
