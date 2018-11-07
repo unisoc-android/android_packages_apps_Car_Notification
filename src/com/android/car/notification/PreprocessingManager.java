@@ -171,6 +171,15 @@ public class PreprocessingManager {
             NotificationListenerService.RankingMap rankingMap) {
 
         Collections.sort(notifications, new NotificationComparator(rankingMap));
+
+        // Rank within each group
+        notifications.forEach(notificationGroup -> {
+            if (notificationGroup.isGroup()) {
+                Collections.sort(
+                        notificationGroup.getChildNotifications(),
+                        new InGroupComparator(rankingMap));
+            }
+        });
         return notifications;
     }
 
@@ -191,6 +200,40 @@ public class PreprocessingManager {
         }
     }
 
+    /**
+     * Comparator that sorts within the notification group by the sort key. If a sort key is not
+     * supplied, sort by the global ranking order.
+     */
+    private static class InGroupComparator implements Comparator<StatusBarNotification> {
+        private final NotificationListenerService.RankingMap mRankingMap;
+
+        InGroupComparator(NotificationListenerService.RankingMap rankingMap) {
+            mRankingMap = rankingMap;
+        }
+
+        @Override
+        public int compare(StatusBarNotification left, StatusBarNotification right) {
+            if (left.getNotification().getSortKey() != null
+                    && right.getNotification().getSortKey() != null) {
+                return left.getNotification().getSortKey().compareTo(
+                        right.getNotification().getSortKey());
+            }
+
+            NotificationListenerService.Ranking leftRanking =
+                    new NotificationListenerService.Ranking();
+            mRankingMap.getRanking(left.getKey(), leftRanking);
+
+            NotificationListenerService.Ranking rightRanking =
+                    new NotificationListenerService.Ranking();
+            mRankingMap.getRanking(right.getKey(), rightRanking);
+
+            return leftRanking.getRank() - rightRanking.getRank();
+        }
+    }
+
+    /**
+     * Comparator that sorts the notification groups by their representative notification's rank.
+     */
     private static class NotificationComparator implements Comparator<NotificationGroup> {
         private final NotificationListenerService.RankingMap mRankingMap;
 
