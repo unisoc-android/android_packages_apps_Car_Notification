@@ -44,7 +44,7 @@ LOCAL_STATIC_ANDROID_LIBRARIES += \
     androidx.palette_palette
 
 LOCAL_STATIC_JAVA_LIBRARIES += \
-    android.car.user
+    android.car.userlib
 
 LOCAL_JAVA_LIBRARIES += \
     android.car
@@ -76,7 +76,7 @@ LOCAL_STATIC_ANDROID_LIBRARIES += \
     androidx.palette_palette \
 
 LOCAL_STATIC_JAVA_LIBRARIES += \
-    android.car.user
+    android.car.userlib
 
 LOCAL_JAVA_LIBRARIES += \
     android.car

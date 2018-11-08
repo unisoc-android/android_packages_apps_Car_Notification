@@ -47,23 +47,6 @@ public class NotificationGroup {
     public void addNotification(StatusBarNotification statusBarNotification) {
         assertSameGroupKey(statusBarNotification.getGroupKey());
         mNotifications.add(statusBarNotification);
-
-        // Sort the child notifications by the sort key
-        // If a sort key is not supplied, sort by the posted time in the descending order
-        Comparator<StatusBarNotification> comparator = ((Comparator<StatusBarNotification>)
-                (left, right) -> {
-                    if (left.getNotification().getSortKey() == null
-                            || right.getNotification().getSortKey() == null) {
-                        return 0;
-                    }
-                    return left.getNotification().getSortKey().compareTo(
-                            right.getNotification().getSortKey());
-                })
-                .thenComparing(
-                        (left, right)
-                                -> left.getPostTime() < right.getPostTime() ? 1 : -1);
-
-        Collections.sort(mNotifications, comparator);
     }
 
     void setGroupSummaryNotification(StatusBarNotification groupSummaryNotification) {
