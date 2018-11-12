@@ -75,7 +75,7 @@ public class MediaNotificationProcessor {
     private static final float DIFF_LOWER_BOUND = 10;
     private static final float DIFF_HIGHER_BOUND = 350;
     private static final int RESIZE_BITMAP_AREA = 150 * 150;
-    private static final int DEFAULT_BACKGROUND_COLOR = R.color.notification_card_background;
+    private static final int DEFAULT_BACKGROUND_COLOR = android.R.attr.colorPrimary;
     private final Context mContext;
     private float[] mFilteredBackgroundHsl = null;
     private Palette.Filter mBlackWhiteFilter = (rgb, hsl) -> !isWhiteOrBlack(hsl);

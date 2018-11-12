@@ -47,7 +47,6 @@ public class GroupNotificationViewHolder extends CarNotificationBaseViewHolder {
     private final Drawable mExpandDrawable;
     private final Drawable mCollapseDrawable;
     private final Paint mPaint;
-    private final int mDividerMargin;
     private final int mDividerHeight;
     private StatusBarNotification mStatusBarNotification;
 
@@ -58,15 +57,14 @@ public class GroupNotificationViewHolder extends CarNotificationBaseViewHolder {
         mToggleButton = view.findViewById(R.id.toggle_button);
         mNotificationListView = view.findViewById(R.id.notification_list);
 
-        int carAccentColor = mContext.getColor(R.color.car_body2);
+        int carAccentColor = mContext.getColor(R.color.notification_accent_color);
         mExpandDrawable = mContext.getDrawable(R.drawable.expand_more);
         mExpandDrawable.setTint(carAccentColor);
         mCollapseDrawable = mContext.getDrawable(R.drawable.expand_less);
         mCollapseDrawable.setTint(carAccentColor);
 
-        mDividerMargin = mContext.getResources().getDimensionPixelSize(R.dimen.car_keyline_1);
         mPaint = new Paint();
-        mPaint.setColor(mContext.getColor(R.color.car_list_divider));
+        mPaint.setColor(mContext.getColor(R.color.notification_list_divider_color));
         mDividerHeight = mContext.getResources().getDimensionPixelSize(
                 R.dimen.car_list_divider_height);
 
@@ -154,8 +152,8 @@ public class GroupNotificationViewHolder extends CarNotificationBaseViewHolder {
          * Draws a divider under {@code container}.
          */
         private void drawDivider(Canvas c, View container) {
-            int left = container.getLeft() + mDividerMargin;
-            int right = container.getRight() - mDividerMargin;
+            int left = container.getLeft();
+            int right = container.getRight();
             int bottom = container.getBottom() + mDividerHeight;
             int top = bottom - mDividerHeight;
 

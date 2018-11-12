@@ -34,6 +34,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.android.car.notification.R;
+import com.android.car.theme.Themes;
 
 /**
  * Notification header view that contains the issuer app icon and name, and extra information.
@@ -69,8 +70,8 @@ public class CarNotificationHeaderView extends LinearLayout {
 
     {
         mPackageManager = getContext().getPackageManager();
-        mDefaultTextColor = getContext().getColor(R.color.header_text_color);
-        mCardBackgroundColor = getContext().getColor(R.color.notification_card_background);
+        mCardBackgroundColor = Themes.getAttrColor(getContext(), android.R.attr.colorPrimary);
+        mDefaultTextColor = Themes.getAttrColor(getContext(), android.R.attr.textColorPrimary);
         mSeparatorText = getContext().getString(R.string.header_text_separator);
         inflate(getContext(), R.layout.car_notification_header_view, this);
     }
@@ -140,7 +141,7 @@ public class CarNotificationHeaderView extends LinearLayout {
             mHeaderTextView.setTextColor(mediaForegroundColor);
         } else if (notification.color != Notification.COLOR_DEFAULT) {
             int calculatedColor = NotificationColorUtil.resolveContrastColor(
-                    getContext(), notification.color, mCardBackgroundColor);
+                    notification.color, mCardBackgroundColor);
             mIconView.setColorFilter(calculatedColor);
         }
 

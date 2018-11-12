@@ -27,8 +27,8 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
+        app:cardBackgroundColor="?android:attr/colorPrimary"
         app:columnSpan="@integer/notification_center_column_number"
-        app:cardBackgroundColor="@color/car_card"
         app:cardCornerRadius="@dimen/notification_card_radius">
 
         <include

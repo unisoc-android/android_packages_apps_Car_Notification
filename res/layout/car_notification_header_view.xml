@@ -17,8 +17,8 @@
 <merge xmlns:android="http://schemas.android.com/apk/res/android">
     <ImageView
         android:id="@+id/app_icon"
-        android:layout_width="@dimen/car_secondary_icon_size"
-        android:layout_height="@dimen/car_secondary_icon_size"
+        android:layout_width="@dimen/notification_secondary_icon_size"
+        android:layout_height="@dimen/notification_secondary_icon_size"
         android:layout_gravity="center_vertical"
         android:scaleType="fitCenter"/>
 
@@ -27,9 +27,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical"
-        android:paddingStart="@dimen/car_padding_3"
-        android:maxLines="1"
-        android:ellipsize="end"
+        android:paddingStart="@dimen/header_small_icon_padding"
         android:textAppearance="@style/NotificationHeaderText"/>
 </merge>
 

@@ -22,10 +22,10 @@
         android:layout_height="wrap_content"
         android:layout_alignParentStart="true"
         android:layout_toStartOf="@id/notification_body_icon"
-        android:layout_marginStart="@dimen/car_keyline_1"
-        android:layout_marginEnd="@dimen/car_keyline_1"
-        android:layout_marginBottom="@dimen/car_padding_0"
-        style="@style/NotificationTitleText"/>
+        android:layout_marginStart="@dimen/card_start_margin"
+        android:layout_marginEnd="@dimen/card_end_margin"
+        android:layout_marginBottom="@dimen/text_padding"
+        style="@style/NotificationBodyTitleText"/>
 
     <TextView
         android:id="@+id/notification_body_content"
@@ -35,18 +35,18 @@
         android:layout_centerVertical="true"
         android:layout_below="@id/notification_body_title"
         android:layout_toStartOf="@id/notification_body_icon"
-        android:layout_marginStart="@dimen/car_keyline_1"
-        android:layout_marginEnd="@dimen/car_keyline_1"
-        android:layout_marginBottom="@dimen/car_padding_3"
-        android:textAppearance="@style/TextAppearance.Car.Body3.Light"/>
+        android:layout_marginStart="@dimen/card_start_margin"
+        android:layout_marginEnd="@dimen/card_end_margin"
+        android:layout_marginBottom="@dimen/body_bottom_padding"
+        android:textAppearance="@style/NotificationBodyContentText"/>
 
     <ImageButton
         android:id="@+id/notification_body_icon"
-        android:layout_width="@dimen/car_touch_target_size"
-        android:layout_height="@dimen/car_touch_target_size"
+        android:layout_width="@dimen/notification_touch_target_size"
+        android:layout_height="@dimen/notification_touch_target_size"
         android:layout_alignParentEnd="true"
-        android:layout_marginStart="@dimen/car_padding_4"
-        android:layout_marginEnd="@dimen/car_keyline_1"
-        style="@style/NotificationImageIcon"/>
+        android:layout_marginStart="@dimen/body_big_icon_margin"
+        android:layout_marginEnd="@dimen/card_end_margin"
+        style="@style/NotificationBodyImageIcon"/>
 
 </merge>
