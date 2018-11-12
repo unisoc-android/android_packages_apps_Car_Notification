@@ -20,15 +20,6 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
-    <com.android.car.notification.template.CarNotificationHeaderView
-        android:id="@+id/notification_header"
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/notification_card_header_height"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentStart="true"
-        android:layout_marginStart="@dimen/card_start_margin"
-        android:layout_marginEnd="@dimen/card_end_margin"/>
-
     <TextView
         android:id="@+id/child_notification_title_1"
         android:layout_width="match_parent"

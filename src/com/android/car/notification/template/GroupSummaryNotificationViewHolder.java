@@ -35,7 +35,6 @@ import com.android.car.notification.R;
  */
 public class GroupSummaryNotificationViewHolder extends CarNotificationBaseViewHolder {
     private static final String TAG = "car_notif_group_summary";
-    private final CarNotificationHeaderView mHeaderView;
     private final TextView mTitle1View;
     private final TextView mTitle2View;
     private final TextView mUnshownCountView;
@@ -52,7 +51,6 @@ public class GroupSummaryNotificationViewHolder extends CarNotificationBaseViewH
         super(view);
         mParentView = view;
         mContext = view.getContext();
-        mHeaderView = view.findViewById(R.id.notification_header);
         mTitle1View = view.findViewById(R.id.child_notification_title_1);
         mTitle2View = view.findViewById(R.id.child_notification_title_2);
         mUnshownCountView = view.findViewById(R.id.unshown_count);
@@ -76,8 +74,6 @@ public class GroupSummaryNotificationViewHolder extends CarNotificationBaseViewH
                 }
             });
         }
-
-        mHeaderView.bind(mStatusBarNotification, /* primaryColor= */ null);
 
         List<String> titles = notificationGroup.getChildTitles();
         if (titles != null && !titles.isEmpty()) {

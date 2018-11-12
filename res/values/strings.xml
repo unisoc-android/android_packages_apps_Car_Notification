@@ -31,9 +31,6 @@
     <!-- The separator for notification header text fields. -->
     <string name="header_text_separator" translatable="false">&#160;&#8226;&#160;</string>
 
-    <string name="expand">Expand</string>
-    <string name="collapse">Collapse</string>
-
     <!-- Text indicating the number of the unshown notifications in the group summary [CHAR_LIMIT=5] -->
     <string name="unshown_count">+<xliff:g id="count">%d</xliff:g></string>
 
