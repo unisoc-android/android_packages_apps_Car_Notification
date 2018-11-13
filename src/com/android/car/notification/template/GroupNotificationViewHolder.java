@@ -83,10 +83,11 @@ public class GroupNotificationViewHolder extends CarNotificationBaseViewHolder {
 
     public void bind(
             NotificationGroup group, CarNotificationViewAdapter parentAdapter, boolean isExpanded) {
+        reset();
 
-        mStatusBarNotification = group.getGroupSummaryNotification();
+        mStatusBarNotification = group.getSingleNotification();
 
-        mGroupHeaderView.bind(mStatusBarNotification);
+        mGroupHeaderView.bind(mStatusBarNotification, /* isInGroup= */ false);
 
         mAdapter.setCarUxRestrictions(parentAdapter.getCarUxRestrictions());
 
@@ -95,15 +96,15 @@ public class GroupNotificationViewHolder extends CarNotificationBaseViewHolder {
         // the view pool is created and stored in the root adapter
         mNotificationListView.setRecycledViewPool(parentAdapter.getViewPool());
 
-        // bind expand button
+        // expand button
         updateToggleButton(group.getChildCount(), isExpanded);
         mToggleButton.setOnClickListener(
                 view -> parentAdapter.setExpanded(group.getGroupKey(), !isExpanded));
 
-        // bind notification cards
+        // notification cards
         List<NotificationGroup> list = new ArrayList<>();
         if (isExpanded) {
-            // bind all child notifications
+            // all child notifications
             group.getChildNotifications().forEach(notification -> {
                 NotificationGroup notificationGroup = new NotificationGroup();
                 notificationGroup.addNotification(notification);
@@ -164,11 +165,21 @@ public class GroupNotificationViewHolder extends CarNotificationBaseViewHolder {
     }
 
     @Override
-    public StatusBarNotification getStatusBarNotification() {
-        return mStatusBarNotification;
+    void reset() {
+        super.reset();
+    }
+
+    /**
+     * Group notification view holder is special in that it requires extra data to bind,
+     * therefore the standard bind() method is no used. Still implementing
+     * {@link CarNotificationBaseViewHolder} because the touch events/animations need to work.
+     */
+    @Override
+    public void bind(StatusBarNotification statusBarNotification, boolean isInGroup) {
     }
 
     @Override
-    void reset() {
+    public StatusBarNotification getStatusBarNotification() {
+        return mStatusBarNotification;
     }
 }

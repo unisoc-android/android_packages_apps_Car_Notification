@@ -24,7 +24,6 @@ import android.util.Log;
 import android.view.View;
 import android.widget.ProgressBar;
 
-
 import com.android.car.notification.R;
 /**
  * Basic notification view template that displays a progress bar notification.
@@ -50,16 +49,19 @@ public class ProgressNotificationViewHolder extends CarNotificationBaseViewHolde
 
     /**
      * Binds a {@link StatusBarNotification} to a car progress notification template.
-     *
-     * @param statusBarNotification passing {@code null} clears the view.
-     * @param isInGroup whether this notification card is part of a group.
      */
+    @Override
     public void bind(StatusBarNotification statusBarNotification, boolean isInGroup) {
         reset();
-        if (statusBarNotification == null) {
-            return;
-        }
+        bindBody(statusBarNotification);
+        mHeaderView.bind(statusBarNotification, isInGroup);
+        mActionsView.bind(statusBarNotification, isInGroup);
+    }
 
+    /**
+     * Private method that binds the data to the view.
+     */
+    private void bindBody(StatusBarNotification statusBarNotification) {
         mStatusBarNotification = statusBarNotification;
         Notification notification = statusBarNotification.getNotification();
 
@@ -72,9 +74,6 @@ public class ProgressNotificationViewHolder extends CarNotificationBaseViewHolde
                 }
             });
         }
-
-        mHeaderView.bind(statusBarNotification, /* primaryColor= */ null);
-        mActionsView.bind(statusBarNotification, isInGroup);
 
         Bundle extraData = notification.extras;
         CharSequence title = extraData.getCharSequence(Notification.EXTRA_TITLE);

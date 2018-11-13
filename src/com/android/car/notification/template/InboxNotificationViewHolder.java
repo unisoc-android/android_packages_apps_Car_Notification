@@ -15,7 +15,6 @@
  */
 package com.android.car.notification.template;
 
-import android.annotation.Nullable;
 import android.app.Notification;
 import android.app.PendingIntent;
 import android.graphics.drawable.Icon;
@@ -23,7 +22,6 @@ import android.os.Bundle;
 import android.service.notification.StatusBarNotification;
 import android.util.Log;
 import android.view.View;
-
 
 import com.android.car.notification.R;
 /**
@@ -48,16 +46,19 @@ public class InboxNotificationViewHolder extends CarNotificationBaseViewHolder {
 
     /**
      * Binds a {@link StatusBarNotification} to an inbox style car notification template.
-     *
-     * @param statusBarNotification passing {@code null} clears the view.
-     * @param isInGroup whether this notification card is part of a group.
      */
-    public void bind(@Nullable StatusBarNotification statusBarNotification, boolean isInGroup) {
+    @Override
+    public void bind(StatusBarNotification statusBarNotification, boolean isInGroup) {
         reset();
-        if (statusBarNotification == null) {
-            return;
-        }
+        bindBody(statusBarNotification);
+        mHeaderView.bind(statusBarNotification, isInGroup);
+        mActionsView.bind(statusBarNotification, isInGroup);
+    }
 
+    /**
+     * Private method that binds the data to the view.
+     */
+    private void bindBody(StatusBarNotification statusBarNotification) {
         mStatusBarNotification = statusBarNotification;
         Notification notification = statusBarNotification.getNotification();
 
@@ -70,9 +71,6 @@ public class InboxNotificationViewHolder extends CarNotificationBaseViewHolder {
                 }
             });
         }
-
-        mHeaderView.bind(statusBarNotification, /* primaryColor= */ null);
-        mActionsView.bind(statusBarNotification, isInGroup);
 
         Bundle extraData = notification.extras;
         CharSequence title = extraData.getCharSequence(Notification.EXTRA_TITLE_BIG);

@@ -15,9 +15,9 @@
  */
 package com.android.car.notification.template;
 
+import android.annotation.ColorInt;
 import android.annotation.Nullable;
 import android.app.Notification;
-import android.app.UiModeManager;
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
@@ -87,22 +87,17 @@ public class CarNotificationHeaderView extends LinearLayout {
      * Binds the notification header that contains the issuer app icon and name.
      *
      * @param statusBarNotification the notification to be bound.
+     * @param isInGroup whether this notification is part of a grouped notification.
      */
-    public void bind(StatusBarNotification statusBarNotification) {
-        bind(statusBarNotification, /* mediaForegroundColor= */ null);
-    }
-
-    /**
-     * Binds the notification header that contains the issuer app icon and name.
-     *
-     * @param statusBarNotification the notification to be bound.
-     * @param mediaForegroundColor  the foreground color used for the texts and icons of media
-     *                              notifications.
-     *                              Passing {@code null} will use the default colors.
-     */
-    public void bind(StatusBarNotification statusBarNotification,
-            @Nullable Integer mediaForegroundColor) {
+    public void bind(StatusBarNotification statusBarNotification, boolean isInGroup) {
         reset();
+
+        if (isInGroup) {
+            // if the notification is part of a group, individual headers are not shown
+            // instead, there is a header for the entire group in the group notification template
+            return;
+        }
+
         setVisibility(View.VISIBLE);
         Notification notification = statusBarNotification.getNotification();
         Context packageContext = statusBarNotification.getPackageContext(getContext());
@@ -144,21 +139,32 @@ public class CarNotificationHeaderView extends LinearLayout {
             stringBuilder.append(dateString);
         }
 
-        // optional foreground colors
-        if (mediaForegroundColor != null) {
-            mIconView.setColorFilter(mediaForegroundColor);
-            mHeaderTextView.setTextColor(mediaForegroundColor);
-        } else if (notification.color != Notification.COLOR_DEFAULT) {
+        mHeaderTextView.setText(stringBuilder);
+
+        // optional color
+        if (notification.color != Notification.COLOR_DEFAULT) {
             int calculatedColor = NotificationColorUtil.resolveContrastColor(
                     notification.color, mCardBackgroundColor);
             mIconView.setColorFilter(calculatedColor);
         }
-
-        mHeaderTextView.setText(stringBuilder);
     }
 
     /**
-     * Resets the notification header empty for recycling.
+     * Binds the notification header that contains the issuer app icon and name.
+     *
+     * @param statusBarNotification the notification to be bound.
+     * @param mediaForegroundColor  the foreground color used for the texts and icons of media
+     *                              notifications.
+     */
+    public void bindWithMediaColor(
+            StatusBarNotification statusBarNotification, @ColorInt int mediaForegroundColor) {
+        bind(statusBarNotification, false);
+        mIconView.setColorFilter(mediaForegroundColor);
+        mHeaderTextView.setTextColor(mediaForegroundColor);
+    }
+
+    /**
+     * Resets the notification header empty.
      */
     private void reset() {
         setVisibility(View.GONE);

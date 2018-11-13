@@ -19,7 +19,6 @@ package com.android.car.notification.template;
 import android.annotation.ColorInt;
 import android.annotation.Nullable;
 import android.content.Context;
-import android.content.res.TypedArray;
 import android.graphics.drawable.Icon;
 import android.text.TextUtils;
 import android.util.AttributeSet;

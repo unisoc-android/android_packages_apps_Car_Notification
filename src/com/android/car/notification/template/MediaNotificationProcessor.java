@@ -28,12 +28,7 @@ import android.util.LayoutDirection;
 
 import androidx.palette.graphics.Palette;
 
-import com.android.car.notification.template.ImageGradientColorizer;
-import com.android.car.notification.template.NotificationColorUtil;
-
 import java.util.List;
-
-import com.android.car.notification.R;
 
 /**
  * A class the processes media notifications and extracts the right text and background colors.
