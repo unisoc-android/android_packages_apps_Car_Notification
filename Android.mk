@@ -41,7 +41,8 @@ LOCAL_DEX_PREOPT := false
 
 LOCAL_STATIC_ANDROID_LIBRARIES += \
     androidx.car_car \
-    androidx.palette_palette
+    androidx.palette_palette \
+    car-theme-lib \
 
 LOCAL_STATIC_JAVA_LIBRARIES += \
     android.car.userlib
@@ -74,6 +75,7 @@ LOCAL_DEX_PREOPT := false
 LOCAL_STATIC_ANDROID_LIBRARIES += \
     androidx.car_car \
     androidx.palette_palette \
+    car-theme-lib \
 
 LOCAL_STATIC_JAVA_LIBRARIES += \
     android.car.userlib

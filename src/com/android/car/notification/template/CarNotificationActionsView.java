@@ -19,6 +19,8 @@ import android.app.Notification;
 import android.app.PendingIntent;
 import android.app.UiModeManager;
 import android.content.Context;
+import android.content.res.TypedArray;
+import android.graphics.Color;
 import android.service.notification.StatusBarNotification;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -27,6 +29,7 @@ import android.widget.Button;
 import android.widget.RelativeLayout;
 
 import com.android.car.notification.R;
+import com.android.car.theme.Themes;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -66,9 +69,9 @@ public class CarNotificationActionsView extends RelativeLayout {
     }
 
     {
-        mCarActionBarColor = getContext().getColor(R.color.action_bar_color);
-        mCardBackgroundColor = getContext().getColor(R.color.notification_card_background);
-        mDefaultTextColor = getContext().getColor(R.color.header_text_color);
+        mCarActionBarColor = Themes.getAttrColor(getContext(), R.attr.action_bar_color);
+        mCardBackgroundColor = Themes.getAttrColor(getContext(), android.R.attr.colorPrimary);
+        mDefaultTextColor = Themes.getAttrColor(getContext(), android.R.attr.textColorPrimary);
         inflate(getContext(), R.layout.car_notification_actions_view, /* root= */ this);
     }
 
@@ -108,7 +111,7 @@ public class CarNotificationActionsView extends RelativeLayout {
             button.setText(action.title.toString());
             if (notification.color != Notification.COLOR_DEFAULT) {
                 int calculatedColor = NotificationColorUtil.resolveContrastColor(
-                        getContext(), notification.color, mCardBackgroundColor);
+                        notification.color, mCardBackgroundColor);
                 button.setTextColor(calculatedColor);
             }
 

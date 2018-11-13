@@ -34,7 +34,7 @@
         <activity
             android:name=".CarNotificationCenterActivity"
             android:label="@string/application_label"
-            android:theme="@style/Theme.Car.Light.NoActionBar"
+            android:theme="@style/Theme.DeviceDefault.NoActionBar.Notification"
             android:launchMode="singleInstance"
             android:noHistory="true"
             android:exported="true"

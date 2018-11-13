@@ -23,11 +23,11 @@
     <com.android.car.notification.template.CarNotificationHeaderView
         android:id="@+id/notification_header"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/header_height"
+        android:layout_height="@dimen/notification_card_header_height"
         android:layout_alignParentTop="true"
         android:layout_alignParentStart="true"
-        android:layout_marginStart="@dimen/car_keyline_1"
-        android:layout_marginEnd="@dimen/car_keyline_1"/>
+        android:layout_marginStart="@dimen/card_start_margin"
+        android:layout_marginEnd="@dimen/card_end_margin"/>
 
     <TextView
         android:id="@+id/child_notification_title_1"
@@ -35,11 +35,11 @@
         android:layout_height="wrap_content"
         android:layout_alignParentStart="true"
         android:layout_below="@id/notification_header"
-        android:layout_marginStart="@dimen/car_keyline_1"
-        android:layout_marginBottom="@dimen/car_padding_1"
+        android:layout_marginStart="@dimen/card_start_margin"
+        android:layout_marginBottom="@dimen/text_padding"
         android:maxLines="1"
         android:ellipsize="end"
-        android:textAppearance="@style/TextAppearance.Car.Body1"/>
+        android:textAppearance="@style/NotificationBodyTitleText"/>
 
     <TextView
         android:id="@+id/child_notification_title_2"
@@ -48,11 +48,11 @@
         android:layout_alignParentStart="true"
         android:layout_below="@id/child_notification_title_1"
         android:layout_toStartOf="@id/unshown_count"
-        android:layout_marginStart="@dimen/car_keyline_1"
-        android:layout_marginBottom="@dimen/car_padding_3"
+        android:layout_marginStart="@dimen/card_start_margin"
+        android:layout_marginBottom="@dimen/body_bottom_padding"
         android:maxLines="1"
         android:ellipsize="end"
-        android:textAppearance="@style/TextAppearance.Car.Body1"/>
+        android:textAppearance="@style/NotificationBodyTitleText"/>
 
     <TextView
         android:id="@+id/unshown_count"
@@ -60,8 +60,8 @@
         android:layout_height="wrap_content"
         android:layout_alignParentEnd="true"
         android:layout_below="@id/child_notification_title_1"
-        android:layout_marginStart="@dimen/car_padding_1"
-        android:layout_marginEnd="@dimen/car_keyline_1"
-        android:layout_marginBottom="@dimen/car_padding_3"
-        android:textAppearance="@style/TextAppearance.Car.Body1"/>
+        android:layout_marginStart="@dimen/unshown_count_start_margin"
+        android:layout_marginEnd="@dimen/card_end_margin"
+        android:layout_marginBottom="@dimen/body_bottom_padding"
+        android:textAppearance="@style/NotificationBodyTitleText"/>
 </RelativeLayout>

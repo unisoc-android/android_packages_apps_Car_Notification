@@ -21,7 +21,7 @@
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_centerVertical="true"
-        android:layout_marginStart="@dimen/car_keyline_1"
+        android:layout_marginStart="@dimen/card_start_margin"
         android:visibility="gone"
         style="@style/NotificationActionButton"/>
 
@@ -31,7 +31,7 @@
         android:layout_height="match_parent"
         android:layout_toEndOf="@id/action_1"
         android:layout_centerVertical="true"
-        android:layout_marginStart="@dimen/car_padding_5"
+        android:layout_marginStart="@dimen/action_button_margin"
         android:visibility="gone"
         style="@style/NotificationActionButton"/>
 
@@ -41,7 +41,7 @@
         android:layout_height="match_parent"
         android:layout_toEndOf="@id/action_2"
         android:layout_centerVertical="true"
-        android:layout_marginStart="@dimen/car_padding_5"
+        android:layout_marginStart="@dimen/action_button_margin"
         android:visibility="gone"
         style="@style/NotificationActionButton"/>
 </merge>
