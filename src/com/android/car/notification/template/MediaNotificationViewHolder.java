@@ -16,7 +16,6 @@
 
 package com.android.car.notification.template;
 
-import android.annotation.Nullable;
 import android.app.Notification;
 import android.app.PendingIntent;
 import android.content.Context;
@@ -30,10 +29,10 @@ import android.widget.ImageButton;
 
 import androidx.car.widget.ColumnCardView;
 
+import com.android.car.notification.R;
+
 import java.util.ArrayList;
 import java.util.List;
-
-import com.android.car.notification.R;
 
 /**
  * Media notification view template that displays a media notification with controls.
@@ -68,14 +67,10 @@ public class MediaNotificationViewHolder extends CarNotificationBaseViewHolder {
 
     /**
      * Binds a {@link StatusBarNotification} to a car media notification template.
-     *
-     * @param statusBarNotification passing {@code null} clears the view.
      */
-    public void bind(@Nullable StatusBarNotification statusBarNotification) {
+    @Override
+    public void bind(StatusBarNotification statusBarNotification, boolean isInGroup) {
         reset();
-        if (statusBarNotification == null) {
-            return;
-        }
 
         mStatusBarNotification = statusBarNotification;
         Notification notification = statusBarNotification.getNotification();
@@ -102,7 +97,7 @@ public class MediaNotificationViewHolder extends CarNotificationBaseViewHolder {
         mActionBarView.setBackgroundColor(averageColor);
 
         // header
-        mHeaderView.bind(statusBarNotification, primaryColor);
+        mHeaderView.bindWithMediaColor(statusBarNotification, primaryColor);
 
         // body
         Bundle extraData = notification.extras;

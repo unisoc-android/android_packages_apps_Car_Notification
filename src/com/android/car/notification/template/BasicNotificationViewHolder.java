@@ -25,7 +25,6 @@ import android.util.Log;
 import android.view.View;
 import android.widget.FrameLayout;
 
-
 import com.android.car.notification.R;
 /**
  * Basic notification view template that displays a minimal notification.
@@ -38,7 +37,6 @@ public class BasicNotificationViewHolder extends CarNotificationBaseViewHolder {
     private final CarNotificationHeaderView mHeaderView;
     private final CarNotificationBodyView mBodyView;
     private final CarNotificationActionsView mActionsView;
-    private final View mParentView;
     private final FrameLayout mBigContentView;
 
     private StatusBarNotification mStatusBarNotification;
@@ -46,7 +44,6 @@ public class BasicNotificationViewHolder extends CarNotificationBaseViewHolder {
     public BasicNotificationViewHolder(View view) {
         super(view);
         mContext = view.getContext();
-        mParentView = view;
         mHeaderView = view.findViewById(R.id.notification_header);
         mBodyView = view.findViewById(R.id.notification_body);
         mActionsView = view.findViewById(R.id.notification_actions);
@@ -55,16 +52,19 @@ public class BasicNotificationViewHolder extends CarNotificationBaseViewHolder {
 
     /**
      * Binds a {@link StatusBarNotification} to a basic car notification template.
-     *
-     * @param statusBarNotification passing {@code null} clears the view.
-     * @param isInGroup whether this notification card is part of a group.
      */
+    @Override
     public void bind(StatusBarNotification statusBarNotification, boolean isInGroup) {
         reset();
-        if (statusBarNotification == null) {
-            return;
-        }
+        bindBody(statusBarNotification);
+        mHeaderView.bind(statusBarNotification, isInGroup);
+        mActionsView.bind(statusBarNotification, isInGroup);
+    }
 
+    /**
+     * Private method that binds the data to the view.
+     */
+    private void bindBody(StatusBarNotification statusBarNotification) {
         mStatusBarNotification = statusBarNotification;
         Notification notification = statusBarNotification.getNotification();
 
@@ -90,8 +90,6 @@ public class BasicNotificationViewHolder extends CarNotificationBaseViewHolder {
             return;
         }
 
-        mHeaderView.bind(statusBarNotification, /* primaryColor= */ null);
-        mActionsView.bind(statusBarNotification, isInGroup);
 
         Bundle extraData = notification.extras;
 

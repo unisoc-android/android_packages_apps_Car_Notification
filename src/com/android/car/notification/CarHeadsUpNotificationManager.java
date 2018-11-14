@@ -143,7 +143,7 @@ public class CarHeadsUpNotificationManager
                         R.layout.car_emergency_headsup_notification_template, mWrapper);
                 EmergencyNotificationViewHolder holder =
                         new EmergencyNotificationViewHolder(notificationView);
-                holder.bind(statusBarNotification);
+                holder.bind(statusBarNotification, /* isInGroup= */ false);
                 break;
             }
             case NotificationViewType.CAR_WARNING_HEADSUP: {
@@ -171,10 +171,11 @@ public class CarHeadsUpNotificationManager
                         R.layout.message_headsup_notification_template, mWrapper);
                 MessageNotificationViewHolder holder =
                         new MessageNotificationViewHolder(notificationView);
-                holder.bind(
-                        statusBarNotification,
-                        /* isInGroup= */ false,
-                        mShouldRestrictMessagePreview);
+                if (mShouldRestrictMessagePreview) {
+                    holder.bindRestricted(statusBarNotification, /* isInGroup= */ false);
+                } else {
+                    holder.bind(statusBarNotification, /* isInGroup= */ false);
+                }
                 break;
             }
             case NotificationViewType.INBOX_HEADSUP: {

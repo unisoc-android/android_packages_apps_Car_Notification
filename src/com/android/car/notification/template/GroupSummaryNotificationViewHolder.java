@@ -24,10 +24,10 @@ import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
-import java.util.List;
-
 import com.android.car.notification.NotificationGroup;
 import com.android.car.notification.R;
+
+import java.util.List;
 
 /**
  * Group summary notification view template that displays an automatically generated
@@ -112,6 +112,16 @@ public class GroupSummaryNotificationViewHolder extends CarNotificationBaseViewH
 
         mUnshownCountView.setText(null);
         mUnshownCountView.setVisibility(View.GONE);
+    }
+
+    /**
+     * Group summary notification view holder is special in that it binds a
+     * {@link NotificationGroup} instead of a {@link StatusBarNotification},
+     * therefore the standard bind() method is no used. Still implementing
+     * {@link CarNotificationBaseViewHolder} because the touch events/animations need to work.
+     */
+    @Override
+    public void bind(StatusBarNotification statusBarNotification, boolean isInGroup) {
     }
 
     @Override
