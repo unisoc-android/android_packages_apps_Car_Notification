@@ -87,6 +87,15 @@ public class CarNotificationHeaderView extends LinearLayout {
      * Binds the notification header that contains the issuer app icon and name.
      *
      * @param statusBarNotification the notification to be bound.
+     */
+    public void bind(StatusBarNotification statusBarNotification) {
+        bind(statusBarNotification, /* mediaForegroundColor= */ null);
+    }
+
+    /**
+     * Binds the notification header that contains the issuer app icon and name.
+     *
+     * @param statusBarNotification the notification to be bound.
      * @param mediaForegroundColor  the foreground color used for the texts and icons of media
      *                              notifications.
      *                              Passing {@code null} will use the default colors.

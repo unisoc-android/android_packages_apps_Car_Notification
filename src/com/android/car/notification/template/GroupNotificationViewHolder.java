@@ -48,13 +48,15 @@ public class GroupNotificationViewHolder extends CarNotificationBaseViewHolder {
     private final Drawable mCollapseDrawable;
     private final Paint mPaint;
     private final int mDividerHeight;
+    private final CarNotificationHeaderView mGroupHeaderView;
     private StatusBarNotification mStatusBarNotification;
 
     public GroupNotificationViewHolder(View view) {
         super(view);
         mContext = view.getContext();
 
-        mToggleButton = view.findViewById(R.id.toggle_button);
+        mGroupHeaderView = view.findViewById(R.id.group_header);
+        mToggleButton = view.findViewById(R.id.group_toggle_button);
         mNotificationListView = view.findViewById(R.id.notification_list);
 
         int carAccentColor = mContext.getColor(R.color.notification_accent_color);
@@ -73,9 +75,9 @@ public class GroupNotificationViewHolder extends CarNotificationBaseViewHolder {
         ((SimpleItemAnimator) mNotificationListView.getItemAnimator())
                 .setSupportsChangeAnimations(false);
         mNotificationListView.setNestedScrollingEnabled(false);
-        mNotificationListView.addOnItemTouchListener(
-                new CarNotificationItemTouchListener(view.getContext()));
         mAdapter = new CarNotificationViewAdapter(mContext, /* isGroupNotificationAdapter= */ true);
+        mNotificationListView.addOnItemTouchListener(
+                new CarNotificationItemTouchListener(view.getContext(), mAdapter));
         mNotificationListView.setAdapter(mAdapter);
     }
 
@@ -83,6 +85,8 @@ public class GroupNotificationViewHolder extends CarNotificationBaseViewHolder {
             NotificationGroup group, CarNotificationViewAdapter parentAdapter, boolean isExpanded) {
 
         mStatusBarNotification = group.getGroupSummaryNotification();
+
+        mGroupHeaderView.bind(mStatusBarNotification);
 
         mAdapter.setCarUxRestrictions(parentAdapter.getCarUxRestrictions());
 
@@ -128,11 +132,9 @@ public class GroupNotificationViewHolder extends CarNotificationBaseViewHolder {
         mToggleButton.setVisibility(View.VISIBLE);
 
         if (isExpanded) {
-            mToggleButton.setText(R.string.collapse);
             mToggleButton.setCompoundDrawablesWithIntrinsicBounds(
                     mCollapseDrawable, null, null, null);
         } else {
-            mToggleButton.setText(R.string.expand);
             mToggleButton.setCompoundDrawablesWithIntrinsicBounds(
                     mExpandDrawable, null, null, null);
         }

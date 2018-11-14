@@ -34,6 +34,7 @@ import android.view.ViewConfiguration;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.android.car.notification.template.CarNotificationBaseViewHolder;
+import com.android.car.notification.template.GroupNotificationViewHolder;
 import com.android.internal.statusbar.IStatusBarService;
 import com.android.internal.statusbar.NotificationVisibility;
 
@@ -46,6 +47,9 @@ import java.util.concurrent.TimeUnit;
 public class CarNotificationItemTouchListener extends RecyclerView.SimpleOnItemTouchListener {
 
     private static final String TAG = "CarNotificationItemTouchListener";
+
+    private final CarNotificationViewAdapter mAdapter;
+
 
     /** StatusBarService for dismissing a notification. */
     private final IStatusBarService mBarService;
@@ -83,6 +87,7 @@ public class CarNotificationItemTouchListener extends RecyclerView.SimpleOnItemT
     private final int mMinimumFlingVelocity;
     /** The cap on velocity in pixel per second a swipe gesture is calculated to have. */
     private final int mMaximumFlingVelocity;
+    private final float mGroupHeaderHeight;
 
     /* Valid throughout a single gesture. */
     private VelocityTracker mVelocityTracker;
@@ -92,7 +97,8 @@ public class CarNotificationItemTouchListener extends RecyclerView.SimpleOnItemT
     @Nullable
     private CarNotificationBaseViewHolder mViewHolder;
 
-    public CarNotificationItemTouchListener(Context context) {
+    public CarNotificationItemTouchListener(Context context, CarNotificationViewAdapter adapter) {
+        mAdapter = adapter;
         mBarService = IStatusBarService.Stub.asInterface(
                 ServiceManager.getService(Context.STATUS_BAR_SERVICE));
 
@@ -124,6 +130,8 @@ public class CarNotificationItemTouchListener extends RecyclerView.SimpleOnItemT
         });
 
         Resources res = context.getResources();
+
+        mGroupHeaderHeight = res.getDimension(R.dimen.notification_card_header_height);
 
         mErrorFactorMultiplier = res.getFloat(R.dimen.error_factor_multiplier);
 
@@ -215,6 +223,18 @@ public class CarNotificationItemTouchListener extends RecyclerView.SimpleOnItemT
                         // Stop detecting swipe for the remainder of this gesture.
                         onGestureEnd();
                         return false;
+                    }
+
+                    // If a group notification is expanded, we desire a behavior that swiping on the
+                    // header would swipe the entire group away; while swiping on the child
+                    // notifications would swipe individual child notification away.
+                    if (mAdapter.isExpanded(mViewHolder.getStatusBarNotification().getGroupKey())) {
+                        float itemTop = mViewHolder.itemView.getY();
+                        boolean isTouchingGroupHeader =
+                                (currY > itemTop) && (currY < itemTop + mGroupHeaderHeight);
+                        if (!isTouchingGroupHeader) {
+                            return false;
+                        }
                     }
 
                     if (absDeltaX > mTouchSlop) {
