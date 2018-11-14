@@ -93,4 +93,5 @@ public class InboxNotificationViewHolder extends CarNotificationBaseViewHolder {
     public StatusBarNotification getStatusBarNotification() {
         return mStatusBarNotification;
     }
+
 }

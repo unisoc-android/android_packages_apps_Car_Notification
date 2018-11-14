@@ -98,7 +98,6 @@ public class CarNotificationHeaderView extends LinearLayout {
             return;
         }
 
-        setVisibility(View.VISIBLE);
         Notification notification = statusBarNotification.getNotification();
         Context packageContext = statusBarNotification.getPackageContext(getContext());
 
@@ -167,8 +166,6 @@ public class CarNotificationHeaderView extends LinearLayout {
      * Resets the notification header empty.
      */
     private void reset() {
-        setVisibility(View.GONE);
-
         mIconView.setVisibility(View.GONE);
         mIconView.setImageDrawable(null);
         mIconView.setColorFilter(mDefaultTextColor);

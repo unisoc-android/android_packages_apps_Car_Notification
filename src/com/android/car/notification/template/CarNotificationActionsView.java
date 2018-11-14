@@ -41,12 +41,10 @@ public class CarNotificationActionsView extends RelativeLayout {
     // https://developer.android.com/reference/android/app/Notification.Builder.html#addAction
     private static final int MAX_NUM_ACTIONS = 3;
 
-    private final int mCarActionBarColor;
     private final int mCardBackgroundColor;
     private final int mDefaultTextColor;
 
     private final List<Button> mActionButtons = new ArrayList<>();
-    private View mActionBarView;
 
     public CarNotificationActionsView(Context context) {
         super(context);
@@ -66,7 +64,6 @@ public class CarNotificationActionsView extends RelativeLayout {
     }
 
     {
-        mCarActionBarColor = Themes.getAttrColor(getContext(), R.attr.action_bar_color);
         mCardBackgroundColor = Themes.getAttrColor(getContext(), android.R.attr.colorPrimary);
         mDefaultTextColor = Themes.getAttrColor(getContext(), android.R.attr.textColorPrimary);
         inflate(getContext(), R.layout.car_notification_actions_view, /* root= */ this);
@@ -75,7 +72,6 @@ public class CarNotificationActionsView extends RelativeLayout {
     @Override
     protected void onFinishInflate() {
         super.onFinishInflate();
-        mActionBarView = findViewById(R.id.notification_actions);
         mActionButtons.add(findViewById(R.id.action_1));
         mActionButtons.add(findViewById(R.id.action_2));
         mActionButtons.add(findViewById(R.id.action_3));
@@ -95,8 +91,6 @@ public class CarNotificationActionsView extends RelativeLayout {
         if (actions == null || actions.length == 0) {
             return;
         }
-
-        setVisibility(View.VISIBLE);
 
         int length = Math.min(actions.length, MAX_NUM_ACTIONS);
         for (int i = 0; i < length; i++) {
@@ -121,16 +115,12 @@ public class CarNotificationActionsView extends RelativeLayout {
                 });
             }
         }
-
-        mActionBarView.setBackgroundColor(isInGroup ? mCardBackgroundColor : mCarActionBarColor);
     }
 
     /**
      * Resets the notification actions empty for recycling.
      */
     private void reset() {
-        setVisibility(View.GONE);
-        mActionBarView.setBackgroundColor(mCarActionBarColor);
         for (Button button : mActionButtons) {
             button.setVisibility(View.GONE);
             button.setText(null);

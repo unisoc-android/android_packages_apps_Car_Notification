@@ -109,4 +109,5 @@ public class ProgressNotificationViewHolder extends CarNotificationBaseViewHolde
     public StatusBarNotification getStatusBarNotification() {
         return mStatusBarNotification;
     }
+
 }

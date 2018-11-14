@@ -155,4 +155,5 @@ public class MediaNotificationViewHolder extends CarNotificationBaseViewHolder {
     public StatusBarNotification getStatusBarNotification() {
         return mStatusBarNotification;
     }
+
 }
