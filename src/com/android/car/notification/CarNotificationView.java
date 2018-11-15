@@ -11,8 +11,6 @@ import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.SimpleItemAnimator;
 
-import com.android.car.notification.template.GroupNotificationViewHolder;
-
 import java.util.List;
 
 
@@ -45,7 +43,7 @@ public class CarNotificationView extends RelativeLayout
         ((SimpleItemAnimator) listView.getRecyclerView().getItemAnimator())
                 .setSupportsChangeAnimations(false);
         listView.getRecyclerView().addOnItemTouchListener(
-                new CarNotificationItemTouchListener(mContext));
+                new CarNotificationItemTouchListener(mContext, mAdapter));
     }
 
     /**

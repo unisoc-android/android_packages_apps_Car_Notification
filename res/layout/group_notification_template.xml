@@ -35,24 +35,31 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
+            <com.android.car.notification.template.CarNotificationHeaderView
+                android:id="@+id/group_header"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/notification_card_header_height"
+                android:layout_alignParentTop="true"
+                android:layout_alignParentStart="true"
+                android:layout_toStartOf="@+id/group_toggle_button"
+                android:layout_marginStart="@dimen/card_start_margin"
+                android:gravity="center_vertical"/>
+
+            <Button
+                android:id="@+id/group_toggle_button"
+                android:layout_width="wrap_content"
+                android:layout_height="@dimen/notification_card_header_height"
+                android:layout_alignParentTop="true"
+                android:layout_alignParentEnd="true"
+                android:layout_marginStart="@dimen/header_small_icon_padding"
+                android:layout_marginEnd="@dimen/card_end_margin"
+                style="@style/NotificationActionButton"/>
+
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/notification_list"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"/>
-
-            <FrameLayout
-                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/notification_list">
-
-                <Button
-                    android:id="@+id/toggle_button"
-                    android:layout_width="wrap_content"
-                    android:layout_height="@dimen/notification_card_action_bar_height"
-                    android:layout_centerVertical="true"
-                    android:layout_marginStart="@dimen/card_start_margin"
-                    style="@style/NotificationActionButton"/>
-            </FrameLayout>
+                android:layout_below="@id/group_header"/>
 
         </RelativeLayout>
 

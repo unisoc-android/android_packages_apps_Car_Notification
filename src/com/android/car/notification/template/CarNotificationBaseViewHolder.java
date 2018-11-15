@@ -45,6 +45,14 @@ public abstract class CarNotificationBaseViewHolder extends RecyclerView.ViewHol
     }
 
     /**
+     * Binds a {@link StatusBarNotification} to a notification template.
+     *
+     * @param statusBarNotification the notification to be bound.
+     * @param isInGroup whether this notification is part of a grouped notification.
+     */
+    public abstract void bind(StatusBarNotification statusBarNotification, boolean isInGroup);
+
+    /**
      * Returns true if the notification contained in this view holder can be swiped away.
      */
     public boolean isDismissible() {

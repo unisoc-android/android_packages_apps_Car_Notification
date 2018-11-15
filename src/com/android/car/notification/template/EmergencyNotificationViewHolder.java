@@ -24,7 +24,6 @@ import android.service.notification.StatusBarNotification;
 import android.util.Log;
 import android.view.View;
 
-
 import com.android.car.notification.R;
 /**
  * Notification view template that displays a car emergency notification.
@@ -51,14 +50,10 @@ public class EmergencyNotificationViewHolder extends CarNotificationBaseViewHold
 
     /**
      * Binds a {@link StatusBarNotification} to a car emergency notification template.
-     *
-     * @param statusBarNotification passing {@code null} clears the view.
      */
-    public void bind(StatusBarNotification statusBarNotification) {
+    @Override
+    public void bind(StatusBarNotification statusBarNotification, boolean isInGroup) {
         reset();
-        if (statusBarNotification == null) {
-            return;
-        }
 
         mStatusBarNotification = statusBarNotification;
         Notification notification = statusBarNotification.getNotification();
@@ -73,8 +68,8 @@ public class EmergencyNotificationViewHolder extends CarNotificationBaseViewHold
             });
         }
 
-        mHeaderView.bind(statusBarNotification, /* primaryColor= */ null);
-        mActionsView.bind(statusBarNotification, /* isInGroup= */ false);
+        mHeaderView.bind(statusBarNotification, isInGroup);
+        mActionsView.bind(statusBarNotification, isInGroup);
 
         // Override the car action bar color that was set in CarNotificationActionsView.bind()
         mActionsView.setBackgroundColor(mEmergencyActionBarColor);

@@ -28,9 +28,9 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 
-import java.util.List;
-
 import com.android.car.notification.R;
+
+import java.util.List;
 
 /**
  * Messaging notification template that displays a messaging notification and a voice reply button.
@@ -54,27 +54,34 @@ public class MessageNotificationViewHolder extends CarNotificationBaseViewHolder
     }
 
     /**
-     * Binds a {@link StatusBarNotification} to a messaging car notification template.
-     *
-     * @param statusBarNotification passing {@code null} clears the view.
-     * @param isInGroup whether this notification card is part of a group.
-     * @param isRestricted whether this notification should show only a summary of the notification
-     *                     (e.g. "1 new message") or the actual content of the message.
+     * Binds a {@link StatusBarNotification} to a messaging car notification template without
+     * UX restriction.
      */
-    public void bind(
-            @Nullable StatusBarNotification statusBarNotification,
-            boolean isInGroup,
-            boolean isRestricted) {
-
+    @Override
+    public void bind(StatusBarNotification statusBarNotification, boolean isInGroup) {
         reset();
-        if (statusBarNotification == null) {
-            return;
-        }
-        mStatusBarNotification = statusBarNotification;
-
-        mHeaderView.bind(statusBarNotification, /* primaryColor= */ null);
+        bindBody(statusBarNotification, /* isRestricted= */ false);
+        mHeaderView.bind(statusBarNotification, isInGroup);
         mActionsView.bind(statusBarNotification, isInGroup);
+    }
 
+    /**
+     * Binds a {@link StatusBarNotification} to a messaging car notification template with
+     * UX restriction.
+     */
+    public void bindRestricted(StatusBarNotification statusBarNotification, boolean isInGroup) {
+        reset();
+        bindBody(statusBarNotification, /* isRestricted= */ true);
+        mHeaderView.bind(statusBarNotification, isInGroup);
+        mActionsView.bind(statusBarNotification, isInGroup);
+    }
+
+    /**
+     * Private method that binds the data to the view.
+     */
+    private void bindBody(
+            @Nullable StatusBarNotification statusBarNotification, boolean isRestricted) {
+        mStatusBarNotification = statusBarNotification;
         Notification notification = statusBarNotification.getNotification();
 
         if (notification.contentIntent != null) {
