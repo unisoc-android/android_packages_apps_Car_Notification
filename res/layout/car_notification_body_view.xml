@@ -24,7 +24,6 @@
         android:layout_toStartOf="@id/notification_body_icon"
         android:layout_marginStart="@dimen/card_start_margin"
         android:layout_marginEnd="@dimen/card_end_margin"
-        android:layout_marginBottom="@dimen/text_padding"
         style="@style/NotificationBodyTitleText"/>
 
     <TextView
@@ -32,12 +31,11 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentStart="true"
-        android:layout_centerVertical="true"
         android:layout_below="@id/notification_body_title"
         android:layout_toStartOf="@id/notification_body_icon"
         android:layout_marginStart="@dimen/card_start_margin"
+        android:layout_marginTop="@dimen/text_padding"
         android:layout_marginEnd="@dimen/card_end_margin"
-        android:layout_marginBottom="@dimen/body_bottom_padding"
         android:textAppearance="@style/NotificationBodyContentText"/>
 
     <ImageButton
@@ -45,6 +43,8 @@
         android:layout_width="@dimen/notification_touch_target_size"
         android:layout_height="@dimen/notification_touch_target_size"
         android:layout_alignParentEnd="true"
+        android:layout_centerVertical="true"
+        android:layout_marginTop="@dimen/text_padding"
         android:layout_marginStart="@dimen/body_big_icon_margin"
         android:layout_marginEnd="@dimen/card_end_margin"
         style="@style/NotificationBodyImageIcon"/>

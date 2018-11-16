@@ -128,4 +128,5 @@ public class GroupSummaryNotificationViewHolder extends CarNotificationBaseViewH
     public StatusBarNotification getStatusBarNotification() {
         return mStatusBarNotification;
     }
+
 }

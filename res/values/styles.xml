@@ -19,7 +19,7 @@
     <style name="NotificationCenterAppTitle" parent="@android:TextAppearance.DeviceDefault.Large">
     </style>
 
-    <style name="NotificationHeaderText" parent="@android:TextAppearance.DeviceDefault.Medium">
+    <style name="NotificationHeaderText" parent="@android:TextAppearance.DeviceDefault">
         <item name="android:maxLines">1</item>
         <item name="android:ellipsize">end</item>
     </style>
@@ -29,7 +29,7 @@
         <item name="android:ellipsize">end</item>
     </style>
 
-    <style name="NotificationBodyContentText" parent="@android:TextAppearance.DeviceDefault.Medium">
+    <style name="NotificationBodyContentText" parent="@android:TextAppearance.DeviceDefault">
     </style>
 
     <style name="NotificationBodyImageIcon">

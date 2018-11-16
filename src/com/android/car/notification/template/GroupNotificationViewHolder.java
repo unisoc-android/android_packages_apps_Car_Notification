@@ -41,6 +41,7 @@ import java.util.List;
 public class GroupNotificationViewHolder extends CarNotificationBaseViewHolder {
     private static final String TAG = "car_notification_group";
     private final Context mContext;
+    private final View mHeaderDividerView;
     private final Button mToggleButton;
     private final RecyclerView mNotificationListView;
     private final CarNotificationViewAdapter mAdapter;
@@ -48,6 +49,7 @@ public class GroupNotificationViewHolder extends CarNotificationBaseViewHolder {
     private final Drawable mCollapseDrawable;
     private final Paint mPaint;
     private final int mDividerHeight;
+    private final int mMinTopPadding;
     private final CarNotificationHeaderView mGroupHeaderView;
     private StatusBarNotification mStatusBarNotification;
 
@@ -56,6 +58,7 @@ public class GroupNotificationViewHolder extends CarNotificationBaseViewHolder {
         mContext = view.getContext();
 
         mGroupHeaderView = view.findViewById(R.id.group_header);
+        mHeaderDividerView = view.findViewById(R.id.header_divider);
         mToggleButton = view.findViewById(R.id.group_toggle_button);
         mNotificationListView = view.findViewById(R.id.notification_list);
 
@@ -69,6 +72,9 @@ public class GroupNotificationViewHolder extends CarNotificationBaseViewHolder {
         mPaint.setColor(mContext.getColor(R.color.notification_list_divider_color));
         mDividerHeight = mContext.getResources().getDimensionPixelSize(
                 R.dimen.car_list_divider_height);
+
+        mMinTopPadding =
+                mContext.getResources().getDimensionPixelOffset(R.dimen.card_min_top_padding);
 
         mNotificationListView.setLayoutManager(new LinearLayoutManager(mContext));
         mNotificationListView.addItemDecoration(new GroupedNotificationItemDecoration());
@@ -104,6 +110,9 @@ public class GroupNotificationViewHolder extends CarNotificationBaseViewHolder {
         // notification cards
         List<NotificationGroup> list = new ArrayList<>();
         if (isExpanded) {
+            // show header divider
+            mHeaderDividerView.setVisibility(View.VISIBLE);
+
             // all child notifications
             group.getChildNotifications().forEach(notification -> {
                 NotificationGroup notificationGroup = new NotificationGroup();
@@ -111,6 +120,9 @@ public class GroupNotificationViewHolder extends CarNotificationBaseViewHolder {
                 list.add(notificationGroup);
             });
         } else {
+            // hide header divider
+            mHeaderDividerView.setVisibility(View.GONE);
+
             // only show group summary notification
             NotificationGroup newGroup = new NotificationGroup();
             newGroup.addNotification(group.getGroupSummaryNotification());
@@ -182,4 +194,5 @@ public class GroupNotificationViewHolder extends CarNotificationBaseViewHolder {
     public StatusBarNotification getStatusBarNotification() {
         return mStatusBarNotification;
     }
+
 }
