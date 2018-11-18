@@ -107,4 +107,5 @@ public abstract class CarNotificationBaseViewHolder extends RecyclerView.ViewHol
      */
     @Nullable
     public abstract StatusBarNotification getStatusBarNotification();
+
 }

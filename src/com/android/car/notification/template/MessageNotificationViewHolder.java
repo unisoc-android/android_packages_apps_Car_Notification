@@ -81,6 +81,7 @@ public class MessageNotificationViewHolder extends CarNotificationBaseViewHolder
      */
     private void bindBody(
             @Nullable StatusBarNotification statusBarNotification, boolean isRestricted) {
+
         mStatusBarNotification = statusBarNotification;
         Notification notification = statusBarNotification.getNotification();
 
@@ -159,4 +160,5 @@ public class MessageNotificationViewHolder extends CarNotificationBaseViewHolder
     public StatusBarNotification getStatusBarNotification() {
         return mStatusBarNotification;
     }
+
 }

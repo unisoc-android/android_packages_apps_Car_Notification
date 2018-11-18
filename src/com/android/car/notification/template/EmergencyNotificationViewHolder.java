@@ -35,7 +35,6 @@ public class EmergencyNotificationViewHolder extends CarNotificationBaseViewHold
     private final CarNotificationActionsView mActionsView;
     private final CarNotificationBodyView mBodyView;
     private final View mParentView;
-    private final int mEmergencyActionBarColor;
     private StatusBarNotification mStatusBarNotification;
 
     public EmergencyNotificationViewHolder(View view) {
@@ -45,7 +44,6 @@ public class EmergencyNotificationViewHolder extends CarNotificationBaseViewHold
         mHeaderView = view.findViewById(R.id.notification_header);
         mBodyView = view.findViewById(R.id.notification_body);
         mActionsView = view.findViewById(R.id.notification_actions);
-        mEmergencyActionBarColor = mContext.getColor(R.color.emergency_action_bar_background_color);
     }
 
     /**
@@ -71,9 +69,6 @@ public class EmergencyNotificationViewHolder extends CarNotificationBaseViewHold
         mHeaderView.bind(statusBarNotification, isInGroup);
         mActionsView.bind(statusBarNotification, isInGroup);
 
-        // Override the car action bar color that was set in CarNotificationActionsView.bind()
-        mActionsView.setBackgroundColor(mEmergencyActionBarColor);
-
         Bundle extraData = notification.extras;
         CharSequence title = extraData.getCharSequence(Notification.EXTRA_TITLE);
         CharSequence text = extraData.getCharSequence(Notification.EXTRA_TEXT);
@@ -95,4 +90,5 @@ public class EmergencyNotificationViewHolder extends CarNotificationBaseViewHold
     public StatusBarNotification getStatusBarNotification() {
         return mStatusBarNotification;
     }
+
 }
