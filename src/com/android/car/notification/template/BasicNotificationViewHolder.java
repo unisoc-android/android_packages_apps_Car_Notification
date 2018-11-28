@@ -37,7 +37,6 @@ public class BasicNotificationViewHolder extends CarNotificationBaseViewHolder {
     private final CarNotificationHeaderView mHeaderView;
     private final CarNotificationBodyView mBodyView;
     private final CarNotificationActionsView mActionsView;
-    private final FrameLayout mBigContentView;
 
     private StatusBarNotification mStatusBarNotification;
 
@@ -47,7 +46,6 @@ public class BasicNotificationViewHolder extends CarNotificationBaseViewHolder {
         mHeaderView = view.findViewById(R.id.notification_header);
         mBodyView = view.findViewById(R.id.notification_body);
         mActionsView = view.findViewById(R.id.notification_actions);
-        mBigContentView = view.findViewById(R.id.big_content_view);
     }
 
     /**
@@ -78,21 +76,7 @@ public class BasicNotificationViewHolder extends CarNotificationBaseViewHolder {
             });
         }
 
-        if (notification.bigContentView != null) {
-            View view = notification.bigContentView.apply(mContext, /* parent= */ mBigContentView);
-            mBigContentView.setVisibility(View.VISIBLE);
-            mBigContentView.addView(view);
-            mHeaderView.setVisibility(View.GONE);
-            mBodyView.setVisibility(View.GONE);
-            mActionsView.setVisibility(View.GONE);
-            // If a notification came with a custom content view,
-            // do not bind anything else other than the custom view.
-            return;
-        }
-
-
         Bundle extraData = notification.extras;
-
         CharSequence title = extraData.getCharSequence(Notification.EXTRA_TITLE);
         CharSequence text = extraData.getCharSequence(Notification.EXTRA_TEXT);
         Icon icon = notification.getLargeIcon();
@@ -102,15 +86,5 @@ public class BasicNotificationViewHolder extends CarNotificationBaseViewHolder {
     @Override
     public StatusBarNotification getStatusBarNotification() {
         return mStatusBarNotification;
-    }
-
-    /**
-     * Resets the basic notification view empty for recycling.
-     */
-    @Override
-    void reset() {
-        super.reset();
-        mBigContentView.removeAllViews();
-        mBigContentView.setVisibility(View.GONE);
     }
 }
