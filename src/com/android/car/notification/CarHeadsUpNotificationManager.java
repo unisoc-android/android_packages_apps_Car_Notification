@@ -65,6 +65,7 @@ public class CarHeadsUpNotificationManager
     private final FrameLayout mWrapper;
     private StatusBarNotification mVisibleNotification;
     private boolean mShouldRestrictMessagePreview;
+    private boolean mIsShowingHeadsUpNotification;
 
     private CarHeadsUpNotificationManager(Context context) {
         mContext = context.getApplicationContext();
@@ -131,9 +132,8 @@ public class CarHeadsUpNotificationManager
     }
 
     private void showHeadsUp(StatusBarNotification statusBarNotification) {
-        // Remove previous heads-up notifications immediately as well as the previous timer
+        // Remove previous heads-up notifications immediately
         mWrapper.removeAllViews();
-        mTimer.removeCallbacksAndMessages(null);
 
         View notificationView;
         @NotificationViewType int viewType = getNotificationViewType(statusBarNotification);
@@ -232,9 +232,11 @@ public class CarHeadsUpNotificationManager
                     }
                 });
 
-        // Remove heads-up notifications after a timer
-        mTimer.postDelayed(() -> clearViews(), mDuration);
-
+        if(!mIsShowingHeadsUpNotification) {
+            // Remove heads-up notifications after a timer
+            mTimer.postDelayed(() -> clearViews(), mDuration);
+        }
+        mIsShowingHeadsUpNotification = true;
         // Add swipe gesture
         notificationView.setOnTouchListener(
                 new HeadsUpNotificationOnTouchListener(notificationView,
@@ -273,9 +275,11 @@ public class CarHeadsUpNotificationManager
     }
 
     private void clearViews() {
+        mTimer.removeCallbacksAndMessages(null);
         mVisibleNotification = null;
         mScrimView.setVisibility(View.GONE);
         mWrapper.removeAllViews();
+        mIsShowingHeadsUpNotification = false;
     }
 
     /**
