@@ -44,6 +44,10 @@ public class CarNotificationView extends RelativeLayout
                 .setSupportsChangeAnimations(false);
         listView.getRecyclerView().addOnItemTouchListener(
                 new CarNotificationItemTouchListener(mContext, mAdapter));
+        // TODO: Remove this line after PagedListView supports lowering the scroll bar elevation.
+        // Elevate the PagedListView so that cards can go on top of the scroll bar when swiping.
+        // Setting a large number because the z position of the scroll bar is unknown.
+        listView.getRecyclerView().bringToFront();
     }
 
     /**

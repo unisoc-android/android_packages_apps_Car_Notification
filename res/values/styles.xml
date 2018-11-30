@@ -30,6 +30,8 @@
     </style>
 
     <style name="NotificationBodyContentText" parent="@android:TextAppearance.DeviceDefault">
+        <item name="android:maxLines">2</item>
+        <item name="android:ellipsize">end</item>
     </style>
 
     <style name="NotificationBodyImageIcon">
