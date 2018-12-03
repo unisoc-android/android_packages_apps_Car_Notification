@@ -63,13 +63,17 @@ public class CarHeadsUpNotificationManager
     private final Handler mTimer;
     private final View mScrimView;
     private final FrameLayout mWrapper;
-    private StatusBarNotification mVisibleNotification;
+    private StatusBarNotification mCurrentNotification;
     private boolean mShouldRestrictMessagePreview;
-    private boolean mIsShowingHeadsUpNotification;
     private NotificationClickHandlerFactory mClickHandlerFactory;
+    private boolean mIsHeadsUpNotificationActive;
+    private long mLastHeadsUpDismissTimeMs;
+    private long mHeadsUpSnoozeTimeMs;
 
     private CarHeadsUpNotificationManager(Context context) {
         mContext = context.getApplicationContext();
+        mHeadsUpSnoozeTimeMs = mContext.getResources().getInteger(
+                R.integer.heads_up_snooze_time_ms);
         mBarService = IStatusBarService.Stub.asInterface(
                 ServiceManager.getService(Context.STATUS_BAR_SERVICE));
         mEnableMediaNotification =
@@ -126,15 +130,37 @@ public class CarHeadsUpNotificationManager
     public void maybeShowHeadsUp(
             StatusBarNotification statusBarNotification,
             NotificationListenerService.RankingMap rankingMap) {
+
         if (!shouldShowHeadsUp(statusBarNotification, rankingMap)) {
             return;
         }
-        showHeadsUp(mPreprocessingManager.optimizeForDriving(statusBarNotification));
+        boolean isUpdate = CarNotificationDiff.sameNotificationKey(
+                mCurrentNotification, statusBarNotification);
+        // Validates if the same notification is being posted again within the heads up snooze time.
+        if (isUpdate && hasNotPassedSnoozeTime()) {
+            return;
+        }
+        showHeadsUp(mPreprocessingManager.optimizeForDriving(statusBarNotification), isUpdate);
     }
 
-    private void showHeadsUp(StatusBarNotification statusBarNotification) {
+    private boolean hasNotPassedSnoozeTime() {
+        long currentTimeMs = System.currentTimeMillis();
+        long timeDiffMs = currentTimeMs - mLastHeadsUpDismissTimeMs;
+        return timeDiffMs < mHeadsUpSnoozeTimeMs;
+    }
+
+    private void showHeadsUp(StatusBarNotification statusBarNotification, boolean isUpdate) {
         // Remove previous heads-up notifications immediately
         mWrapper.removeAllViews();
+        mCurrentNotification = statusBarNotification;
+        // Show animations only when there is no active HUN and notification is new.
+        boolean shouldShowAnimation = !(mIsHeadsUpNotificationActive && isUpdate);
+        mIsHeadsUpNotificationActive = true;
+        if (shouldShowAnimation) {
+            mTimer.removeCallbacksAndMessages(null);
+            mTimer.postDelayed(() -> clearViews(), mDuration);
+            mLastHeadsUpDismissTimeMs = 0;
+        }
 
         View notificationView;
         @NotificationViewType int viewType = getNotificationViewType(statusBarNotification);
@@ -198,12 +224,6 @@ public class CarHeadsUpNotificationManager
             }
         }
 
-        // Show animations only when a different notification comes in.
-        // i.e. an update of the previous heads-up notification will not have animations.
-        boolean shouldShowAnimation = !CarNotificationDiff.sameNotificationKey(
-                mVisibleNotification, statusBarNotification);
-        mVisibleNotification = statusBarNotification;
-
         // Get the height of the notification view after onLayout()
         // in order to set the height of the scrim view and do animations
         notificationView.getViewTreeObserver().addOnGlobalLayoutListener(
@@ -233,11 +253,6 @@ public class CarHeadsUpNotificationManager
                     }
                 });
 
-        if(!mIsShowingHeadsUpNotification) {
-            // Remove heads-up notifications after a timer
-            mTimer.postDelayed(() -> clearViews(), mDuration);
-        }
-        mIsShowingHeadsUpNotification = true;
         // Add swipe gesture
         notificationView.setOnTouchListener(
                 new HeadsUpNotificationOnTouchListener(notificationView,
@@ -277,10 +292,10 @@ public class CarHeadsUpNotificationManager
 
     private void clearViews() {
         mTimer.removeCallbacksAndMessages(null);
-        mVisibleNotification = null;
         mScrimView.setVisibility(View.GONE);
         mWrapper.removeAllViews();
-        mIsShowingHeadsUpNotification = false;
+        mIsHeadsUpNotificationActive = false;
+        mLastHeadsUpDismissTimeMs = System.currentTimeMillis();
     }
 
     /**
@@ -372,7 +387,6 @@ public class CarHeadsUpNotificationManager
                 || Notification.CATEGORY_CAR_WARNING.equals(category)) {
             return true;
         }
-
         return false;
     }
 
