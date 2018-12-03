@@ -20,12 +20,15 @@ import android.annotation.Nullable;
 import android.app.ActivityManager;
 import android.app.Notification;
 import android.app.PendingIntent;
+import android.content.Context;
 import android.os.RemoteException;
 import android.service.notification.NotificationStats;
 import android.service.notification.StatusBarNotification;
 import android.util.Log;
 import android.view.View;
+import android.widget.Toast;
 
+import com.android.car.assist.client.CarAssistUtils;
 import com.android.internal.statusbar.IStatusBarService;
 import com.android.internal.statusbar.NotificationVisibility;
 
@@ -38,11 +41,13 @@ public class NotificationClickHandlerFactory {
 
     private final IStatusBarService mBarService;
     private final Callback mCallback;
+    private CarAssistUtils mCarAssistUtils;
 
     public NotificationClickHandlerFactory(IStatusBarService barService,
             @Nullable Callback callback) {
         mBarService = barService;
         mCallback = callback != null ? callback : launchResult -> { };
+        mCarAssistUtils = null;
     }
 
     /**
@@ -107,26 +112,50 @@ public class NotificationClickHandlerFactory {
             Notification notification = statusBarNotification.getNotification();
             Notification.Action[] actions = notification.actions;
             int result = ActivityManager.START_ABORTED;
-            final PendingIntent intent = actions[index].actionIntent;
             NotificationVisibility notificationVisibility = NotificationVisibility.obtain(
                     statusBarNotification.getKey(),
                     /* rank= */ -1, /* count= */ -1, /* visible= */ true);
-            try {
-                result = intent.sendAndReturnResult(/* context= */ null, /* code= */ 0,
-                        /* intent= */ null, /* onFinished= */null,
-                        /* handler= */ null, /* requiredPermissions= */ null,
-                        /* options= */ null);
-
-                mBarService.onNotificationActionClick(
-                        statusBarNotification.getKey(), index, notificationVisibility);
-            } catch (PendingIntent.CanceledException e) {
-                // Do not take down the app over this
-                Log.w(TAG, "Sending contentIntent failed: " + e);
-            } catch (RemoteException ex) {
-                // system process is dead if we're here.
+            boolean canceledExceptionThrown = false;
+            int semanticAction = actions[index].getSemanticAction();
+            if (CarAssistUtils.isCarCompatibleMessagingNotification(statusBarNotification)
+                    && CarAssistUtils.isSupportedSemanticAction(semanticAction)) {
+                Context context = v.getContext().getApplicationContext();
+                if (mCarAssistUtils == null) {
+                    mCarAssistUtils = new CarAssistUtils(context);
+                }
+                if (mCarAssistUtils.requestAssistantVoiceAction(statusBarNotification,
+                        semanticAction)) {
+                    result = ActivityManager.START_SUCCESS;
+                } else {
+                    showToast(context, R.string.assist_action_failed_toast);
+                }
+            } else {
+                PendingIntent intent = actions[index].actionIntent;
+                try {
+                    result = intent.sendAndReturnResult(/* context= */ null, /* code= */ 0,
+                            /* intent= */ null, /* onFinished= */null,
+                            /* handler= */ null, /* requiredPermissions= */ null,
+                            /* options= */ null);
+                } catch (PendingIntent.CanceledException e) {
+                    // Do not take down the app over this
+                    Log.w(TAG, "Sending contentIntent failed: " + e);
+                    canceledExceptionThrown = true;
+                }
+            }
+            if (!canceledExceptionThrown) {
+                try {
+                    mBarService.onNotificationActionClick(statusBarNotification.getKey(), index,
+                            notificationVisibility);
+                } catch (RemoteException e) {
+                    // system process is dead if we're here.
+                }
             }
             mCallback.onNotificationClicked(result);
         };
+    }
+
+    private void showToast(Context context, int resourceId) {
+        Toast.makeText(context, context.getString(resourceId), Toast.LENGTH_LONG).show();
     }
 
     private boolean shouldAutoCancel(StatusBarNotification sbn) {
@@ -146,9 +175,12 @@ public class NotificationClickHandlerFactory {
     public interface Callback {
 
         /**
-         * A notification was clicked and a PendingIntent was fired.
+         * A notification was clicked and an onClickListener was fired.
          *
-         * @param launchResult returned from {@link PendingIntent#sendAndReturnResult}
+         * @param launchResult For non-Assistant actions, returned from
+         *        {@link PendingIntent#sendAndReturnResult}; for Assistant actions,
+         *        returns {@link ActivityManager#START_SUCCESS} on success;
+         *        {@link ActivityManager#START_ABORTED} otherwise.
          */
         void onNotificationClicked(int launchResult);
     }

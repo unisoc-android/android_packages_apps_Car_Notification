@@ -42,6 +42,7 @@ LOCAL_DEX_PREOPT := false
 LOCAL_STATIC_ANDROID_LIBRARIES += \
     androidx.car_car \
     androidx.palette_palette \
+    car-assist-client-lib \
     car-theme-lib \
 
 LOCAL_STATIC_JAVA_LIBRARIES += \
@@ -77,6 +78,7 @@ LOCAL_STATIC_ANDROID_LIBRARIES += \
     androidx.car_car \
     androidx-constraintlayout_constraintlayout \
     androidx.palette_palette \
+    car-assist-client-lib \
     car-theme-lib \
 
 LOCAL_STATIC_JAVA_LIBRARIES += \
@@ -117,6 +119,7 @@ LOCAL_DEX_PREOPT := false
 LOCAL_STATIC_ANDROID_LIBRARIES += \
     androidx.car_car \
     androidx.palette_palette \
+    car-assist-client-lib \
     car-theme-lib \
 
 LOCAL_STATIC_JAVA_LIBRARIES += \
@@ -152,6 +155,7 @@ LOCAL_STATIC_ANDROID_LIBRARIES += \
     androidx.car_car \
     androidx-constraintlayout_constraintlayout \
     androidx.palette_palette \
+    car-assist-client-lib \
     car-theme-lib \
 
 LOCAL_STATIC_JAVA_LIBRARIES += \
