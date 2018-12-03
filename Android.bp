@@ -35,9 +35,10 @@ android_app {
     static_libs: [
         "androidx.car_car",
         "androidx.palette_palette",
+        "car-assist-client-lib",
         "car-theme-lib-bp",
         "android.car.userlib",
-	"androidx-constraintlayout_constraintlayout-solver"
+        "androidx-constraintlayout_constraintlayout-solver"
     ],
 
     libs: ["android.car"],
@@ -71,9 +72,10 @@ android_library {
     static_libs: [
         "androidx.car_car",
         "androidx.palette_palette",
+        "car-assist-client-lib",
         "car-theme-lib-bp",
         "android.car.userlib",
-	"androidx-constraintlayout_constraintlayout-solver"
+        "androidx-constraintlayout_constraintlayout-solver"
     ],
 
     libs: ["android.car"],
@@ -107,9 +109,10 @@ android_app {
     static_libs: [
         "androidx.car_car",
         "androidx.palette_palette",
+        "car-assist-client-lib",
         "car-theme-lib-bp",
         "android.car.userlib",
-	"androidx-constraintlayout_constraintlayout-solver"
+        "androidx-constraintlayout_constraintlayout-solver"
     ],
 
     libs: ["android.car"],
@@ -143,9 +146,10 @@ android_library {
     static_libs: [
         "androidx.car_car",
         "androidx.palette_palette",
+        "car-assist-client-lib",
         "car-theme-lib-bp",
         "android.car.userlib",
-	"androidx-constraintlayout_constraintlayout-solver"
+        "androidx-constraintlayout_constraintlayout-solver"
     ],
 
     libs: ["android.car"],

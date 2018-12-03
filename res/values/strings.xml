@@ -19,6 +19,12 @@
     <!-- The Application label that appears in app launcher [CHAR_LIMIT=25] -->
     <string name="application_label">Car Notification Center</string>
 
+    <!-- The Action label displayed for Assistant Reply actions [CHAR_LIMIT=20]-->
+    <string name="assist_action_reply_label">Reply</string>
+
+    <!-- The Action label displayed for Assistant Read actions [CHAR_LIMIT=20]-->
+    <string name="assist_action_read_label">Read</string>
+
     <!-- The label for the NotificationListenerService [CHAR_LIMIT=NONE] -->
     <string name="notification_service_label">Car Notification Listener Service</string>
 
