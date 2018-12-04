@@ -16,6 +16,7 @@
 
 package com.android.car.notification.template;
 
+import android.annotation.ColorInt;
 import android.app.Notification;
 import android.app.PendingIntent;
 import android.content.Context;
@@ -26,6 +27,7 @@ import android.widget.TextView;
 
 import com.android.car.notification.NotificationGroup;
 import com.android.car.notification.R;
+import com.android.car.theme.Themes;
 
 import java.util.List;
 
@@ -40,6 +42,10 @@ public class GroupSummaryNotificationViewHolder extends CarNotificationBaseViewH
     private final TextView mUnshownCountView;
     private final View mParentView;
     private final Context mContext;
+    @ColorInt
+    private final int mCardBackgroundColor;
+    @ColorInt
+    private final int mDefaultTextColor;
     private StatusBarNotification mStatusBarNotification;
 
     /**
@@ -51,6 +57,8 @@ public class GroupSummaryNotificationViewHolder extends CarNotificationBaseViewH
         super(view);
         mParentView = view;
         mContext = view.getContext();
+        mCardBackgroundColor = Themes.getAttrColor(mContext, android.R.attr.colorPrimary);
+        mDefaultTextColor = Themes.getAttrColor(mContext, android.R.attr.textColorPrimary);
         mTitle1View = view.findViewById(R.id.child_notification_title_1);
         mTitle2View = view.findViewById(R.id.child_notification_title_2);
         mUnshownCountView = view.findViewById(R.id.unshown_count);
@@ -76,20 +84,30 @@ public class GroupSummaryNotificationViewHolder extends CarNotificationBaseViewH
         }
 
         List<String> titles = notificationGroup.getChildTitles();
-        if (titles != null && !titles.isEmpty()) {
-            mTitle1View.setVisibility(View.VISIBLE);
-            mTitle1View.setText(titles.get(0));
 
-            if (titles.size() > 1) {
-                mTitle2View.setVisibility(View.VISIBLE);
-                mTitle2View.setText(titles.get(1));
+        if (titles == null || titles.isEmpty()) {
+            return;
+        }
+        mTitle1View.setVisibility(View.VISIBLE);
+        mTitle1View.setText(titles.get(0));
 
-                int unshownCount = titles.size() - 2;
-                if (unshownCount > 0) {
-                    mUnshownCountView.setVisibility(View.VISIBLE);
-                    mUnshownCountView.setText(
-                            mContext.getString(R.string.unshown_count, unshownCount));
-                }
+        if (titles.size() <= 1) {
+            return;
+        }
+        mTitle2View.setVisibility(View.VISIBLE);
+        mTitle2View.setText(titles.get(1));
+
+        int unshownCount = titles.size() - 2;
+        if (unshownCount > 0) {
+            mUnshownCountView.setVisibility(View.VISIBLE);
+            mUnshownCountView.setText(
+                    mContext.getString(R.string.unshown_count, unshownCount));
+
+            // optional color
+            if (notification.color != Notification.COLOR_DEFAULT) {
+                int calculatedColor = NotificationColorUtil.resolveContrastColor(
+                        notification.color, mCardBackgroundColor);
+                mUnshownCountView.setTextColor(calculatedColor);
             }
         }
     }
@@ -112,6 +130,7 @@ public class GroupSummaryNotificationViewHolder extends CarNotificationBaseViewH
 
         mUnshownCountView.setText(null);
         mUnshownCountView.setVisibility(View.GONE);
+        mUnshownCountView.setTextColor(mDefaultTextColor);
     }
 
     /**
