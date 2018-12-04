@@ -60,6 +60,6 @@
         app:listContentTopOffset="@dimen/item_spacing"
         app:itemSpacing="@dimen/item_spacing"
         app:showPagedListViewDivider="false"
-        app:gutter="both" />
+        app:gutter="none" />
 
 </com.android.car.notification.CarNotificationView>
