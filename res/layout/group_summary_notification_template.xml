@@ -22,7 +22,7 @@
 
     <TextView
         android:id="@+id/child_notification_title_1"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentStart="true"
         android:layout_below="@id/notification_header"
@@ -34,11 +34,10 @@
 
     <TextView
         android:id="@+id/child_notification_title_2"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentStart="true"
         android:layout_below="@id/child_notification_title_1"
-        android:layout_toStartOf="@id/unshown_count"
         android:layout_marginStart="@dimen/card_start_margin"
         android:layout_marginBottom="@dimen/body_bottom_padding"
         android:maxLines="1"
@@ -49,8 +48,8 @@
         android:id="@+id/unshown_count"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentEnd="true"
         android:layout_below="@id/child_notification_title_1"
+        android:layout_toEndOf="@id/child_notification_title_2"
         android:layout_marginStart="@dimen/unshown_count_start_margin"
         android:layout_marginEnd="@dimen/card_end_margin"
         android:layout_marginBottom="@dimen/body_bottom_padding"
