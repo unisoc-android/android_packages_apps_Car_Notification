@@ -365,9 +365,6 @@ public class CarNotificationViewAdapter extends RecyclerView.Adapter<RecyclerVie
         } else {
             mExpandedNotifications.remove(groupKey);
         }
-
-        int index = findIndexInNotification(groupKey);
-        notifyItemChanged(index);
     }
 
     /**
@@ -375,16 +372,6 @@ public class CarNotificationViewAdapter extends RecyclerView.Adapter<RecyclerVie
      */
     boolean isExpanded(String groupKey) {
         return mExpandedNotifications.contains(groupKey);
-    }
-
-    private int findIndexInNotification(String groupKey) {
-        for (int i = 0; i < mNotifications.size(); i++) {
-            if (mNotifications.get(i).getGroupKey().equals(groupKey)) {
-                return i;
-            }
-        }
-        // this should never happen because the contains() is already called
-        throw new IllegalStateException("Index not found for in expanded package names");
     }
 
     /**

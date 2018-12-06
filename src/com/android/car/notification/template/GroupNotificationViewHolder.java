@@ -105,7 +105,11 @@ public class GroupNotificationViewHolder extends CarNotificationBaseViewHolder {
         // expand button
         updateToggleButton(group.getChildCount(), isExpanded);
         mToggleButton.setOnClickListener(
-                view -> parentAdapter.setExpanded(group.getGroupKey(), !isExpanded));
+                view -> {
+                    boolean isExpanding = !isExpanded;
+                    parentAdapter.setExpanded(group.getGroupKey(), isExpanding);
+                    mAdapter.notifyDataSetChanged();
+                });
 
         // notification cards
         List<NotificationGroup> list = new ArrayList<>();
