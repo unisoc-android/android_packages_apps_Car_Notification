@@ -16,8 +16,6 @@
 
 package com.android.car.notification;
 
-import static com.android.internal.util.Preconditions.checkArgument;
-
 import static java.lang.annotation.RetentionPolicy.SOURCE;
 
 import android.animation.Animator;

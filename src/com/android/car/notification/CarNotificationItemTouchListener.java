@@ -34,7 +34,6 @@ import android.view.ViewConfiguration;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.android.car.notification.template.CarNotificationBaseViewHolder;
-import com.android.car.notification.template.GroupNotificationViewHolder;
 import com.android.internal.statusbar.IStatusBarService;
 import com.android.internal.statusbar.NotificationVisibility;
 

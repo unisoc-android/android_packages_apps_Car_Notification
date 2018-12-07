@@ -190,7 +190,6 @@ class CarNotificationDiff extends DiffUtil.Callback {
         if (oldNotification.flags != newNotification.flags
                 || oldNotification.category != newNotification.category
                 || oldNotification.color != newNotification.color
-                || oldNotification.bigContentView != newNotification.bigContentView
                 || !areBundlesEqual(oldNotification.extras, newNotification.extras)
                 || !Objects.equals(oldNotification.contentIntent, newNotification.contentIntent)
                 || !Objects.equals(oldNotification.deleteIntent, newNotification.deleteIntent)

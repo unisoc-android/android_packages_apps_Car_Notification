@@ -35,20 +35,16 @@ import java.util.List;
  * Messaging notification template that displays a messaging notification and a voice reply button.
  */
 public class MessageNotificationViewHolder extends CarNotificationBaseViewHolder {
-    private static final String TAG = "notification_messaging";
     private final Context mContext;
     private final CarNotificationHeaderView mHeaderView;
     private final CarNotificationBodyView mBodyView;
     private final CarNotificationActionsView mActionsView;
     private NotificationClickHandlerFactory mClickHandlerFactory;
-    private final View mParentView;
-    private StatusBarNotification mStatusBarNotification;
 
     public MessageNotificationViewHolder(View view,
             NotificationClickHandlerFactory clickHandlerFactory) {
-        super(view);
+        super(view, clickHandlerFactory);
         mContext = view.getContext();
-        mParentView = view;
         mHeaderView = view.findViewById(R.id.notification_header);
         mBodyView = view.findViewById(R.id.notification_body);
         mActionsView = view.findViewById(R.id.notification_actions);
@@ -61,7 +57,7 @@ public class MessageNotificationViewHolder extends CarNotificationBaseViewHolder
      */
     @Override
     public void bind(StatusBarNotification statusBarNotification, boolean isInGroup) {
-        reset();
+        super.bind(statusBarNotification, isInGroup);
         bindBody(statusBarNotification, /* isRestricted= */ false);
         mHeaderView.bind(statusBarNotification, isInGroup);
         mActionsView.bind(mClickHandlerFactory, statusBarNotification, isInGroup);
@@ -72,9 +68,10 @@ public class MessageNotificationViewHolder extends CarNotificationBaseViewHolder
      * UX restriction.
      */
     public void bindRestricted(StatusBarNotification statusBarNotification, boolean isInGroup) {
-        reset();
+        super.bind(statusBarNotification, isInGroup);
         bindBody(statusBarNotification, /* isRestricted= */ true);
         mHeaderView.bind(statusBarNotification, isInGroup);
+        mActionsView.bind(mClickHandlerFactory, statusBarNotification, isInGroup);
     }
 
     /**
@@ -82,11 +79,7 @@ public class MessageNotificationViewHolder extends CarNotificationBaseViewHolder
      */
     private void bindBody(
             @Nullable StatusBarNotification statusBarNotification, boolean isRestricted) {
-
-        mStatusBarNotification = statusBarNotification;
         Notification notification = statusBarNotification.getNotification();
-
-        mParentView.setOnClickListener(mClickHandlerFactory.getClickHandler(statusBarNotification));
 
         CharSequence messageText = null;
         CharSequence senderName = null;
@@ -138,20 +131,4 @@ public class MessageNotificationViewHolder extends CarNotificationBaseViewHolder
 
         mBodyView.bind(senderName, messageText, avatar);
     }
-
-    /**
-     * Resets the messaging notification view empty for recycling.
-     */
-    @Override
-    void reset() {
-        super.reset();
-        mParentView.setClickable(false);
-        mParentView.setOnClickListener(null);
-    }
-
-    @Override
-    public StatusBarNotification getStatusBarNotification() {
-        return mStatusBarNotification;
-    }
-
 }

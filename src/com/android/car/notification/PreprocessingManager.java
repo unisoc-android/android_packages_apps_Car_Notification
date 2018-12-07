@@ -75,7 +75,7 @@ public class PreprocessingManager {
     }
 
     /**
-     * Step 1: Process a list of {@link StatusBarNotification}s to be driving optimized.
+     * Filter a list of {@link StatusBarNotification}s according to OEM's configurations.
      */
     private List<StatusBarNotification> filter(List<StatusBarNotification> notifications) {
         if (!mEnableMediaNotification) {
@@ -91,7 +91,7 @@ public class PreprocessingManager {
     }
 
     /**
-     * Step 1: Process a list of {@link StatusBarNotification}s to be driving optimized.
+     * Process a list of {@link StatusBarNotification}s to be driving optimized.
      * Note that the string length limit is always respected regardless of whether distraction
      * optimization is required.
      */
@@ -132,7 +132,7 @@ public class PreprocessingManager {
     }
 
     /**
-     * Step 2: Group notifications that have the same group key.
+     * Group notifications that have the same group key.
      * Never groups system notifications nor car emergency notifications.
      *
      * @param list list of ungrouped {@link StatusBarNotification}s.
@@ -164,7 +164,7 @@ public class PreprocessingManager {
     }
 
     /**
-     * Step 3: Rank notifications according to the ranking key supplied by the notification.
+     * Rank notifications according to the ranking key supplied by the notification.
      */
     private static List<NotificationGroup> rank(
             List<NotificationGroup> notifications,
