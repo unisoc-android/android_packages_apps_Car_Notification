@@ -35,18 +35,14 @@ import java.util.List;
  * group summary notification.
  */
 public class GroupSummaryNotificationViewHolder extends CarNotificationBaseViewHolder {
-    private static final String TAG = "car_notif_group_summary";
     private final TextView mTitle1View;
     private final TextView mTitle2View;
     private final TextView mUnshownCountView;
-    private NotificationClickHandlerFactory mClickHandlerFactory;
-    private final View mParentView;
     private final Context mContext;
     @ColorInt
     private final int mCardBackgroundColor;
     @ColorInt
     private final int mDefaultTextColor;
-    private StatusBarNotification mStatusBarNotification;
 
     /**
      * Constructor of the GroupSummaryNotificationViewHolder with a group summary template view.
@@ -54,28 +50,27 @@ public class GroupSummaryNotificationViewHolder extends CarNotificationBaseViewH
      * @param view group summary template view supplied by the adapter
      * @param clickHandlerFactory factory to generate onClickListener
      */
-    public GroupSummaryNotificationViewHolder(View view,
-            NotificationClickHandlerFactory clickHandlerFactory) {
-        super(view);
-        mParentView = view;
+    public GroupSummaryNotificationViewHolder(
+            View view, NotificationClickHandlerFactory clickHandlerFactory) {
+        super(view, clickHandlerFactory);
         mContext = view.getContext();
         mCardBackgroundColor = Themes.getAttrColor(mContext, android.R.attr.colorPrimary);
         mDefaultTextColor = Themes.getAttrColor(mContext, android.R.attr.textColorPrimary);
         mTitle1View = view.findViewById(R.id.child_notification_title_1);
         mTitle2View = view.findViewById(R.id.child_notification_title_2);
         mUnshownCountView = view.findViewById(R.id.unshown_count);
-        mClickHandlerFactory = clickHandlerFactory;
     }
 
     /**
      * Binds a {@link NotificationGroup} to a group summary notification template.
+     *
+     * <p> Group summary notification view holder is special in that it binds a
+     * {@link NotificationGroup} instead of a {@link StatusBarNotification}, therefore the standard
+     * bind() method is no used. Still calling super.bind() because the touch events/animations
+     * need to work.
      */
     public void bind(NotificationGroup notificationGroup) {
-        reset();
-
-        mStatusBarNotification = notificationGroup.getSingleNotification();
-
-        mParentView.setOnClickListener(mClickHandlerFactory.getClickHandler(mStatusBarNotification));
+        super.bind(notificationGroup.getSingleNotification(), /* isInGroup= */ false);
 
         List<String> titles = notificationGroup.getChildTitles();
 
@@ -97,7 +92,7 @@ public class GroupSummaryNotificationViewHolder extends CarNotificationBaseViewH
             mUnshownCountView.setText(
                     mContext.getString(R.string.unshown_count, unshownCount));
 
-            Notification notification = mStatusBarNotification.getNotification();
+            Notification notification = notificationGroup.getSingleNotification().getNotification();
             // optional color
             if (notification.color != Notification.COLOR_DEFAULT) {
                 int calculatedColor = NotificationColorUtil.resolveContrastColor(
@@ -112,11 +107,6 @@ public class GroupSummaryNotificationViewHolder extends CarNotificationBaseViewH
      */
     @Override
     void reset() {
-        super.reset();
-
-        mParentView.setClickable(false);
-        mParentView.setOnClickListener(null);
-
         mTitle1View.setText(null);
         mTitle1View.setVisibility(View.GONE);
 
@@ -127,20 +117,4 @@ public class GroupSummaryNotificationViewHolder extends CarNotificationBaseViewH
         mUnshownCountView.setVisibility(View.GONE);
         mUnshownCountView.setTextColor(mDefaultTextColor);
     }
-
-    /**
-     * Group summary notification view holder is special in that it binds a
-     * {@link NotificationGroup} instead of a {@link StatusBarNotification},
-     * therefore the standard bind() method is no used. Still implementing
-     * {@link CarNotificationBaseViewHolder} because the touch events/animations need to work.
-     */
-    @Override
-    public void bind(StatusBarNotification statusBarNotification, boolean isInGroup) {
-    }
-
-    @Override
-    public StatusBarNotification getStatusBarNotification() {
-        return mStatusBarNotification;
-    }
-
 }

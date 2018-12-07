@@ -22,10 +22,6 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.os.ServiceManager;
-import android.service.notification.StatusBarNotification;
-
-import com.android.internal.statusbar.IStatusBarService;
 
 /**
  * Displays all undismissed notifications.

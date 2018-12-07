@@ -22,8 +22,6 @@ import android.os.Bundle;
 import android.service.notification.StatusBarNotification;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -64,8 +62,7 @@ public class NotificationGroup {
     }
 
     /**
-     * Returns the group key of this notification group. When this group contains only one
-     * notification, it is the key of the notification.
+     * Returns the group key of this notification group.
      *
      * <p> {@code null} will be returned if the group key has not been set yet.
      */

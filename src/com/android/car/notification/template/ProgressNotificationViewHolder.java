@@ -33,21 +33,17 @@ import com.android.car.theme.Themes;
  * This template is only used in notification center and never as a heads-up notification.
  */
 public class ProgressNotificationViewHolder extends CarNotificationBaseViewHolder {
-    private static final String TAG = "car_notification_basic";
     private final CarNotificationHeaderView mHeaderView;
     private final CarNotificationBodyView mBodyView;
     private final CarNotificationActionsView mActionsView;
     private final ProgressBar mProgressBarView;
-    private NotificationClickHandlerFactory mClickHandlerFactory;
-    private final View mParentView;
     @ColorInt
     private final int mCardBackgroundColor;
-    private StatusBarNotification mStatusBarNotification;
+    private NotificationClickHandlerFactory mClickHandlerFactory;
 
     public ProgressNotificationViewHolder(View view,
             NotificationClickHandlerFactory clickHandlerFactory) {
-        super(view);
-        mParentView = view;
+        super(view, clickHandlerFactory);
         mHeaderView = view.findViewById(R.id.notification_header);
         mBodyView = view.findViewById(R.id.notification_body);
         mActionsView = view.findViewById(R.id.notification_actions);
@@ -61,7 +57,7 @@ public class ProgressNotificationViewHolder extends CarNotificationBaseViewHolde
      */
     @Override
     public void bind(StatusBarNotification statusBarNotification, boolean isInGroup) {
-        reset();
+        super.bind(statusBarNotification, isInGroup);
         bindBody(statusBarNotification);
         mHeaderView.bind(statusBarNotification, isInGroup);
         mActionsView.bind(mClickHandlerFactory, statusBarNotification, isInGroup);
@@ -71,10 +67,7 @@ public class ProgressNotificationViewHolder extends CarNotificationBaseViewHolde
      * Private method that binds the data to the view.
      */
     private void bindBody(StatusBarNotification statusBarNotification) {
-        mStatusBarNotification = statusBarNotification;
         Notification notification = statusBarNotification.getNotification();
-
-        mParentView.setOnClickListener(mClickHandlerFactory.getClickHandler(statusBarNotification));
 
         Bundle extraData = notification.extras;
         CharSequence title = extraData.getCharSequence(Notification.EXTRA_TITLE);
@@ -83,8 +76,7 @@ public class ProgressNotificationViewHolder extends CarNotificationBaseViewHolde
         mBodyView.bind(title, text, icon);
 
         mProgressBarView.setVisibility(View.VISIBLE);
-        boolean isIndeterminate = extraData.getBoolean(
-                Notification.EXTRA_PROGRESS_INDETERMINATE);
+        boolean isIndeterminate = extraData.getBoolean(Notification.EXTRA_PROGRESS_INDETERMINATE);
         int progress = extraData.getInt(Notification.EXTRA_PROGRESS);
         int progressMax = extraData.getInt(Notification.EXTRA_PROGRESS_MAX);
         mProgressBarView.setIndeterminate(isIndeterminate);
@@ -105,19 +97,8 @@ public class ProgressNotificationViewHolder extends CarNotificationBaseViewHolde
      */
     @Override
     void reset() {
-        super.reset();
-
-        mParentView.setClickable(false);
-        mParentView.setOnClickListener(null);
-
         mProgressBarView.setProgress(0);
         mProgressBarView.setVisibility(View.GONE);
         mProgressBarView.setProgressTintList(null);
     }
-
-    @Override
-    public StatusBarNotification getStatusBarNotification() {
-        return mStatusBarNotification;
-    }
-
 }
