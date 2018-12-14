@@ -179,7 +179,9 @@ class HeadsUpNotificationOnTouchListener implements View.OnTouchListener {
     }
 
     private void reset() {
-        mVelocityTracker.recycle();
+        if (mVelocityTracker != null) {
+            mVelocityTracker.recycle();
+        }
         mVelocityTracker = null;
         mTranslationX = 0;
         mDownX = 0;

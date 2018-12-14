@@ -16,7 +16,6 @@
 package com.android.car.notification.template;
 
 import android.app.Notification;
-import android.content.Context;
 import android.graphics.drawable.Icon;
 import android.os.Bundle;
 import android.service.notification.StatusBarNotification;
@@ -28,20 +27,14 @@ import com.android.car.notification.R;
  * Notification view template that displays a car emergency notification.
  */
 public class EmergencyNotificationViewHolder extends CarNotificationBaseViewHolder {
-    private static final String TAG = "car_emergency";
-    private final Context mContext;
     private final CarNotificationHeaderView mHeaderView;
     private final CarNotificationActionsView mActionsView;
-    private NotificationClickHandlerFactory mClickHandlerFactory;
     private final CarNotificationBodyView mBodyView;
-    private final View mParentView;
-    private StatusBarNotification mStatusBarNotification;
+    private NotificationClickHandlerFactory mClickHandlerFactory;
 
     public EmergencyNotificationViewHolder(View view,
             NotificationClickHandlerFactory clickHandlerFactory) {
-        super(view);
-        mContext = view.getContext();
-        mParentView = view;
+        super(view, clickHandlerFactory);
         mHeaderView = view.findViewById(R.id.notification_header);
         mBodyView = view.findViewById(R.id.notification_body);
         mActionsView = view.findViewById(R.id.notification_actions);
@@ -53,12 +46,9 @@ public class EmergencyNotificationViewHolder extends CarNotificationBaseViewHold
      */
     @Override
     public void bind(StatusBarNotification statusBarNotification, boolean isInGroup) {
-        reset();
+        super.bind(statusBarNotification, isInGroup);
 
-        mStatusBarNotification = statusBarNotification;
         Notification notification = statusBarNotification.getNotification();
-
-        mParentView.setOnClickListener(mClickHandlerFactory.getClickHandler(statusBarNotification));
 
         mHeaderView.bind(statusBarNotification, isInGroup);
         mActionsView.bind(mClickHandlerFactory, statusBarNotification, /* isInGroup= */ false);
@@ -69,20 +59,4 @@ public class EmergencyNotificationViewHolder extends CarNotificationBaseViewHold
         Icon icon = notification.getLargeIcon();
         mBodyView.bind(title, text, icon);
     }
-
-    /**
-     * Resets the basic notification view empty for recycling.
-     */
-    @Override
-    void reset() {
-        super.reset();
-        mParentView.setClickable(false);
-        mParentView.setOnClickListener(null);
-    }
-
-    @Override
-    public StatusBarNotification getStatusBarNotification() {
-        return mStatusBarNotification;
-    }
-
 }
