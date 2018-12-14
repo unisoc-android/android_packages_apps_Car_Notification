@@ -16,14 +16,13 @@
 package com.android.car.notification.template;
 
 import android.app.Notification;
-import android.app.PendingIntent;
 import android.content.Context;
 import android.graphics.drawable.Icon;
 import android.os.Bundle;
 import android.service.notification.StatusBarNotification;
-import android.util.Log;
 import android.view.View;
 
+import com.android.car.notification.NotificationClickHandlerFactory;
 import com.android.car.notification.R;
 /**
  * Notification view template that displays a car emergency notification.
@@ -33,17 +32,20 @@ public class EmergencyNotificationViewHolder extends CarNotificationBaseViewHold
     private final Context mContext;
     private final CarNotificationHeaderView mHeaderView;
     private final CarNotificationActionsView mActionsView;
+    private NotificationClickHandlerFactory mClickHandlerFactory;
     private final CarNotificationBodyView mBodyView;
     private final View mParentView;
     private StatusBarNotification mStatusBarNotification;
 
-    public EmergencyNotificationViewHolder(View view) {
+    public EmergencyNotificationViewHolder(View view,
+            NotificationClickHandlerFactory clickHandlerFactory) {
         super(view);
         mContext = view.getContext();
         mParentView = view;
         mHeaderView = view.findViewById(R.id.notification_header);
         mBodyView = view.findViewById(R.id.notification_body);
         mActionsView = view.findViewById(R.id.notification_actions);
+        mClickHandlerFactory = clickHandlerFactory;
     }
 
     /**
@@ -56,18 +58,10 @@ public class EmergencyNotificationViewHolder extends CarNotificationBaseViewHold
         mStatusBarNotification = statusBarNotification;
         Notification notification = statusBarNotification.getNotification();
 
-        if (notification.contentIntent != null) {
-            mParentView.setOnClickListener(v -> {
-                try {
-                    notification.contentIntent.send();
-                } catch (PendingIntent.CanceledException e) {
-                    Log.e(TAG, "Cannot send pendingIntent in action button");
-                }
-            });
-        }
+        mParentView.setOnClickListener(mClickHandlerFactory.getClickHandler(statusBarNotification));
 
         mHeaderView.bind(statusBarNotification, isInGroup);
-        mActionsView.bind(statusBarNotification, isInGroup);
+        mActionsView.bind(mClickHandlerFactory, statusBarNotification, /* isInGroup= */ false);
 
         Bundle extraData = notification.extras;
         CharSequence title = extraData.getCharSequence(Notification.EXTRA_TITLE);

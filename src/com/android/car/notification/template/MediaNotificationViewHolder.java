@@ -29,6 +29,7 @@ import android.widget.ImageButton;
 
 import androidx.car.widget.ColumnCardView;
 
+import com.android.car.notification.NotificationClickHandlerFactory;
 import com.android.car.notification.R;
 
 import java.util.ArrayList;
@@ -48,8 +49,10 @@ public class MediaNotificationViewHolder extends CarNotificationBaseViewHolder {
     private final List<ImageButton> mButtons;
     private final View mActionBarView;
     private StatusBarNotification mStatusBarNotification;
+    private NotificationClickHandlerFactory mClickHandlerFactory;
 
-    public MediaNotificationViewHolder(View view) {
+    public MediaNotificationViewHolder(View view,
+            NotificationClickHandlerFactory clickHandlerFactory) {
         super(view);
         mContext = view.getContext();
         mParentView = view;
@@ -57,6 +60,7 @@ public class MediaNotificationViewHolder extends CarNotificationBaseViewHolder {
         mHeaderView = view.findViewById(R.id.notification_header);
         mBodyView = view.findViewById(R.id.notification_body);
         mActionBarView = view.findViewById(R.id.action_bar);
+        mClickHandlerFactory = clickHandlerFactory;
         mButtons = new ArrayList<>();
         mButtons.add(view.findViewById(R.id.action_1));
         mButtons.add(view.findViewById(R.id.action_2));
@@ -75,15 +79,7 @@ public class MediaNotificationViewHolder extends CarNotificationBaseViewHolder {
         mStatusBarNotification = statusBarNotification;
         Notification notification = statusBarNotification.getNotification();
 
-        if (notification.contentIntent != null) {
-            mParentView.setOnClickListener(v -> {
-                try {
-                    notification.contentIntent.send();
-                } catch (PendingIntent.CanceledException e) {
-                    Log.e(TAG, "Cannot send pendingIntent in action button");
-                }
-            });
-        }
+        mParentView.setOnClickListener(mClickHandlerFactory.getClickHandler(statusBarNotification));
 
         // colors
         Notification.Builder builder = Notification.Builder.recoverBuilder(mContext, notification);
