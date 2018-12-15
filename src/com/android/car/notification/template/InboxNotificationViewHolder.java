@@ -16,13 +16,12 @@
 package com.android.car.notification.template;
 
 import android.app.Notification;
-import android.app.PendingIntent;
 import android.graphics.drawable.Icon;
 import android.os.Bundle;
 import android.service.notification.StatusBarNotification;
-import android.util.Log;
 import android.view.View;
 
+import com.android.car.notification.NotificationClickHandlerFactory;
 import com.android.car.notification.R;
 /**
  * Inbox notification view template that
@@ -33,15 +32,18 @@ public class InboxNotificationViewHolder extends CarNotificationBaseViewHolder {
     private final CarNotificationHeaderView mHeaderView;
     private final CarNotificationBodyView mBodyView;
     private final CarNotificationActionsView mActionsView;
+    private NotificationClickHandlerFactory mClickHandlerFactory;
     private final View mParentView;
     private StatusBarNotification mStatusBarNotification;
 
-    public InboxNotificationViewHolder(View view) {
+    public InboxNotificationViewHolder(View view,
+            NotificationClickHandlerFactory clickHandlerFactory) {
         super(view);
         mParentView = view;
         mHeaderView = view.findViewById(R.id.notification_header);
         mBodyView = view.findViewById(R.id.notification_body);
         mActionsView = view.findViewById(R.id.notification_actions);
+        mClickHandlerFactory = clickHandlerFactory;
     }
 
     /**
@@ -52,7 +54,7 @@ public class InboxNotificationViewHolder extends CarNotificationBaseViewHolder {
         reset();
         bindBody(statusBarNotification);
         mHeaderView.bind(statusBarNotification, isInGroup);
-        mActionsView.bind(statusBarNotification, isInGroup);
+        mActionsView.bind(mClickHandlerFactory, statusBarNotification, isInGroup);
     }
 
     /**
@@ -62,15 +64,7 @@ public class InboxNotificationViewHolder extends CarNotificationBaseViewHolder {
         mStatusBarNotification = statusBarNotification;
         Notification notification = statusBarNotification.getNotification();
 
-        if (notification.contentIntent != null) {
-            mParentView.setOnClickListener(v -> {
-                try {
-                    notification.contentIntent.send();
-                } catch (PendingIntent.CanceledException e) {
-                    Log.e(TAG, "Cannot send pendingIntent in action button");
-                }
-            });
-        }
+        mParentView.setOnClickListener(mClickHandlerFactory.getClickHandler(statusBarNotification));
 
         Bundle extraData = notification.extras;
         CharSequence title = extraData.getCharSequence(Notification.EXTRA_TITLE_BIG);

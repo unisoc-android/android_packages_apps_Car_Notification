@@ -5,9 +5,9 @@ import android.car.drivingstate.CarUxRestrictionsManager;
 import android.content.Context;
 import android.util.AttributeSet;
 import android.view.ViewGroup;
-import android.widget.RelativeLayout;
 
 import androidx.car.widget.PagedListView;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.SimpleItemAnimator;
@@ -21,7 +21,7 @@ import java.util.List;
  * It does some extra setup in the onFinishInflate method because it may not get used from an
  * activity where one would normally attach RecyclerViews
  */
-public class CarNotificationView extends RelativeLayout
+public class CarNotificationView extends ConstraintLayout
         implements CarUxRestrictionsManager.OnUxRestrictionsChangedListener {
 
     private CarNotificationViewAdapter mAdapter;
@@ -69,5 +69,14 @@ public class CarNotificationView extends RelativeLayout
     @Override
     public void onUxRestrictionsChanged(CarUxRestrictions restrictionInfo) {
         mAdapter.setCarUxRestrictions(restrictionInfo);
+    }
+
+    /**
+     * Sets the NotificationClickHandlerFactory that allows for a hook to run a block off code
+     * when  the notification is clicked. This is useful to dismiss a screen after
+     * a notification list clicked.
+     */
+    public void setClickHandlerFactory(NotificationClickHandlerFactory clickHandlerFactory) {
+        mAdapter.setClickHandlerFactory(clickHandlerFactory);
     }
 }

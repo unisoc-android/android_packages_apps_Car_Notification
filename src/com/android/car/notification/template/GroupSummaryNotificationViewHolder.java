@@ -18,13 +18,12 @@ package com.android.car.notification.template;
 
 import android.annotation.ColorInt;
 import android.app.Notification;
-import android.app.PendingIntent;
 import android.content.Context;
 import android.service.notification.StatusBarNotification;
-import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
+import com.android.car.notification.NotificationClickHandlerFactory;
 import com.android.car.notification.NotificationGroup;
 import com.android.car.notification.R;
 import com.android.car.theme.Themes;
@@ -40,6 +39,7 @@ public class GroupSummaryNotificationViewHolder extends CarNotificationBaseViewH
     private final TextView mTitle1View;
     private final TextView mTitle2View;
     private final TextView mUnshownCountView;
+    private NotificationClickHandlerFactory mClickHandlerFactory;
     private final View mParentView;
     private final Context mContext;
     @ColorInt
@@ -52,8 +52,10 @@ public class GroupSummaryNotificationViewHolder extends CarNotificationBaseViewH
      * Constructor of the GroupSummaryNotificationViewHolder with a group summary template view.
      *
      * @param view group summary template view supplied by the adapter
+     * @param clickHandlerFactory factory to generate onClickListener
      */
-    public GroupSummaryNotificationViewHolder(View view) {
+    public GroupSummaryNotificationViewHolder(View view,
+            NotificationClickHandlerFactory clickHandlerFactory) {
         super(view);
         mParentView = view;
         mContext = view.getContext();
@@ -62,6 +64,7 @@ public class GroupSummaryNotificationViewHolder extends CarNotificationBaseViewH
         mTitle1View = view.findViewById(R.id.child_notification_title_1);
         mTitle2View = view.findViewById(R.id.child_notification_title_2);
         mUnshownCountView = view.findViewById(R.id.unshown_count);
+        mClickHandlerFactory = clickHandlerFactory;
     }
 
     /**
@@ -71,17 +74,8 @@ public class GroupSummaryNotificationViewHolder extends CarNotificationBaseViewH
         reset();
 
         mStatusBarNotification = notificationGroup.getSingleNotification();
-        Notification notification = mStatusBarNotification.getNotification();
 
-        if (notification.contentIntent != null) {
-            mParentView.setOnClickListener(v -> {
-                try {
-                    notification.contentIntent.send();
-                } catch (PendingIntent.CanceledException e) {
-                    Log.e(TAG, "Cannot send pendingIntent in action button");
-                }
-            });
-        }
+        mParentView.setOnClickListener(mClickHandlerFactory.getClickHandler(mStatusBarNotification));
 
         List<String> titles = notificationGroup.getChildTitles();
 
@@ -103,6 +97,7 @@ public class GroupSummaryNotificationViewHolder extends CarNotificationBaseViewH
             mUnshownCountView.setText(
                     mContext.getString(R.string.unshown_count, unshownCount));
 
+            Notification notification = mStatusBarNotification.getNotification();
             // optional color
             if (notification.color != Notification.COLOR_DEFAULT) {
                 int calculatedColor = NotificationColorUtil.resolveContrastColor(

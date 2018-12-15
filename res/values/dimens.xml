@@ -20,7 +20,7 @@
     <dimen name="notification_card_action_bar_height">@*android:dimen/car_card_action_bar_height</dimen>
     <dimen name="notification_list_divider_height">@*android:dimen/car_list_divider_height</dimen>
 
-    <dimen name="notification_margin">@*android:dimen/car_margin</dimen>
+    <dimen name="notification_scroll_margin">@*android:dimen/car_margin</dimen>
     <dimen name="card_start_margin">@*android:dimen/car_keyline_1</dimen>
     <dimen name="card_end_margin">@*android:dimen/car_keyline_1</dimen>
     <dimen name="card_min_top_padding">@*android:dimen/car_padding_3</dimen>
@@ -31,6 +31,7 @@
     <dimen name="unshown_count_start_margin">@*android:dimen/car_padding_1</dimen>
     <dimen name="headsup_notification_top_margin">@*android:dimen/car_padding_1</dimen>
     <dimen name="item_spacing">@*android:dimen/car_padding_2</dimen>
+    <dimen name="notification_list_top_offset">@*android:dimen/car_padding_4</dimen>
     <dimen name="header_small_icon_padding">@*android:dimen/car_padding_3</dimen>
     <dimen name="body_bottom_padding">@*android:dimen/car_padding_3</dimen>
     <dimen name="body_big_icon_margin">@*android:dimen/car_padding_4</dimen>

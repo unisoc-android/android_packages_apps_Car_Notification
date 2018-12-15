@@ -17,4 +17,8 @@
 <resources>
     <style name="Theme.DeviceDefault.NoActionBar.Notification" parent="@android:Theme.DeviceDefault.NoActionBar">
     </style>
+
+    <!--This Theme contains attributes required for components from the car support lib -->
+    <style name="PagedListTheme" parent="Theme.CarSupportWrapper.NoActionBar">
+    </style>
 </resources>

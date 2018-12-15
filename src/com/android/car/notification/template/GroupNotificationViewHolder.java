@@ -29,6 +29,7 @@ import androidx.recyclerview.widget.SimpleItemAnimator;
 
 import com.android.car.notification.CarNotificationItemTouchListener;
 import com.android.car.notification.CarNotificationViewAdapter;
+import com.android.car.notification.NotificationClickHandlerFactory;
 import com.android.car.notification.NotificationGroup;
 import com.android.car.notification.R;
 
@@ -53,7 +54,8 @@ public class GroupNotificationViewHolder extends CarNotificationBaseViewHolder {
     private final CarNotificationHeaderView mGroupHeaderView;
     private StatusBarNotification mStatusBarNotification;
 
-    public GroupNotificationViewHolder(View view) {
+    public GroupNotificationViewHolder(View view,
+            NotificationClickHandlerFactory clickHandlerFactory) {
         super(view);
         mContext = view.getContext();
 
@@ -82,6 +84,7 @@ public class GroupNotificationViewHolder extends CarNotificationBaseViewHolder {
                 .setSupportsChangeAnimations(false);
         mNotificationListView.setNestedScrollingEnabled(false);
         mAdapter = new CarNotificationViewAdapter(mContext, /* isGroupNotificationAdapter= */ true);
+        mAdapter.setClickHandlerFactory(clickHandlerFactory);
         mNotificationListView.addOnItemTouchListener(
                 new CarNotificationItemTouchListener(view.getContext(), mAdapter));
         mNotificationListView.setAdapter(mAdapter);
