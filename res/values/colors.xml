@@ -19,4 +19,5 @@
     <color name="default_text_color">@*android:color/car_body1</color>
     <color name="notification_accent_color">@*android:color/car_body1</color>
     <color name="notification_list_divider_color">@*android:color/car_list_divider</color>
+    <color name="icon_tint">@*android:color/car_tint</color>
 </resources>

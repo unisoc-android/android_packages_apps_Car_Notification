@@ -16,15 +16,14 @@
 package com.android.car.notification.template;
 
 import android.app.Notification;
-import android.app.PendingIntent;
 import android.content.Context;
 import android.service.notification.StatusBarNotification;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.RelativeLayout;
 
+import com.android.car.notification.NotificationClickHandlerFactory;
 import com.android.car.notification.R;
 import com.android.car.theme.Themes;
 
@@ -80,10 +79,12 @@ public class CarNotificationActionsView extends RelativeLayout {
     /**
      * Binds the notification action buttons.
      *
+     * @param clickHandlerFactory used to generate {@link android.view.View.OnClickListener}
      * @param statusBarNotification the notification that contains the actions.
      * @param isInGroup whether the notification is part of a grouped notification.
      */
-    public void bind(StatusBarNotification statusBarNotification, boolean isInGroup) {
+    public void bind(NotificationClickHandlerFactory clickHandlerFactory,
+            StatusBarNotification statusBarNotification, boolean isInGroup) {
         reset();
 
         Notification notification = statusBarNotification.getNotification();
@@ -106,13 +107,8 @@ public class CarNotificationActionsView extends RelativeLayout {
             }
 
             if (action.actionIntent != null) {
-                button.setOnClickListener(v -> {
-                    try {
-                        action.actionIntent.send();
-                    } catch (PendingIntent.CanceledException e) {
-                        Log.e(TAG, "Cannot send pendingIntent in action button");
-                    }
-                });
+                button.setOnClickListener(
+                        clickHandlerFactory.getActionClickHandler(statusBarNotification, i));
             }
         }
     }
