@@ -33,7 +33,7 @@ import com.android.internal.statusbar.IStatusBarService;
 import com.android.internal.statusbar.NotificationVisibility;
 
 /**
- * Factory that builds a {@link View.OnClickListener} to handle the logic of what to do when a 
+ * Factory that builds a {@link View.OnClickListener} to handle the logic of what to do when a
  * notification is clicked
  */
 public class NotificationClickHandlerFactory {
@@ -42,6 +42,7 @@ public class NotificationClickHandlerFactory {
     private final IStatusBarService mBarService;
     private final Callback mCallback;
     private CarAssistUtils mCarAssistUtils;
+    @Nullable private CarHeadsUpNotificationManager.CallBack mHeadsUpManagerCallback;
 
     public NotificationClickHandlerFactory(IStatusBarService barService,
             @Nullable Callback callback) {
@@ -65,6 +66,9 @@ public class NotificationClickHandlerFactory {
             if (intent == null) {
                 return;
             }
+            if (mHeadsUpManagerCallback != null) {
+                mHeadsUpManagerCallback.clearHeadsUpNotification();
+            }
             int result = ActivityManager.START_ABORTED;
             try {
                 result = intent.sendAndReturnResult(/* context= */ null, /* code= */ 0,
@@ -81,7 +85,7 @@ public class NotificationClickHandlerFactory {
             try {
                 mBarService.onNotificationClick
                         (statusBarNotification.getKey(), notificationVisibility);
-                if (shouldAutoCancel(statusBarNotification)){
+                if (shouldAutoCancel(statusBarNotification)) {
                     mBarService.onNotificationClear(
                             statusBarNotification.getPackageName(),
                             statusBarNotification.getTag(),
@@ -97,6 +101,11 @@ public class NotificationClickHandlerFactory {
             mCallback.onNotificationClicked(result);
         };
 
+    }
+
+    public void setHeadsUpNotificationCallBack(
+            @Nullable CarHeadsUpNotificationManager.CallBack callBack) {
+        mHeadsUpManagerCallback = callBack;
     }
 
     /**
