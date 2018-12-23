@@ -22,6 +22,10 @@
     <!-- Duration of heads-up notifications in milliseconds -->
     <integer name="headsup_notification_duration_ms">5000</integer>
 
+    <!-- The number of milliseconds after a heads up notification is dismissed
+     before the app can interrupt again. -->
+    <integer name="heads_up_snooze_time_ms">6000</integer>
+
     <!-- Duration of fly-in animation for heads-up notifications in milliseconds -->
     <integer name="headsup_enter_duration_ms">300</integer>
 
