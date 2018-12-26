@@ -82,3 +82,76 @@ android_library {
         },
     },
 }
+
+// Duplicate of CarNotification which includes testing only resources for Robolectric
+
+android_app {
+    name: "CarNotificationForTesting",
+
+    srcs: ["src/**/*.java"],
+
+    resource_dirs: ["res"],
+
+    platform_apis: true,
+
+    optimize: {
+        enabled: false,
+    },
+
+    dex_preopt: {
+        enabled: false,
+    },
+
+    static_libs: [
+        "androidx.car_car",
+        "androidx.palette_palette",
+        "car-theme-lib-bp",
+        "android.car.userlib",
+	"androidx-constraintlayout_constraintlayout-solver"
+    ],
+
+    libs: ["android.car"],
+
+    product_variables: {
+        pdk: {
+            enabled: false,
+        },
+    },
+}
+
+// As Lib
+android_library {
+    name: "CarNotificationModuleForTesting",
+    srcs: ["src/**/*.java"],
+
+    resource_dirs: ["res"],
+
+    manifest: "AndroidManifest-withoutActivity.xml",
+
+    platform_apis: true,
+
+    optimize: {
+        enabled: false,
+    },
+
+    dex_preopt: {
+        enabled: false,
+    },
+
+    static_libs: [
+        "androidx.car_car",
+        "androidx.palette_palette",
+        "car-theme-lib-bp",
+        "android.car.userlib",
+	"androidx-constraintlayout_constraintlayout-solver"
+    ],
+
+    libs: ["android.car"],
+
+    product_variables: {
+        pdk: {
+            enabled: false,
+        },
+    },
+}
+
