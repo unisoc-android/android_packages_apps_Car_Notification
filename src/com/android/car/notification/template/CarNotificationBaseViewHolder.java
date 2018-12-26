@@ -17,35 +17,66 @@
 package com.android.car.notification.template;
 
 import android.annotation.CallSuper;
+import android.annotation.ColorInt;
 import android.annotation.Nullable;
 import android.app.Notification;
+import android.content.Context;
+import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageManager;
 import android.service.notification.StatusBarNotification;
+import android.util.Log;
 import android.view.View;
 
+import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.android.car.notification.NotificationClickHandlerFactory;
 import com.android.car.notification.R;
+import com.android.car.theme.Themes;
 
 /**
  * The base view holder class that all template view holders should extend.
  */
 public abstract class CarNotificationBaseViewHolder extends RecyclerView.ViewHolder {
+    private static final String TAG = CarNotificationBaseViewHolder.class.getSimpleName();
+
+    private final PackageManager mPackageManager;
     private final NotificationClickHandlerFactory mClickHandlerFactory;
 
-    /** Nullable for {@link GroupSummaryNotificationViewHolder}. */
     @Nullable
-    private final View mCardView;
+    private final CardView mCardView;
+    @Nullable
+    private final CarNotificationHeaderView mHeaderView;
+    @Nullable
+    private final CarNotificationBodyView mBodyView;
+    @Nullable
+    private final CarNotificationActionsView mActionsView;
+
+    @ColorInt
+    private final int mDefaultBackgroundColor;
+    @ColorInt
+    private final int mDefaultPrimaryForegroundColor;
+    @ColorInt
+    private final int mDefaultSecondaryForegroundColor;
 
     private StatusBarNotification mStatusBarNotification;
-
     private boolean mIsAnimating;
+    @ColorInt
+    private int mBackgroundColor;
 
     CarNotificationBaseViewHolder(
             View itemView, NotificationClickHandlerFactory clickHandlerFactory) {
         super(itemView);
+        Context context = itemView.getContext();
+        mPackageManager = context.getPackageManager();
         mClickHandlerFactory = clickHandlerFactory;
         mCardView = itemView.findViewById(R.id.column_card_view);
+        mHeaderView = itemView.findViewById(R.id.notification_header);
+        mBodyView = itemView.findViewById(R.id.notification_body);
+        mActionsView = itemView.findViewById(R.id.notification_actions);
+        mDefaultBackgroundColor = Themes.getAttrColor(context, android.R.attr.colorPrimary);
+        mDefaultPrimaryForegroundColor = context.getColor(R.color.primary_text_color);
+        mDefaultSecondaryForegroundColor = context.getColor(R.color.secondary_text_color);
     }
 
     /**
@@ -60,25 +91,112 @@ public abstract class CarNotificationBaseViewHolder extends RecyclerView.ViewHol
         reset();
         mStatusBarNotification = statusBarNotification;
 
-        if (mCardView != null) {
-            mCardView.setOnClickListener(
-                    mClickHandlerFactory.getClickHandler(mStatusBarNotification));
+        if (mCardView == null) {
+            return;
         }
+
+        mCardView.setOnClickListener(
+                mClickHandlerFactory.getClickHandler(mStatusBarNotification));
+
+        ApplicationInfo appInfo;
+        try {
+            appInfo =
+                    mPackageManager.getApplicationInfo(mStatusBarNotification.getPackageName(), 0);
+        } catch (PackageManager.NameNotFoundException e) {
+            Log.e(TAG, "Cannot find app in bind() " + e);
+            return;
+        }
+
+        Notification notification = mStatusBarNotification.getNotification();
+
+        boolean isSystemApp = appInfo.isSystemApp();
+        boolean isNavigationCategory =
+                Notification.CATEGORY_NAVIGATION.equals(notification.category);
+        boolean isSystemOrNavigation = isSystemApp || isNavigationCategory;
+        boolean hasColor = notification.color != Notification.COLOR_DEFAULT;
+        boolean isColorized = notification.extras.getBoolean(Notification.EXTRA_COLORIZED, false);
+
+        int calculatedPrimaryForegroundColor = mDefaultPrimaryForegroundColor;
+        int calculatedSecondaryForegroundColor = mDefaultSecondaryForegroundColor;
+        if (isSystemOrNavigation && hasColor && isColorized && !isInGroup) {
+            mBackgroundColor = notification.color;
+            calculatedPrimaryForegroundColor = NotificationColorUtil.resolveContrastColor(
+                    mDefaultPrimaryForegroundColor,
+                    mBackgroundColor);
+            calculatedSecondaryForegroundColor = NotificationColorUtil.resolveContrastColor(
+                    mDefaultSecondaryForegroundColor,
+                    mBackgroundColor);
+            mCardView.setCardBackgroundColor(mBackgroundColor);
+        }
+
+        if (mHeaderView != null) {
+            mHeaderView.setSmallIconColor(
+                    hasCustomBackgroundColor() ? calculatedPrimaryForegroundColor
+                            : getAccentColor());
+            mHeaderView.setHeaderTextColor(calculatedPrimaryForegroundColor);
+            mHeaderView.setTimeTextColor(calculatedPrimaryForegroundColor);
+        }
+
+        if (mBodyView != null) {
+            mBodyView.setPrimaryTextColor(calculatedPrimaryForegroundColor);
+            mBodyView.setSecondaryTextColor(calculatedSecondaryForegroundColor);
+        }
+
+        if (mActionsView != null) {
+            mActionsView.setActionTextColor(
+                    hasCustomBackgroundColor() ? calculatedPrimaryForegroundColor
+                            : getAccentColor());
+        }
+    }
+
+    /**
+     * Returns the accent color for this notification.
+     */
+    @ColorInt
+    int getAccentColor() {
+        int color = mStatusBarNotification.getNotification().color;
+        if (color != Notification.COLOR_DEFAULT) {
+            return color;
+        }
+        return mDefaultPrimaryForegroundColor;
+    }
+
+    /**
+     * Returns whether this card has a custom background color.
+     */
+    boolean hasCustomBackgroundColor() {
+        return mBackgroundColor != mDefaultBackgroundColor;
     }
 
     /**
      * Child view holders should override and call super to recycle any custom component
      * that's not handled by {@link CarNotificationHeaderView}, {@link CarNotificationBodyView} and
      * {@link CarNotificationActionsView}.
-     * Note that any child class that is not calling {@link #bind} has to call this method.
+     * Note that any child class that is not calling {@link #bind} has to call this method directly.
      */
     @CallSuper
     void reset() {
+        mStatusBarNotification = null;
+        mBackgroundColor = mDefaultBackgroundColor;
+
         itemView.setTranslationX(0);
         itemView.setAlpha(1f);
 
         if (mCardView != null) {
             mCardView.setOnClickListener(null);
+            mCardView.setCardBackgroundColor(mDefaultBackgroundColor);
+        }
+
+        if (mHeaderView != null) {
+            mHeaderView.reset();
+        }
+
+        if (mBodyView != null) {
+            mBodyView.reset();
+        }
+
+        if (mActionsView != null) {
+            mActionsView.reset();
         }
     }
 

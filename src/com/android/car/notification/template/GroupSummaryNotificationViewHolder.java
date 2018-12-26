@@ -107,6 +107,7 @@ public class GroupSummaryNotificationViewHolder extends CarNotificationBaseViewH
      */
     @Override
     void reset() {
+        super.reset();
         mTitle1View.setText(null);
         mTitle1View.setVisibility(View.GONE);
 

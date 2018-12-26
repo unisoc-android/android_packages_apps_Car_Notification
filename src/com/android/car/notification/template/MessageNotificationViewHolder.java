@@ -60,7 +60,7 @@ public class MessageNotificationViewHolder extends CarNotificationBaseViewHolder
         super.bind(statusBarNotification, isInGroup);
         bindBody(statusBarNotification, /* isRestricted= */ false);
         mHeaderView.bind(statusBarNotification, isInGroup);
-        mActionsView.bind(mClickHandlerFactory, statusBarNotification, isInGroup);
+        mActionsView.bind(mClickHandlerFactory, statusBarNotification);
     }
 
     /**
@@ -71,7 +71,7 @@ public class MessageNotificationViewHolder extends CarNotificationBaseViewHolder
         super.bind(statusBarNotification, isInGroup);
         bindBody(statusBarNotification, /* isRestricted= */ true);
         mHeaderView.bind(statusBarNotification, isInGroup);
-        mActionsView.bind(mClickHandlerFactory, statusBarNotification, isInGroup);
+        mActionsView.bind(mClickHandlerFactory, statusBarNotification);
     }
 
     /**
