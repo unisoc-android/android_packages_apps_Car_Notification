@@ -68,6 +68,7 @@ public class CarNotificationViewAdapter extends RecyclerView.Adapter<RecyclerVie
         mContext = context;
         mInflater = LayoutInflater.from(context);
         mIsGroupNotificationAdapter = isGroupNotificationAdapter;
+        setHasStableIds(true);
         if (!mIsGroupNotificationAdapter) {
             mViewPool = new RecyclerView.RecycledViewPool();
         }
@@ -350,6 +351,14 @@ public class CarNotificationViewAdapter extends RecyclerView.Adapter<RecyclerVie
         return itemCount;
     }
 
+    @Override
+    public long getItemId(int position) {
+        NotificationGroup notificationGroup = mNotifications.get(position);
+        return notificationGroup.isGroup()
+                ? notificationGroup.getGroupKey().hashCode()
+                : notificationGroup.getSingleNotification().getKey().hashCode();
+    }
+
     /**
      * Set the expansion state of a group notification given its group key.
      *
@@ -373,17 +382,6 @@ public class CarNotificationViewAdapter extends RecyclerView.Adapter<RecyclerVie
      */
     boolean isExpanded(String groupKey) {
         return mExpandedNotifications.contains(groupKey);
-    }
-
-    /**
-     * Gets a notification given its adapter position.
-     */
-    public NotificationGroup getNotificationAtPosition(int position) {
-        if (position < mNotifications.size()) {
-            return mNotifications.get(position);
-        } else {
-            return null;
-        }
     }
 
     /**

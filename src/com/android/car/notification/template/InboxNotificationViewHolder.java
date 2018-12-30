@@ -28,18 +28,14 @@ import com.android.car.notification.R;
  * displays a {@link android.app.Notification.InboxStyle} notification.
  */
 public class InboxNotificationViewHolder extends CarNotificationBaseViewHolder {
-    private static final String TAG = "car_notification_inbox";
     private final CarNotificationHeaderView mHeaderView;
     private final CarNotificationBodyView mBodyView;
     private final CarNotificationActionsView mActionsView;
     private NotificationClickHandlerFactory mClickHandlerFactory;
-    private final View mParentView;
-    private StatusBarNotification mStatusBarNotification;
 
-    public InboxNotificationViewHolder(View view,
-            NotificationClickHandlerFactory clickHandlerFactory) {
-        super(view);
-        mParentView = view;
+    public InboxNotificationViewHolder(
+            View view, NotificationClickHandlerFactory clickHandlerFactory) {
+        super(view, clickHandlerFactory);
         mHeaderView = view.findViewById(R.id.notification_header);
         mBodyView = view.findViewById(R.id.notification_body);
         mActionsView = view.findViewById(R.id.notification_actions);
@@ -51,7 +47,7 @@ public class InboxNotificationViewHolder extends CarNotificationBaseViewHolder {
      */
     @Override
     public void bind(StatusBarNotification statusBarNotification, boolean isInGroup) {
-        reset();
+        super.bind(statusBarNotification, isInGroup);
         bindBody(statusBarNotification);
         mHeaderView.bind(statusBarNotification, isInGroup);
         mActionsView.bind(mClickHandlerFactory, statusBarNotification, isInGroup);
@@ -61,31 +57,11 @@ public class InboxNotificationViewHolder extends CarNotificationBaseViewHolder {
      * Private method that binds the data to the view.
      */
     private void bindBody(StatusBarNotification statusBarNotification) {
-        mStatusBarNotification = statusBarNotification;
         Notification notification = statusBarNotification.getNotification();
-
-        mParentView.setOnClickListener(mClickHandlerFactory.getClickHandler(statusBarNotification));
-
         Bundle extraData = notification.extras;
         CharSequence title = extraData.getCharSequence(Notification.EXTRA_TITLE_BIG);
         CharSequence text = extraData.getCharSequence(Notification.EXTRA_SUMMARY_TEXT);
         Icon icon = notification.getLargeIcon();
         mBodyView.bind(title, text, icon);
     }
-
-    /**
-     * Resets the inbox notification view empty for recycling.
-     */
-    @Override
-    void reset() {
-        super.reset();
-        mParentView.setClickable(false);
-        mParentView.setOnClickListener(null);
-    }
-
-    @Override
-    public StatusBarNotification getStatusBarNotification() {
-        return mStatusBarNotification;
-    }
-
 }

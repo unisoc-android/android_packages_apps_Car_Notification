@@ -254,8 +254,9 @@ public class CarHeadsUpNotificationManager
                 });
 
         // Add swipe gesture
-        notificationView.setOnTouchListener(
-                new HeadsUpNotificationOnTouchListener(notificationView,
+        View columnCardView = notificationView.findViewById(R.id.column_card_view);
+        columnCardView.setOnTouchListener(
+                new HeadsUpNotificationOnTouchListener(columnCardView,
                         () -> {
                             boolean isDismissible = (statusBarNotification.getNotification().flags
                                     & (Notification.FLAG_FOREGROUND_SERVICE

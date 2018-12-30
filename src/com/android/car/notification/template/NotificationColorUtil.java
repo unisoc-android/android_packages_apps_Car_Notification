@@ -17,12 +17,8 @@
 package com.android.car.notification.template;
 
 import android.annotation.ColorInt;
-import android.app.Notification;
-import android.content.Context;
 import android.graphics.Color;
 
-import com.android.car.notification.R;
-import com.android.car.theme.Themes;
 import com.android.internal.graphics.ColorUtils;
 
 /**

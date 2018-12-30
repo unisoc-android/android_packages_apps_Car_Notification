@@ -24,45 +24,81 @@ import android.view.View;
 
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.android.car.notification.NotificationClickHandlerFactory;
+import com.android.car.notification.R;
+
 /**
  * The base view holder class that all template view holders should extend.
  */
 public abstract class CarNotificationBaseViewHolder extends RecyclerView.ViewHolder {
+    private final NotificationClickHandlerFactory mClickHandlerFactory;
+
+    /** Nullable for {@link GroupSummaryNotificationViewHolder}. */
+    @Nullable
+    private final View mCardView;
+
+    private StatusBarNotification mStatusBarNotification;
+
     private boolean mIsAnimating;
 
-    CarNotificationBaseViewHolder(View itemView) {
+    CarNotificationBaseViewHolder(
+            View itemView, NotificationClickHandlerFactory clickHandlerFactory) {
         super(itemView);
+        mClickHandlerFactory = clickHandlerFactory;
+        mCardView = itemView.findViewById(R.id.column_card_view);
     }
 
     /**
-     * Resets the notification view empty for recycling. Child classes should call super to ensure
-     * view being reset.
+     * Binds a {@link StatusBarNotification} to a notification template. Base class sets the
+     * clicking event for the card view and calls recycling methods.
+     *
+     * @param statusBarNotification the notification to be bound.
+     * @param isInGroup             whether this notification is part of a grouped notification.
+     */
+    @CallSuper
+    public void bind(StatusBarNotification statusBarNotification, boolean isInGroup) {
+        reset();
+        mStatusBarNotification = statusBarNotification;
+
+        if (mCardView != null) {
+            mCardView.setOnClickListener(
+                    mClickHandlerFactory.getClickHandler(mStatusBarNotification));
+        }
+    }
+
+    /**
+     * Child view holders should override and call super to recycle any custom component
+     * that's not handled by {@link CarNotificationHeaderView}, {@link CarNotificationBodyView} and
+     * {@link CarNotificationActionsView}.
+     * Note that any child class that is not calling {@link #bind} has to call this method.
      */
     @CallSuper
     void reset() {
         itemView.setTranslationX(0);
         itemView.setAlpha(1f);
+
+        if (mCardView != null) {
+            mCardView.setOnClickListener(null);
+        }
     }
 
     /**
-     * Binds a {@link StatusBarNotification} to a notification template.
-     *
-     * @param statusBarNotification the notification to be bound.
-     * @param isInGroup whether this notification is part of a grouped notification.
+     * Returns the current {@link StatusBarNotification} that this view holder is holding.
+     * Note that any child class that is not calling {@link #bind} has to override this method.
      */
-    public abstract void bind(StatusBarNotification statusBarNotification, boolean isInGroup);
+    public StatusBarNotification getStatusBarNotification() {
+        return mStatusBarNotification;
+    }
 
     /**
      * Returns true if the notification contained in this view holder can be swiped away.
      */
     public boolean isDismissible() {
-        if (getStatusBarNotification() == null) {
-            return false;
+        if (mStatusBarNotification == null) {
+            return true;
         }
 
-        StatusBarNotification statusBarNotification = getStatusBarNotification();
-
-        return (statusBarNotification.getNotification().flags
+        return (mStatusBarNotification.getNotification().flags
                 & (Notification.FLAG_FOREGROUND_SERVICE | Notification.FLAG_ONGOING_EVENT)) == 0;
     }
 
@@ -100,12 +136,4 @@ public abstract class CarNotificationBaseViewHolder extends RecyclerView.ViewHol
     public boolean isAnimating() {
         return mIsAnimating;
     }
-
-    /**
-     * Abstract method that the child class should implement that returns the current
-     * {@link StatusBarNotification} that it is holding.
-     */
-    @Nullable
-    public abstract StatusBarNotification getStatusBarNotification();
-
 }
