@@ -42,19 +42,8 @@ public class CarNotificationView extends ConstraintLayout
         listView.setAdapter(mAdapter);
         ((SimpleItemAnimator) listView.getRecyclerView().getItemAnimator())
                 .setSupportsChangeAnimations(false);
-        // TODO: replace adding margin to the bottom code with the API call to
-        // PagedListView once it's implemented.
-        ViewGroup.MarginLayoutParams marginLayoutParams =
-                (ViewGroup.MarginLayoutParams) listView.getRecyclerView().getLayoutParams();
-        marginLayoutParams.setMargins(0, 0, 0,
-                mContext.getResources().getDimensionPixelOffset(R.dimen.item_spacing));
-        listView.getRecyclerView().setLayoutParams(marginLayoutParams);
         listView.getRecyclerView().addOnItemTouchListener(
                 new CarNotificationItemTouchListener(mContext, mAdapter));
-        // TODO: Remove this line after PagedListView supports lowering the scroll bar elevation.
-        // Elevate the PagedListView so that cards can go on top of the scroll bar when swiping.
-        // Setting a large number because the z position of the scroll bar is unknown.
-        listView.getRecyclerView().bringToFront();
     }
 
     /**
