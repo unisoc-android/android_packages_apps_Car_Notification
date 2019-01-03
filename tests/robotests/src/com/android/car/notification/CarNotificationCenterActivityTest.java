@@ -19,11 +19,13 @@ package com.android.car.notification;
 import static com.google.common.truth.Truth.assertThat;
 
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 
 import android.content.Context;
 import android.os.IBinder;
 import android.view.View;
 
+import android.widget.Button;
 import com.android.car.notification.testutils.ShadowCar;
 
 import org.junit.After;
@@ -73,10 +75,47 @@ public class CarNotificationCenterActivityTest {
      * Test that the CarNotificationCenterActivity's view is loaded and has a exit button.
      */
     @Test
-    public void testExitButtonInCarNotificationCenterActivity() {
+    public void testCarNotificationCenterActivity_exitButton_shouldExists() {
         View contentView = mActivity.findViewById(R.id.exit_button_container);
         assertThat(contentView).isNotNull();
     }
+
+    /**
+     * Test that the CarNotificationCenterActivity's notification view is loaded.
+     */
+    @Test
+    public void testCarNotificationCenterActivity_notificationView_shouldExists() {
+        View contentView = mActivity.findViewById(R.id.notification_view);
+        assertThat(contentView).isNotNull();
+    }
+
+    /**
+     * Test that the CarNotificationCenterActivity's pagedListView is loaded.
+     */
+    @Test
+    public void testCarNotificationCenterActivity_pagedListView_shouldExists() {
+        View contentView = mActivity.findViewById(R.id.notifications);
+        assertThat(contentView).isNotNull();
+    }
+
+    /**
+     * Test that the CarNotificationCenterActivity's notification title is loaded.
+     */
+    @Test
+    public void testCarNotificationCenterActivity_notificationTitle_shouldExists() {
+        View contentView = mActivity.findViewById(R.id.notification_center_title);
+        assertThat(contentView).isNotNull();
+    }
+
+    /**
+     * Test that the CarNotificationCenterActivity's is finished when exit button is clicked.
+     */
+    @Test
+    public void testCarNotificationCenterActivity_finishingActivity_returnsTrue() {
+       mActivity.findViewById(R.id.exit_button_container).performClick();
+       assertThat(mActivity.isFinishing()).isTrue();
+    }
+
 
     /**
      * This class is needed to for testing {@link CarNotificationCenterActivity} as robolectric
