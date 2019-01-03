@@ -61,6 +61,8 @@
         android:theme="@style/PagedListTheme"
         app:gutter="none"
         app:itemSpacing="@dimen/item_spacing"
+        app:listContentTopOffset="@dimen/item_spacing"
+        app:listContentBottomOffset="@dimen/item_spacing"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
