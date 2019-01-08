@@ -15,30 +15,44 @@
  */
 package com.android.car.notification.template;
 
+import android.annotation.ColorInt;
 import android.app.Notification;
 import android.graphics.drawable.Icon;
 import android.os.Bundle;
 import android.service.notification.StatusBarNotification;
 import android.view.View;
 
+import androidx.cardview.widget.CardView;
+
 import com.android.car.notification.NotificationClickHandlerFactory;
 import com.android.car.notification.R;
+
 /**
  * Notification view template that displays a car emergency notification.
  */
 public class EmergencyNotificationViewHolder extends CarNotificationBaseViewHolder {
+    private final CardView mCardView;
     private final CarNotificationHeaderView mHeaderView;
     private final CarNotificationActionsView mActionsView;
     private final CarNotificationBodyView mBodyView;
+    @ColorInt
+    private final int mEmergencyBackgroundColor;
     private NotificationClickHandlerFactory mClickHandlerFactory;
 
     public EmergencyNotificationViewHolder(View view,
             NotificationClickHandlerFactory clickHandlerFactory) {
         super(view, clickHandlerFactory);
+        mCardView = view.findViewById(R.id.column_card_view);
         mHeaderView = view.findViewById(R.id.notification_header);
         mBodyView = view.findViewById(R.id.notification_body);
         mActionsView = view.findViewById(R.id.notification_actions);
+        mEmergencyBackgroundColor = view.getContext().getColor(R.color.emergency_background_color);
         mClickHandlerFactory = clickHandlerFactory;
+    }
+
+    @Override
+    boolean hasCustomBackgroundColor() {
+        return true;
     }
 
     /**
@@ -50,8 +64,9 @@ public class EmergencyNotificationViewHolder extends CarNotificationBaseViewHold
 
         Notification notification = statusBarNotification.getNotification();
 
+        mCardView.setCardBackgroundColor(mEmergencyBackgroundColor);
         mHeaderView.bind(statusBarNotification, isInGroup);
-        mActionsView.bind(mClickHandlerFactory, statusBarNotification, /* isInGroup= */ false);
+        mActionsView.bind(mClickHandlerFactory, statusBarNotification);
 
         Bundle extraData = notification.extras;
         CharSequence title = extraData.getCharSequence(Notification.EXTRA_TITLE);
