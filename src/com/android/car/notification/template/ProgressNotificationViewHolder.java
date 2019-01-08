@@ -60,7 +60,7 @@ public class ProgressNotificationViewHolder extends CarNotificationBaseViewHolde
         super.bind(statusBarNotification, isInGroup);
         bindBody(statusBarNotification);
         mHeaderView.bind(statusBarNotification, isInGroup);
-        mActionsView.bind(mClickHandlerFactory, statusBarNotification, isInGroup);
+        mActionsView.bind(mClickHandlerFactory, statusBarNotification);
     }
 
     /**
@@ -97,6 +97,7 @@ public class ProgressNotificationViewHolder extends CarNotificationBaseViewHolde
      */
     @Override
     void reset() {
+        super.reset();
         mProgressBarView.setProgress(0);
         mProgressBarView.setVisibility(View.GONE);
         mProgressBarView.setProgressTintList(null);

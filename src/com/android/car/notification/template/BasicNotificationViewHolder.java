@@ -50,7 +50,7 @@ public class BasicNotificationViewHolder extends CarNotificationBaseViewHolder {
         super.bind(statusBarNotification, isInGroup);
         bindBody(statusBarNotification);
         mHeaderView.bind(statusBarNotification, isInGroup);
-        mActionsView.bind(mClickHandlerFactory, statusBarNotification, isInGroup);
+        mActionsView.bind(mClickHandlerFactory, statusBarNotification);
     }
 
     /**

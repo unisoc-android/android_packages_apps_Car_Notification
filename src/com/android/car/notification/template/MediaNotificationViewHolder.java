@@ -16,6 +16,7 @@
 
 package com.android.car.notification.template;
 
+import android.annotation.ColorInt;
 import android.app.Notification;
 import android.app.PendingIntent;
 import android.content.Context;
@@ -47,6 +48,7 @@ public class MediaNotificationViewHolder extends CarNotificationBaseViewHolder {
     private final ColumnCardView mCardView;
     private final List<ImageButton> mButtons;
     private final View mActionBarView;
+    @ColorInt private int mAlbumColor;
 
     public MediaNotificationViewHolder(View view,
             NotificationClickHandlerFactory clickHandlerFactory) {
@@ -64,6 +66,11 @@ public class MediaNotificationViewHolder extends CarNotificationBaseViewHolder {
         mButtons.add(view.findViewById(R.id.action_5));
     }
 
+    @Override
+    boolean hasCustomBackgroundColor() {
+        return mAlbumColor != Notification.COLOR_DEFAULT;
+    }
+
     /**
      * Binds a {@link StatusBarNotification} to a car media notification template.
      */
@@ -77,11 +84,11 @@ public class MediaNotificationViewHolder extends CarNotificationBaseViewHolder {
         Context packageContext = statusBarNotification.getPackageContext(mContext);
         MediaNotificationProcessor processor =
                 new MediaNotificationProcessor(mContext, packageContext);
-        int averageColor = processor.processNotification(notification, builder);
+        mAlbumColor = processor.processNotification(notification, builder);
         int primaryColor = builder.getPrimaryTextColor();
 
-        mCardView.setCardBackgroundColor(averageColor);
-        mActionBarView.setBackgroundColor(averageColor);
+        mCardView.setCardBackgroundColor(mAlbumColor);
+        mActionBarView.setBackgroundColor(mAlbumColor);
 
         // header
         mHeaderView.bindWithMediaColor(statusBarNotification, primaryColor);
@@ -92,8 +99,6 @@ public class MediaNotificationViewHolder extends CarNotificationBaseViewHolder {
         CharSequence text = extraData.getCharSequence(Notification.EXTRA_TEXT);
         Icon icon = notification.getLargeIcon();
         mBodyView.bind(title, text, icon);
-        mBodyView.setPrimaryTextColor(primaryColor);
-        mBodyView.setSecondaryTextColor(builder.getSecondaryTextColor());
 
         // action buttons
         Notification.Action[] actions = notification.actions;
@@ -127,6 +132,7 @@ public class MediaNotificationViewHolder extends CarNotificationBaseViewHolder {
      */
     @Override
     void reset() {
+        super.reset();
         mButtons.forEach(button -> {
             button.setImageDrawable(null);
             button.setVisibility(View.GONE);

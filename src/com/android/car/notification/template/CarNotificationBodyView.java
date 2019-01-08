@@ -80,43 +80,6 @@ public class CarNotificationBodyView extends RelativeLayout {
     }
 
     /**
-     * Sets the primary text color for this notification.
-     *
-     * <p> This method has to be called after {@link #bind(CharSequence, CharSequence, Icon)}.
-     *
-     * @param primaryColor the color for the title text.
-     */
-    public void setPrimaryTextColor(int primaryColor) {
-        mTitleView.setTextColor(primaryColor);
-    }
-
-    /**
-     * Sets the secondary text color for this notification.
-     *
-     * <p> This method has to be called after {@link #bind(CharSequence, CharSequence, Icon)}.
-     *
-     * @param secondaryColor the color for the secondary text.
-     */
-    public void setSecondaryTextColor(int secondaryColor) {
-        mContentView.setTextColor(secondaryColor);
-    }
-
-    /**
-     * Resets the primary text color to the default.
-     */
-    public void resetPrimaryTextColor() {
-        mTitleView.setTextColor(mDefaultPrimaryTextColor);
-    }
-
-
-    /**
-     * Resets the secondary text color to the default.
-     */
-    public void resetSecondaryTextColor() {
-        mContentView.setTextColor(mDefaultSecondaryTextColor);
-    }
-
-    /**
      * Binds the notification body.
      *
      * @param title   the primary text.
@@ -124,7 +87,6 @@ public class CarNotificationBodyView extends RelativeLayout {
      * @param icon    the large icon, usually used for avatars.
      */
     public void bind(CharSequence title, @Nullable CharSequence content, @Nullable Icon icon) {
-        reset();
         setVisibility(View.VISIBLE);
 
         mTitleView.setVisibility(View.VISIBLE);
@@ -143,15 +105,28 @@ public class CarNotificationBodyView extends RelativeLayout {
     }
 
     /**
+     * Sets the primary text color.
+     */
+    public void setSecondaryTextColor(@ColorInt int color) {
+        mContentView.setTextColor(color);
+    }
+
+    /**
+     * Sets the secondary text color.
+     */
+    public void setPrimaryTextColor(@ColorInt int color) {
+        mTitleView.setTextColor(color);
+    }
+
+    /**
      * Resets the notification actions empty for recycling.
      */
-    private void reset() {
-        resetPrimaryTextColor();
-        resetSecondaryTextColor();
-
+    public void reset() {
         setVisibility(View.GONE);
         mTitleView.setVisibility(View.GONE);
         mContentView.setVisibility(View.GONE);
         mIconView.setVisibility(View.GONE);
+        setPrimaryTextColor(mDefaultPrimaryTextColor);
+        setSecondaryTextColor(mDefaultSecondaryTextColor);
     }
 }
