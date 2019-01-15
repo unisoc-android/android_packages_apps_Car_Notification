@@ -16,6 +16,7 @@
 package com.android.car.notification;
 
 import android.app.Notification;
+import android.app.NotificationManager;
 import android.car.CarNotConnectedException;
 import android.car.drivingstate.CarUxRestrictions;
 import android.content.Context;
@@ -63,27 +64,59 @@ public class PreprocessingManager {
     /**
      * Process the given notifications.
      *
-     * @param rankingMap    the ranking map for the notifications.
+     * @param showForeground whether less important foreground notifications should be shown.
+     * @param notifications the list of notifications to be processed.
+     * @param rankingMap the ranking map for the notifications.
      * @return the processed notifications in a new list.
      */
     public List<NotificationGroup> process(
+            boolean showForeground,
             @NonNull List<StatusBarNotification> notifications,
             @NonNull NotificationListenerService.RankingMap rankingMap) {
 
         return new ArrayList<>(
-                rank(group(optimizeForDriving(filter(notifications))), rankingMap));
+                rank(group(optimizeForDriving(
+                        filter(showForeground, new ArrayList<>(notifications), rankingMap))),
+                        rankingMap));
     }
 
     /**
      * Filter a list of {@link StatusBarNotification}s according to OEM's configurations.
      */
-    private List<StatusBarNotification> filter(List<StatusBarNotification> notifications) {
+    private List<StatusBarNotification> filter(
+            boolean showForeground,
+            List<StatusBarNotification> notifications,
+            NotificationListenerService.RankingMap rankingMap) {
+
+        // remove less important foreground service notifications for car
+        if (!showForeground) {
+            notifications.removeIf(
+                    statusBarNotification -> {
+                        boolean isForeground =
+                                (statusBarNotification.getNotification().flags
+                                        & Notification.FLAG_FOREGROUND_SERVICE) != 0;
+
+                        if (!isForeground) {
+                            return false;
+                        }
+
+                        int importance = 0;
+                        NotificationListenerService.Ranking ranking =
+                                new NotificationListenerService.Ranking();
+                        if (rankingMap.getRanking(statusBarNotification.getKey(), ranking)) {
+                            importance = ranking.getImportance();
+                        }
+                        return importance < NotificationManager.IMPORTANCE_DEFAULT;
+                    });
+        }
+
         if (!mEnableMediaNotification) {
             notifications.removeIf(
                     statusBarNotification ->
                             Notification.CATEGORY_TRANSPORT.equals(
                                     statusBarNotification.getNotification().category));
         }
+
         if (!mEnableOngoingNotification) {
             notifications.removeIf(statusBarNotification -> statusBarNotification.isOngoing());
         }
