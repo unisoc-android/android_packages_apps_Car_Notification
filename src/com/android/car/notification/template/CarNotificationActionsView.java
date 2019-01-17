@@ -24,6 +24,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.RelativeLayout;
 
+import com.android.car.assist.client.CarAssistUtils;
 import com.android.car.notification.NotificationClickHandlerFactory;
 import com.android.car.notification.R;
 import com.android.car.theme.Themes;
@@ -93,6 +94,10 @@ public class CarNotificationActionsView extends RelativeLayout {
             return;
         }
 
+        if (CarAssistUtils.isCarCompatibleMessagingNotification(statusBarNotification)) {
+            mapActionLabels(statusBarNotification);
+        }
+
         int length = Math.min(actions.length, MAX_NUM_ACTIONS);
         for (int i = 0; i < length; i++) {
             Notification.Action action = actions[i];
@@ -102,9 +107,37 @@ public class CarNotificationActionsView extends RelativeLayout {
             button.setText(action.title.toString());
 
             if (action.actionIntent != null) {
-                button.setOnClickListener(
-                        clickHandlerFactory.getActionClickHandler(statusBarNotification, i));
+                button.setOnClickListener(clickHandlerFactory.getActionClickHandler(
+                        statusBarNotification, i));
             }
+        }
+    }
+
+    /**
+     * Replaces the action labels of the Assistant callbacks with the corresponding
+     * Assistant action labels.
+     * This method has no effect if the notification is not a Car-Compatible Messaging Notification.
+     *
+     * @param sbn the notification whose action labels should be mapped
+     */
+    private void mapActionLabels(StatusBarNotification sbn) {
+        if (CarAssistUtils.isCarCompatibleMessagingNotification(sbn)) {
+            for (Notification.Action action : sbn.getNotification().actions) {
+                mapActionLabels(action);
+            }
+        }
+    }
+
+    private void mapActionLabels(Notification.Action action) {
+        switch (action.getSemanticAction()) {
+            case Notification.Action.SEMANTIC_ACTION_REPLY:
+                action.title = mContext.getString(R.string.assist_action_reply_label);
+                break;
+            case Notification.Action.SEMANTIC_ACTION_MARK_AS_READ:
+                action.title = mContext.getString(R.string.assist_action_read_label);
+            default:
+                // no effect
+                break;
         }
     }
 
