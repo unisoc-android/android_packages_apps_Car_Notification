@@ -42,7 +42,7 @@ public class NotificationClickHandlerFactory {
     private final IStatusBarService mBarService;
     private final Callback mCallback;
     private CarAssistUtils mCarAssistUtils;
-    @Nullable private CarHeadsUpNotificationManager.CallBack mHeadsUpManagerCallback;
+    @Nullable private CarHeadsUpNotificationManager.Callback mHeadsUpManagerCallback;
 
     public NotificationClickHandlerFactory(IStatusBarService barService,
             @Nullable Callback callback) {
@@ -105,8 +105,8 @@ public class NotificationClickHandlerFactory {
     }
 
     public void setHeadsUpNotificationCallBack(
-            @Nullable CarHeadsUpNotificationManager.CallBack callBack) {
-        mHeadsUpManagerCallback = callBack;
+            @Nullable CarHeadsUpNotificationManager.Callback callback) {
+        mHeadsUpManagerCallback = callback;
     }
 
     /**

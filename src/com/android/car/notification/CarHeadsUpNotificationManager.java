@@ -166,7 +166,7 @@ public class CarHeadsUpNotificationManager
         View notificationView;
         @NotificationViewType int viewType = getNotificationViewType(statusBarNotification);
         mClickHandlerFactory.setHeadsUpNotificationCallBack(
-                new CarHeadsUpNotificationManager.CallBack() {
+                new CarHeadsUpNotificationManager.Callback() {
                     @Override
                     public void clearHeadsUpNotification() {
                         clearViews();
@@ -432,7 +432,7 @@ public class CarHeadsUpNotificationManager
     /**
      * Callback that will be issued after a Heads up notification is clicked
      */
-    public interface CallBack {
+    public interface Callback {
         /**
          * Clears Heads up notification on click.
          */
