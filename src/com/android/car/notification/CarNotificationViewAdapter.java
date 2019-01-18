@@ -16,6 +16,7 @@
 package com.android.car.notification;
 
 import android.app.Notification;
+import android.app.NotificationManager;
 import android.car.drivingstate.CarUxRestrictions;
 import android.content.Context;
 import android.os.Bundle;
@@ -389,6 +390,13 @@ public class CarNotificationViewAdapter extends RecyclerView.Adapter<RecyclerVie
      */
     public CarUxRestrictions getCarUxRestrictions() {
         return mCarUxRestrictions;
+    }
+
+    /**
+     * Clear all notifications.
+     */
+    public void clearAllNotifications() {
+        mClickHandlerFactory.clearAllNotifications();
     }
 
     /**
