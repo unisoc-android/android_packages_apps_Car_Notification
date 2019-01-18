@@ -29,7 +29,10 @@
     <string name="notification_service_label">Car Notification Listener Service</string>
 
     <!-- The title displayed in notification center activity [CHAR_LIMIT=25] -->
-    <string name="notifications">Notifications</string>
+    <string name="notifications">Notification center</string>
+
+    <!-- The button text for clearing all notifications in notification center [CHAR_LIMIT=15] -->
+    <string name="clear_all">Clear all</string>
 
     <!-- The string displayed at the end of a shortened text, e.g. "..." [CHAR_LIMIT=10] -->
     <string name="ellipsized_string">&#8230;</string>
