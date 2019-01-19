@@ -4,6 +4,7 @@ import android.car.drivingstate.CarUxRestrictions;
 import android.car.drivingstate.CarUxRestrictionsManager;
 import android.content.Context;
 import android.util.AttributeSet;
+import android.view.ViewGroup;
 
 import androidx.car.widget.PagedListView;
 import androidx.constraintlayout.widget.ConstraintLayout;
@@ -37,16 +38,12 @@ public class CarNotificationView extends ConstraintLayout
     protected void onFinishInflate() {
         super.onFinishInflate();
         PagedListView listView = findViewById(R.id.notifications);
-
         mAdapter = new CarNotificationViewAdapter(mContext,/* isGroupNotificationAdapter= */ false);
         listView.setAdapter(mAdapter);
         ((SimpleItemAnimator) listView.getRecyclerView().getItemAnimator())
                 .setSupportsChangeAnimations(false);
         listView.getRecyclerView().addOnItemTouchListener(
                 new CarNotificationItemTouchListener(mContext, mAdapter));
-
-        findViewById(R.id.clear_all_button)
-                .setOnClickListener(view -> mAdapter.clearAllNotifications());
     }
 
     /**
