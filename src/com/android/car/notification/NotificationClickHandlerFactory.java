@@ -21,7 +21,6 @@ import android.app.ActivityManager;
 import android.app.Notification;
 import android.app.PendingIntent;
 import android.content.Context;
-import android.content.pm.PackageManager;
 import android.os.RemoteException;
 import android.service.notification.NotificationStats;
 import android.service.notification.StatusBarNotification;
