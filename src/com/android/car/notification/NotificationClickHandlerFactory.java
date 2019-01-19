@@ -21,7 +21,6 @@ import android.app.ActivityManager;
 import android.app.Notification;
 import android.app.PendingIntent;
 import android.content.Context;
-import android.content.pm.PackageManager;
 import android.os.RemoteException;
 import android.service.notification.NotificationStats;
 import android.service.notification.StatusBarNotification;
@@ -35,7 +34,7 @@ import com.android.internal.statusbar.NotificationVisibility;
 
 /**
  * Factory that builds a {@link View.OnClickListener} to handle the logic of what to do when a
- * notification is clicked. It also handles the interaction with the StatusBarService.
+ * notification is clicked
  */
 public class NotificationClickHandlerFactory {
     private static final String TAG = "NotificationClickHandlerFactory";
@@ -116,8 +115,8 @@ public class NotificationClickHandlerFactory {
      * @param statusBarNotification that contains the clicked action.
      * @param index the index of the action clicked
      */
-    public View.OnClickListener getActionClickHandler(
-            StatusBarNotification statusBarNotification, int index) {
+    public View.OnClickListener getActionClickHandler(StatusBarNotification statusBarNotification,
+            int index) {
         return v -> {
             Notification notification = statusBarNotification.getNotification();
             Notification.Action[] actions = notification.actions;
@@ -177,14 +176,6 @@ public class NotificationClickHandlerFactory {
             return false;
         }
         return true;
-    }
-
-    public void clearAllNotifications() {
-        try {
-            mBarService.onClearAllNotifications(ActivityManager.getCurrentUser());
-        } catch (RemoteException e) {
-            Log.e(TAG, "clearAllNotifications: ", e);
-        }
     }
 
     /**
