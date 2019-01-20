@@ -20,6 +20,7 @@
     </style>
 
     <style name="NotificationHeaderText" parent="@android:TextAppearance.DeviceDefault">
+        <item name="android:gravity">center_vertical</item>
         <item name="android:maxLines">1</item>
         <item name="android:ellipsize">end</item>
     </style>

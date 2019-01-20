@@ -112,7 +112,6 @@ public class NotificationClickHandlerFactory {
         return v -> {
             Notification notification = statusBarNotification.getNotification();
             Notification.Action[] actions = notification.actions;
-            int result = ActivityManager.START_ABORTED;
             NotificationVisibility notificationVisibility = NotificationVisibility.obtain(
                     statusBarNotification.getKey(),
                     /* rank= */ -1, /* count= */ -1, /* visible= */ true);
@@ -124,13 +123,18 @@ public class NotificationClickHandlerFactory {
                 if (mCarAssistUtils == null) {
                     mCarAssistUtils = new CarAssistUtils(context);
                 }
-                if (mCarAssistUtils.requestAssistantVoiceAction(statusBarNotification,
-                        semanticAction)) {
-                    result = ActivityManager.START_SUCCESS;
-                } else {
-                    showToast(context, R.string.assist_action_failed_toast);
-                }
+                CarAssistUtils.ActionRequestCallback requestCallback = (error) -> {
+                    if (error) {
+                        mCallback.onNotificationClicked(ActivityManager.START_ABORTED);
+                        showToast(context, R.string.assist_action_failed_toast);
+                    } else {
+                        mCallback.onNotificationClicked(ActivityManager.START_SUCCESS);
+                    }
+                };
+                mCarAssistUtils.requestAssistantVoiceAction(statusBarNotification, semanticAction,
+                        requestCallback);
             } else {
+                int result = ActivityManager.START_ABORTED;
                 PendingIntent intent = actions[index].actionIntent;
                 try {
                     result = intent.sendAndReturnResult(/* context= */ null, /* code= */ 0,
@@ -142,6 +146,7 @@ public class NotificationClickHandlerFactory {
                     Log.w(TAG, "Sending contentIntent failed: " + e);
                     canceledExceptionThrown = true;
                 }
+                mCallback.onNotificationClicked(result);
             }
             if (!canceledExceptionThrown) {
                 try {
@@ -155,7 +160,6 @@ public class NotificationClickHandlerFactory {
                     // system process is dead if we're here.
                 }
             }
-            mCallback.onNotificationClicked(result);
         };
     }
 
