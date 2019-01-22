@@ -4,7 +4,7 @@ import android.car.drivingstate.CarUxRestrictions;
 import android.car.drivingstate.CarUxRestrictionsManager;
 import android.content.Context;
 import android.util.AttributeSet;
-import android.view.ViewGroup;
+import android.widget.Button;
 
 import androidx.car.widget.PagedListView;
 import androidx.constraintlayout.widget.ConstraintLayout;
@@ -45,6 +45,11 @@ public class CarNotificationView extends ConstraintLayout
                 .setSupportsChangeAnimations(false);
         listView.getRecyclerView().addOnItemTouchListener(
                 new CarNotificationItemTouchListener(mContext, mAdapter));
+
+        Button clearAllButton = findViewById(R.id.clear_all_button);
+        if (clearAllButton != null) {
+            clearAllButton.setOnClickListener(view -> mAdapter.clearAllNotifications());
+        }
     }
 
     /**
