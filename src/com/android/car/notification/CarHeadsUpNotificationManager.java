@@ -60,7 +60,7 @@ public class CarHeadsUpNotificationManager
     private final PreprocessingManager mPreprocessingManager;
     private final WindowManager mWindowManager;
     private final LayoutInflater mInflater;
-    private final Handler mTimer;
+    private final Handler mHandler;
     private final View mScrimView;
     private final FrameLayout mWrapper;
     private StatusBarNotification mCurrentNotification;
@@ -86,7 +86,7 @@ public class CarHeadsUpNotificationManager
         mWindowManager =
                 (WindowManager) mContext.getSystemService(Context.WINDOW_SERVICE);
         mInflater = LayoutInflater.from(mContext);
-        mTimer = new Handler();
+        mHandler = new Handler();
 
         // The reason we are adding the gradient scrim as its own window is because
         // we want the touch events to work for notifications, but not the gradient scrim.
@@ -128,6 +128,12 @@ public class CarHeadsUpNotificationManager
             NotificationListenerService.RankingMap rankingMap) {
 
         if (!shouldShowHeadsUp(statusBarNotification, rankingMap)) {
+            // check if this is a update to the existing notification and if it should still show
+            // as a heads up or not.
+            if (CarNotificationDiff.sameNotificationKey(mCurrentNotification, statusBarNotification)
+                    && mHandler.hasMessagesOrCallbacks()) {
+                clearViews();
+            }
             return;
         }
         boolean isUpdate = CarNotificationDiff.sameNotificationKeyAndFlags(
@@ -153,12 +159,19 @@ public class CarHeadsUpNotificationManager
         boolean shouldShowAnimation = !isUpdate;
         if (shouldShowAnimation) {
             mPostedTimeStampMs = System.currentTimeMillis();
-            mTimer.removeCallbacksAndMessages(null);
-            mTimer.postDelayed(() -> clearViews(), mDuration);
+            mHandler.removeCallbacksAndMessages(null);
+            mHandler.postDelayed(() -> clearViews(), mDuration);
         }
 
         View notificationView;
         @NotificationViewType int viewType = getNotificationViewType(statusBarNotification);
+        mClickHandlerFactory.setHeadsUpNotificationCallBack(
+                new CarHeadsUpNotificationManager.CallBack() {
+                    @Override
+                    public void clearHeadsUpNotification() {
+                        clearViews();
+                    }
+                });
         switch (viewType) {
             case NotificationViewType.CAR_EMERGENCY_HEADSUP: {
                 notificationView = mInflater.inflate(
@@ -283,12 +296,12 @@ public class CarHeadsUpNotificationManager
                                 throw e.rethrowFromSystemServer();
                             }
                             clearViews();
-                            mTimer.removeCallbacksAndMessages(null);
+                            mHandler.removeCallbacksAndMessages(null);
                         }));
     }
 
     private void clearViews() {
-        mTimer.removeCallbacksAndMessages(null);
+        mHandler.removeCallbacksAndMessages(null);
         mScrimView.setVisibility(View.GONE);
         mWrapper.removeAllViews();
     }
@@ -414,5 +427,15 @@ public class CarHeadsUpNotificationManager
      */
     private void setClickHandlerFactory(NotificationClickHandlerFactory clickHandlerFactory) {
         mClickHandlerFactory = clickHandlerFactory;
+    }
+
+    /**
+     * Callback that will be issued after a Heads up notification is clicked
+     */
+    public interface CallBack {
+        /**
+         * Clears Heads up notification on click.
+         */
+        void clearHeadsUpNotification();
     }
 }
