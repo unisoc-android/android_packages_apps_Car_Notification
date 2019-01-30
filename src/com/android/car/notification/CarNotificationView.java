@@ -38,6 +38,7 @@ public class CarNotificationView extends ConstraintLayout
     protected void onFinishInflate() {
         super.onFinishInflate();
         PagedListView listView = findViewById(R.id.notifications);
+        listView.setClipChildren(false);
         mAdapter = new CarNotificationViewAdapter(mContext,/* isGroupNotificationAdapter= */ false);
         listView.setAdapter(mAdapter);
         ((SimpleItemAnimator) listView.getRecyclerView().getItemAnimator())
