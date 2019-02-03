@@ -231,6 +231,9 @@ public class PreprocessingManager {
 
     public void setCarUxRestrictionManagerWrapper(CarUxRestrictionManagerWrapper manager) {
         try {
+            if (manager == null || manager.getCurrentCarUxRestrictions() == null) {
+                return;
+            }
             mMaxStringLength = manager.getCurrentCarUxRestrictions().getMaxRestrictedStringLength();
         } catch (CarNotConnectedException e) {
             mMaxStringLength = Integer.MAX_VALUE;

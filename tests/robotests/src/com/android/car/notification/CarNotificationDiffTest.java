@@ -183,17 +183,6 @@ public class CarNotificationDiffTest {
     }
 
     @Test
-    public void sameGroupUniqueIdentifiers_differenChildCount_shouldReturnFalse() {
-        mNotificationGroup1.setGroupKey(OVERRIDE_GROUP_KEY);
-        mNotificationGroup2.setGroupKey(OVERRIDE_GROUP_KEY);
-        assertThat(mNotificationGroup1.getGroupKey()).isEqualTo(mNotificationGroup2.getGroupKey());
-        assertThat(mNotificationGroup1.getChildCount()).isNotEqualTo(
-                mNotificationGroup2.getChildCount());
-        assertThat(CarNotificationDiff.sameGroupUniqueIdentifiers(mNotificationGroup1,
-                mNotificationGroup2)).isFalse();
-    }
-
-    @Test
     public void sameGroupUniqueIdentifiers_diffNotificationKey_shouldReturnFalse() {
         mNotificationGroup4 = new NotificationGroup();
         mNotificationGroupList4 = new ArrayList<>();
@@ -226,14 +215,13 @@ public class CarNotificationDiffTest {
                 mNotificationGroup4)).isTrue();
     }
 
-
     /**
      * Test that the CarNotificationDiff's sameGroupUniqueIdentifiers should return false.
      */
     @Test
     public void differentGroupUniqueIdentifiers_shouldReturnFalse() {
         assertThat(CarNotificationDiff.sameGroupUniqueIdentifiers(mNotificationGroup1,
-                mNotificationGroup2)).isFalse();
+                mNotificationGroup3)).isFalse();
     }
 
     /**
@@ -244,16 +232,6 @@ public class CarNotificationDiffTest {
         CarNotificationDiff carNotificationDiff = new CarNotificationDiff(mContext,
                 mNotificationGroupList1, mNotificationGroupList1);
         assertThat(carNotificationDiff.areItemsTheSame(0, 0)).isTrue();
-    }
-
-    /**
-     * Test that the CarNotificationDiff's areItemsTheSame should return false.
-     */
-    @Test
-    public void differentItems_shouldReturnFalse() {
-        CarNotificationDiff carNotificationDiff = new CarNotificationDiff(mContext,
-                mNotificationGroupList1, mNotificationGroupList2);
-        assertThat(carNotificationDiff.areItemsTheSame(0, 0)).isFalse();
     }
 
     @Test
