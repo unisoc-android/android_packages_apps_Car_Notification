@@ -17,15 +17,15 @@
 
 <resources xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
-    <string name="application_label" msgid="1566158363200714724">"ကားအကြောင်းကြားချက် စင်တာ"</string>
     <string name="assist_action_reply_label" msgid="6946087036560525072">"ပြန်ကြားရန်"</string>
     <string name="assist_action_read_label" msgid="5779806540783232628">"ဖတ်ရန်"</string>
     <string name="notification_service_label" msgid="7512186049723777468">"ကားအကြောင်းကြားချက် နားဆင်စနစ် ဝန်ဆောင်မှု"</string>
-    <string name="notifications" msgid="3695813926014370458">"အကြောင်းကြားချက်များ"</string>
+    <!-- no translation found for notifications (2865534625906329283) -->
+    <skip />
     <string name="ellipsized_string" msgid="6993649229498857557">"…"</string>
     <string name="unshown_count" msgid="3983441624645436587">"+<xliff:g id="COUNT">%d</xliff:g> ခု"</string>
     <plurals name="restricted_message_text" formatted="false" msgid="507312322886633308">
-      <item quantity="other">မက်ဆေ့ဂျ်အသစ် <xliff:g id="COUNT">%d</xliff:g> စောင်</item>
-      <item quantity="one">မက်ဆေ့ဂျ်အသစ် ၁ စောင်</item>
+      <item quantity="other">မက်ဆေ့ဂျ်သစ် <xliff:g id="COUNT">%d</xliff:g> စောင်</item>
+      <item quantity="one">မက်ဆေ့ဂျ်သစ် ၁ စောင်</item>
     </plurals>
 </resources>
