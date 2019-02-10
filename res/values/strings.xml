@@ -16,9 +16,6 @@
 -->
 <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
 
-    <!-- The Application label that appears in app launcher [CHAR_LIMIT=25] -->
-    <string name="application_label">Car Notification Center</string>
-
     <!-- The Action label displayed for Assistant Reply actions [CHAR_LIMIT=20]-->
     <string name="assist_action_reply_label">Reply</string>
 
@@ -28,8 +25,8 @@
     <!-- The label for the NotificationListenerService [CHAR_LIMIT=NONE] -->
     <string name="notification_service_label">Car Notification Listener Service</string>
 
-    <!-- The title displayed in notification center activity [CHAR_LIMIT=25] -->
-    <string name="notifications">Notifications</string>
+    <!-- The title displayed in notification center activity [CHAR_LIMIT=50] -->
+    <string name="notifications">Notification center</string>
 
     <!-- The string displayed at the end of a shortened text, e.g. "..." [CHAR_LIMIT=10] -->
     <string name="ellipsized_string">&#8230;</string>
@@ -37,7 +34,7 @@
     <!-- The separator for notification header text fields. -->
     <string name="header_text_separator" translatable="false">&#160;&#8226;&#160;</string>
 
-    <!-- Text indicating the number of the unshown notifications in the group summary [CHAR_LIMIT=5] -->
+    <!-- Text indicating the number of the unshown notifications in the group summary [CHAR_LIMIT=10] -->
     <string name="unshown_count">+<xliff:g id="count">%d</xliff:g></string>
 
     <!-- Text indicating the number of messages a user has received when driving [CHAR_LIMIT=20] -->

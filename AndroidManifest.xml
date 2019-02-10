@@ -31,21 +31,15 @@
     <!--Permission to start a voice interaction service-->
     <uses-permission android:name="android.permission.ACCESS_VOICE_INTERACTION_SERVICE"/>
 
-    <application android:label="@string/application_label"
-                 android:name=".NotificationApplication">
+    <application android:name=".NotificationApplication">
         <activity
             android:name=".CarNotificationCenterActivity"
-            android:label="@string/application_label"
             android:theme="@style/Theme.DeviceDefault.NoActionBar.Notification"
             android:launchMode="singleInstance"
             android:noHistory="true"
             android:exported="true"
             android:stateNotNeeded="true">
             <meta-data android:name="distractionOptimized" android:value="true"/>
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
-                <category android:name="android.intent.category.LAUNCHER"/>
-            </intent-filter>
           </activity>
           <service android:name=".CarNotificationListener"
               android:label="@string/notification_service_label"
