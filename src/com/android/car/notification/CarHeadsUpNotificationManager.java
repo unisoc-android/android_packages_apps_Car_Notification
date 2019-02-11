@@ -139,12 +139,28 @@ public class CarHeadsUpNotificationManager
             }
             return;
         }
-        boolean isUpdate = CarNotificationDiff.sameNotificationKeyAndFlags(
-                mCurrentNotification, statusBarNotification);
-        if (isUpdate && !canUpdate()) {
-            return;
+        boolean alertAgain = alertAgain(statusBarNotification.getNotification());
+        if (alertAgain || canUpdate()) {
+            showHeadsUp(mPreprocessingManager.optimizeForDriving(statusBarNotification));
         }
-        showHeadsUp(mPreprocessingManager.optimizeForDriving(statusBarNotification), isUpdate);
+    }
+
+    /**
+     * Returns true if the notification's flag is not set to
+     * {@link Notification#FLAG_ONLY_ALERT_ONCE}
+     */
+    private boolean alertAgain(Notification newNotification) {
+        return (newNotification.flags & Notification.FLAG_ONLY_ALERT_ONCE) == 0;
+    }
+
+    /**
+     * Return true if the currently displaying notification have the same key as the new added
+     * notification. In that case is will be considered as an update to the currently displayed
+     * notification.
+     */
+    private boolean isUpdate(StatusBarNotification statusBarNotification) {
+        return CarNotificationDiff.sameNotificationKey(mCurrentNotification,
+                statusBarNotification);
     }
 
     /**
@@ -154,13 +170,11 @@ public class CarHeadsUpNotificationManager
         return System.currentTimeMillis() - mPostedTimeStampMs < mDuration;
     }
 
-    private void showHeadsUp(StatusBarNotification statusBarNotification, boolean isUpdate) {
+    private void showHeadsUp(StatusBarNotification statusBarNotification) {
         // Remove previous heads-up notifications immediately
         mWrapper.removeAllViews();
         mCurrentNotification = statusBarNotification;
-        // Show animations only when there is no active HUN and notification is new.
-        boolean shouldShowAnimation = !isUpdate;
-        if (shouldShowAnimation) {
+        if (alertAgain(statusBarNotification.getNotification())) {
             mPostedTimeStampMs = System.currentTimeMillis();
             mHandler.removeCallbacksAndMessages(null);
             mHandler.postDelayed(() -> clearViews(), mDuration);
@@ -247,6 +261,8 @@ public class CarHeadsUpNotificationManager
                         scrimParams.height = notificationHeight + mScrimHeightBelowNotification;
                         mWindowManager.updateViewLayout(mScrimView, scrimParams);
 
+                        // Show animations only when there is no active HUN and notification is new.
+                        boolean shouldShowAnimation = !isUpdate(statusBarNotification);
                         if (shouldShowAnimation) {
                             mScrimView.setY(0 - notificationHeight - mScrimHeightBelowNotification);
                             mNotificationView.setY(0 - notificationHeight);
