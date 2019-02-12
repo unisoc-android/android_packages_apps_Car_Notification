@@ -36,22 +36,19 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 
 /**
- * Manager that groups and ranks the notifications in the notification center.
+ * Manager that filters, groups and ranks the notifications in the notification center.
+ *
+ * <p> Note that heads-up notifications have a different filtering mechanism and is managed by
+ * {@link CarHeadsUpNotificationManager}.
  */
 public class PreprocessingManager {
     private static final String TAG = "PreprocessingManager";
     private static PreprocessingManager mInstance;
     private final String mEllipsizedString;
-    private final boolean mEnableMediaNotification;
-    private final boolean mEnableOngoingNotification;
     private CarUxRestrictionManagerWrapper mUxRestrictionsManager;
 
     private PreprocessingManager(Context context) {
         mEllipsizedString = context.getString(R.string.ellipsized_string);
-        mEnableMediaNotification =
-                context.getResources().getBoolean(R.bool.config_showMediaNotification);
-        mEnableOngoingNotification =
-                context.getResources().getBoolean(R.bool.config_showOngoingNotification);
     }
 
     public static PreprocessingManager getInstance(Context context) {
@@ -65,8 +62,8 @@ public class PreprocessingManager {
      * Process the given notifications.
      *
      * @param showForeground whether less important foreground notifications should be shown.
-     * @param notifications the list of notifications to be processed.
-     * @param rankingMap the ranking map for the notifications.
+     * @param notifications  the list of notifications to be processed.
+     * @param rankingMap     the ranking map for the notifications.
      * @return the processed notifications in a new list.
      */
     public List<NotificationGroup> process(
@@ -110,16 +107,14 @@ public class PreprocessingManager {
                     });
         }
 
-        if (!mEnableMediaNotification) {
-            notifications.removeIf(
-                    statusBarNotification ->
-                            Notification.CATEGORY_TRANSPORT.equals(
-                                    statusBarNotification.getNotification().category));
-        }
+        // remove media and navigation notifications in the notification center for car
+        notifications.removeIf(
+                statusBarNotification -> {
+                    Notification notification = statusBarNotification.getNotification();
+                    return notification.isMediaNotification()
+                            || Notification.CATEGORY_NAVIGATION.equals(notification.category);
+                });
 
-        if (!mEnableOngoingNotification) {
-            notifications.removeIf(statusBarNotification -> statusBarNotification.isOngoing());
-        }
         return notifications;
     }
 

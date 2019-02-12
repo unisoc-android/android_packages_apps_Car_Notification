@@ -42,7 +42,6 @@ import java.lang.annotation.RetentionPolicy;
         NotificationViewType.CAR_INFORMATION,
         NotificationViewType.CAR_INFORMATION_HEADSUP,
         NotificationViewType.CAR_INFORMATION_IN_GROUP,
-        NotificationViewType.MEDIA
 })
 @Retention(RetentionPolicy.SOURCE)
 @interface NotificationViewType {
@@ -75,6 +74,4 @@ import java.lang.annotation.RetentionPolicy;
     int CAR_INFORMATION = 19;
     int CAR_INFORMATION_HEADSUP = 20;
     int CAR_INFORMATION_IN_GROUP = 21;
-
-    int MEDIA = 22;
 }

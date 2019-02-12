@@ -53,8 +53,7 @@ public class CarHeadsUpNotificationManager
     private static CarHeadsUpNotificationManager sManager;
     private final Context mContext;
     private final IStatusBarService mBarService;
-    private final boolean mEnableMediaNotification;
-    private final boolean mEnableOngoingNotification;
+    private final boolean mEnableNavigationHeadsup;
     private final long mDuration;
     private final long mEnterAnimationDuration;
     private final int mScrimHeightBelowNotification;
@@ -76,10 +75,8 @@ public class CarHeadsUpNotificationManager
         mContext = context.getApplicationContext();
         mBarService = IStatusBarService.Stub.asInterface(
                 ServiceManager.getService(Context.STATUS_BAR_SERVICE));
-        mEnableMediaNotification =
-                context.getResources().getBoolean(R.bool.config_showMediaNotification);
-        mEnableOngoingNotification =
-                context.getResources().getBoolean(R.bool.config_showOngoingNotification);
+        mEnableNavigationHeadsup =
+                context.getResources().getBoolean(R.bool.config_showNavigationHeadsup);
         mDuration = mContext.getResources().getInteger(R.integer.headsup_notification_duration_ms);
         mEnterAnimationDuration =
                 mContext.getResources().getInteger(R.integer.headsup_enter_duration_ms);
@@ -385,14 +382,9 @@ public class CarHeadsUpNotificationManager
         }
         Notification notification = statusBarNotification.getNotification();
 
-        // Media notification configured by OEM
-        if (!mEnableMediaNotification
-                && Notification.CATEGORY_TRANSPORT.equals(
+        // Navigation notification configured by OEM
+        if (!mEnableNavigationHeadsup && Notification.CATEGORY_NAVIGATION.equals(
                 statusBarNotification.getNotification().category)) {
-            return false;
-        }
-        // Ongoing notification configured by OEM
-        if (!mEnableOngoingNotification && statusBarNotification.isOngoing()) {
             return false;
         }
         // Group alert behavior
