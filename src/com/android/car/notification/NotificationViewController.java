@@ -5,6 +5,8 @@ import android.car.drivingstate.CarUxRestrictions;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
+import android.view.View;
+import android.widget.Toast;
 
 /**
  * This class is a bridge to collect signals from the notification and ux restriction services and
@@ -18,6 +20,7 @@ public class NotificationViewController {
     private final CarNotificationListener mCarNotificationListener;
     private CarUxRestrictionManagerWrapper mUxResitrictionListener;
     private NotificationUpdateHandler mNotificationUpdateHandler = new NotificationUpdateHandler();
+    private boolean mShowForegroundNotifications;
 
     public NotificationViewController(CarNotificationView carNotificationView,
             PreprocessingManager preprocessingManager,
@@ -27,6 +30,23 @@ public class NotificationViewController {
         mPreprocessingManager = preprocessingManager;
         mCarNotificationListener = carNotificationListener;
         mUxResitrictionListener = uxResitrictionListener;
+
+        // Temporary hack for demo purposes: Long clicking on the notification center title toggles
+        // hiding less important (< IMPORTANCE_DEFAULT) ongoing foreground service notifications.
+        // This hack should be removed after OEM integration.
+        View view = mCarNotificationView.findViewById(R.id.notification_center_title);
+        if (view != null) {
+            view.setOnLongClickListener(v -> {
+                mShowForegroundNotifications = !mShowForegroundNotifications;
+                Toast.makeText(
+                        carNotificationView.getContext(),
+                        "Foreground notifications " + (
+                                mShowForegroundNotifications ? "ENABLED" : "DISABLED"),
+                        Toast.LENGTH_SHORT).show();
+                updateNotifications(mShowForegroundNotifications);
+                return true;
+            });
+        }
     }
 
     /**
@@ -42,7 +62,7 @@ public class NotificationViewController {
         } catch (CarNotConnectedException e) {
             Log.e(TAG, "Car not connected", e);
         }
-        updateNotifications();
+        updateNotifications(mShowForegroundNotifications);
     }
 
     /**
@@ -57,9 +77,10 @@ public class NotificationViewController {
     /**
      * Update all notifications and ranking
      */
-    private void updateNotifications() {
+    private void updateNotifications(boolean showForegroundNotifications) {
         mCarNotificationView.setNotifications(
                 mPreprocessingManager.process(
+                        showForegroundNotifications,
                         mCarNotificationListener.getNotifications(),
                         mCarNotificationListener.getCurrentRanking()));
     }
@@ -68,10 +89,10 @@ public class NotificationViewController {
         @Override
         public void handleMessage(Message message) {
             if (message.what == CarNotificationListener.NOTIFY_NOTIFICATIONS_CHANGED) {
-                updateNotifications();
+                updateNotifications(mShowForegroundNotifications);
 
             } else if (message.what == CarNotificationListener.NOTIFY_NOTIFICATION_ADDED) {
-                updateNotifications();
+                updateNotifications(mShowForegroundNotifications);
             }
         }
     }
