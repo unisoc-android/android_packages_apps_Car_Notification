@@ -47,11 +47,19 @@
         android:id="@+id/notification_center_title"
         android:layout_width="wrap_content"
         android:layout_height="@dimen/notification_app_bar_height"
-        app:layout_constraintStart_toEndOf="@+id/exit_button_container"
         android:gravity="center_vertical"
         android:maxLines="1"
         android:text="@string/notifications"
-        android:textAppearance="@style/NotificationCenterAppTitle"/>
+        android:textAppearance="@style/NotificationCenterAppTitle"
+        app:layout_constraintStart_toEndOf="@+id/exit_button_container"/>
+
+    <Button
+        android:id="@+id/clear_all_button"
+        android:layout_width="wrap_content"
+        android:layout_height="@dimen/notification_app_bar_height"
+        android:text="@string/clear_all"
+        style="@style/ClearAllButton"
+        app:layout_constraintEnd_toEndOf="parent"/>
 
     <androidx.car.widget.PagedListView
         android:id="@+id/notifications"
