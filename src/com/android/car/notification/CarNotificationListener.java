@@ -16,6 +16,7 @@
 package com.android.car.notification;
 
 import android.annotation.Nullable;
+import android.app.ActivityManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -24,7 +25,6 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
 import android.os.RemoteException;
-import android.os.UserHandle;
 import android.service.notification.NotificationListenerService;
 import android.service.notification.StatusBarNotification;
 import android.util.Log;
@@ -51,12 +51,13 @@ public class CarNotificationListener extends NotificationListenerService {
     private List<StatusBarNotification> mNotifications = new ArrayList<>();
 
     /**
-     * Call this if to register this service as a system service. This is useful if the notification
-     * service is being used as a lib instead of a standalone app. The standalone app version has
-     * a manifest entry that will have the same effect.
+     * Call this if to register this service as a system service and connect to HUN. This is useful
+     * if the notification service is being used as a lib instead of a standalone app. The
+     * standalone app version has a manifest entry that will have the same effect.
      *
      * @param context Context required for registering the service.
-     * @param carUxRestrictionManagerWrapper
+     * @param carUxRestrictionManagerWrapper will have the heads up manager registered with it.
+     * @param clickHandlerFactory used to construct Heads up manager
      */
     public void registerAsSystemService(Context context,
             CarUxRestrictionManagerWrapper carUxRestrictionManagerWrapper,
@@ -64,7 +65,7 @@ public class CarNotificationListener extends NotificationListenerService {
         try {
             registerAsSystemService(context,
                     new ComponentName(context.getPackageName(), getClass().getCanonicalName()),
-                    UserHandle.USER_ALL);
+                    ActivityManager.getCurrentUser());
             // Note: The first call to CarHeadsUpNotificationManager.getInstance will build the
             // UI thus we do it here to be sure it's ready.
             mHeadsUpManager = CarHeadsUpNotificationManager.getInstance(context,
