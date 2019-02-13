@@ -33,7 +33,6 @@ import com.android.car.notification.template.EmergencyNotificationViewHolder;
 import com.android.car.notification.template.GroupNotificationViewHolder;
 import com.android.car.notification.template.GroupSummaryNotificationViewHolder;
 import com.android.car.notification.template.InboxNotificationViewHolder;
-import com.android.car.notification.template.MediaNotificationViewHolder;
 import com.android.car.notification.template.MessageNotificationViewHolder;
 import com.android.car.notification.template.ProgressNotificationViewHolder;
 
@@ -125,10 +124,6 @@ public class CarNotificationViewAdapter extends RecyclerView.Adapter<RecyclerVie
                 view = mInflater.inflate(R.layout.message_notification_template, parent, false);
                 viewHolder = new MessageNotificationViewHolder(view, mClickHandlerFactory);
                 break;
-            case NotificationViewType.MEDIA:
-                view = mInflater.inflate(R.layout.media_notification_template, parent, false);
-                viewHolder = new MediaNotificationViewHolder(view, mClickHandlerFactory);
-                break;
             case NotificationViewType.PROGRESS_IN_GROUP:
                 view = mInflater.inflate(
                         R.layout.progress_notification_template_inner, parent, false);
@@ -208,11 +203,6 @@ public class CarNotificationViewAdapter extends RecyclerView.Adapter<RecyclerVie
                 }
                 break;
             }
-            case NotificationViewType.MEDIA: {
-                StatusBarNotification notification = notificationGroup.getSingleNotification();
-                ((MediaNotificationViewHolder) holder).bind(notification, /* isInGroup= */ false);
-                break;
-            }
             case NotificationViewType.PROGRESS: {
                 StatusBarNotification notification = notificationGroup.getSingleNotification();
                 ((ProgressNotificationViewHolder) holder)
@@ -284,11 +274,6 @@ public class CarNotificationViewAdapter extends RecyclerView.Adapter<RecyclerVie
                 default:
                     break;
             }
-        }
-
-        // media
-        if (notification.isMediaNotification()) {
-            return NotificationViewType.MEDIA;
         }
 
         // progress
@@ -389,6 +374,13 @@ public class CarNotificationViewAdapter extends RecyclerView.Adapter<RecyclerVie
      */
     public CarUxRestrictions getCarUxRestrictions() {
         return mCarUxRestrictions;
+    }
+
+    /**
+     * Clear all notifications.
+     */
+    public void clearAllNotifications() {
+        mClickHandlerFactory.clearAllNotifications();
     }
 
     /**
