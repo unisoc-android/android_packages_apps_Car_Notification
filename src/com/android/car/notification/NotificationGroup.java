@@ -87,6 +87,21 @@ public class NotificationGroup {
     }
 
     /**
+     * Returns true if all of the notifications this group holds is dismissible by user action.
+     */
+    public boolean isDismissible() {
+        for (StatusBarNotification notification : mNotifications) {
+            boolean isForeground =
+                    (notification.getNotification().flags & Notification.FLAG_FOREGROUND_SERVICE)
+                            != 0;
+            if (isForeground || notification.isOngoing()) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
      * Returns the list of the child notifications.
      */
     public List<StatusBarNotification> getChildNotifications() {
