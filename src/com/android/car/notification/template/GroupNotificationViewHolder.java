@@ -53,6 +53,7 @@ public class GroupNotificationViewHolder extends CarNotificationBaseViewHolder {
     private final int mDividerHeight;
     private final CarNotificationHeaderView mGroupHeaderView;
     private StatusBarNotification mSummaryNotification;
+    private NotificationGroup mNotificationGroup;
 
     public GroupNotificationViewHolder(
             View view, NotificationClickHandlerFactory clickHandlerFactory) {
@@ -108,6 +109,7 @@ public class GroupNotificationViewHolder extends CarNotificationBaseViewHolder {
             NotificationGroup group, CarNotificationViewAdapter parentAdapter, boolean isExpanded) {
         super.reset();
 
+        mNotificationGroup = group;
         mSummaryNotification = group.getGroupSummaryNotification();
         mGroupHeaderView.bind(mSummaryNotification, /* isInGroup= */ false);
 
@@ -175,6 +177,11 @@ public class GroupNotificationViewHolder extends CarNotificationBaseViewHolder {
             mToggleButton.setCompoundDrawablesWithIntrinsicBounds(
                     mExpandDrawable, null, null, null);
         }
+    }
+
+    @Override
+    public boolean isDismissible() {
+        return mNotificationGroup == null || mNotificationGroup.isDismissible();
     }
 
     private class GroupedNotificationItemDecoration extends RecyclerView.ItemDecoration {
