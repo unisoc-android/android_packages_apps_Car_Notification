@@ -15,10 +15,11 @@
  */
 package com.android.car.notification;
 
+import android.annotation.Nullable;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.car.CarNotConnectedException;
-import android.car.drivingstate.CarUxRestrictions;
+import android.car.drivingstate.CarUxRestrictionsManager;
 import android.content.Context;
 import android.os.Bundle;
 import android.service.notification.NotificationListenerService;
@@ -27,6 +28,8 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
+
+import com.android.car.notification.template.MessageNotificationViewHolder;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -45,7 +48,7 @@ public class PreprocessingManager {
     private static final String TAG = "PreprocessingManager";
     private static PreprocessingManager mInstance;
     private final String mEllipsizedString;
-    private CarUxRestrictionManagerWrapper mUxRestrictionsManager;
+    private int mMaxStringLength = Integer.MAX_VALUE;
 
     private PreprocessingManager(Context context) {
         mEllipsizedString = context.getString(R.string.ellipsized_string);
@@ -120,26 +123,31 @@ public class PreprocessingManager {
 
     /**
      * Process a list of {@link StatusBarNotification}s to be driving optimized.
-     * Note that the string length limit is always respected regardless of whether distraction
+     *
+     * <p> Note that the string length limit is always respected regardless of whether distraction
      * optimization is required.
      */
     private List<StatusBarNotification> optimizeForDriving(
             List<StatusBarNotification> notifications) {
-        notifications.forEach(
-                notification -> notification = optimizeForDriving(notification));
+        notifications.forEach(notification -> notification = optimizeForDriving(notification));
         return notifications;
     }
 
     /**
      * Helper method that optimize a single {@link StatusBarNotification} for driving.
-     * Currently only trimming texts that have visual effects in car.
-     * Operation is done on the original notification object passed in; no new object is created.
+     *
+     * <p> Currently only trimming texts that have visual effects in car. Operation is done on
+     * the original notification object passed in; no new object is created.
+     *
+     * <p> Note that message notifications are not trimmed, so that messages are preserved for
+     * assistant read-out. Instead, {@link MessageNotificationViewHolder} will be responsible for
+     * the presentation-level text truncation.
      */
     StatusBarNotification optimizeForDriving(StatusBarNotification notification) {
-        CarUxRestrictions carUxRestrictions = getCurrentUxRestrictions();
-        int maxStringLength = carUxRestrictions != null
-                ? carUxRestrictions.getMaxRestrictedStringLength()
-                : Integer.MAX_VALUE;
+        if (Notification.CATEGORY_MESSAGE.equals(notification.getNotification().category)) {
+            return notification;
+        }
+
         Bundle extras = notification.getNotification().extras;
         for (String key : extras.keySet()) {
             switch (key) {
@@ -148,15 +156,25 @@ public class PreprocessingManager {
                 case Notification.EXTRA_TITLE_BIG:
                 case Notification.EXTRA_SUMMARY_TEXT:
                     CharSequence value = extras.getCharSequence(key);
-                    if (!TextUtils.isEmpty(value) && value.length() > maxStringLength) {
-                        extras.putString(key, value.toString()
-                                .substring(0, maxStringLength).concat(mEllipsizedString));
-                    }
+                    extras.putCharSequence(key, trimText(value));
                 default:
                     continue;
             }
         }
         return notification;
+    }
+
+    /**
+     * Helper method that takes a string and trims the length to the maximum character allowed
+     * by the {@link CarUxRestrictionsManager}.
+     */
+    @Nullable
+    public CharSequence trimText(@Nullable CharSequence text) {
+        if (TextUtils.isEmpty(text) || text.length() < mMaxStringLength) {
+            return text;
+        }
+        int maxLength = mMaxStringLength - mEllipsizedString.length();
+        return text.toString().substring(0, maxLength).concat(mEllipsizedString);
     }
 
     /**
@@ -212,19 +230,11 @@ public class PreprocessingManager {
     }
 
     public void setCarUxRestrictionManagerWrapper(CarUxRestrictionManagerWrapper manager) {
-        mUxRestrictionsManager = manager;
-    }
-
-    private CarUxRestrictions getCurrentUxRestrictions() {
-        if (mUxRestrictionsManager == null) {
-            return null;
-        }
-
         try {
-            return mUxRestrictionsManager.getCurrentCarUxRestrictions();
+            mMaxStringLength = manager.getCurrentCarUxRestrictions().getMaxRestrictedStringLength();
         } catch (CarNotConnectedException e) {
+            mMaxStringLength = Integer.MAX_VALUE;
             Log.e(TAG, "Failed to get UxRestrictions thus running unrestricted", e);
-            return null;
         }
     }
 
