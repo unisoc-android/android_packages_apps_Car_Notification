@@ -51,6 +51,7 @@ LOCAL_MODULE := RunCarNotificationRoboTests
 LOCAL_JAVA_LIBRARIES := \
     CarNotificationRoboTests \
     robolectric_android-all-stub \
+    android.test.runner \
     Robolectric_all-target \
     mockito-robolectric-prebuilt \
     truth-prebuilt \
