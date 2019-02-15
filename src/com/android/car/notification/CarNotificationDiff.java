@@ -131,7 +131,7 @@ class CarNotificationDiff extends DiffUtil.Callback {
     /**
      * Deep comparison for {@link NotificationGroup}.
      *
-     * <p> Compare the content of each StatusBarNotification inside the NotificationGroup.
+     * <p> Compare the size and contents of each StatusBarNotification inside the NotificationGroup.
      *
      * <p> This method will only be called if {@link #areItemsTheSame} returns true.
      */
@@ -142,6 +142,10 @@ class CarNotificationDiff extends DiffUtil.Callback {
 
         if (!sameNotificationContent(
                 oldItem.getGroupSummaryNotification(), newItem.getGroupSummaryNotification())) {
+            return false;
+        }
+
+        if (oldItem.getChildCount() != newItem.getChildCount()) {
             return false;
         }
 
