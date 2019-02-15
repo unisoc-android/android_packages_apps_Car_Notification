@@ -104,6 +104,7 @@ public class CarNotificationListener extends NotificationListenerService {
     public void onNotificationRemoved(StatusBarNotification sbn) {
         mNotifications.removeIf(notification ->
                 CarNotificationDiff.sameNotificationKey(notification, sbn));
+        mHeadsUpManager.maybeRemoveHeadsUp(sbn);
         onNotificationChanged();
     }
 
