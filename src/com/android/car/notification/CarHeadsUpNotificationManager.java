@@ -30,7 +30,6 @@ import android.os.ServiceManager;
 import android.service.notification.NotificationListenerService;
 import android.service.notification.NotificationStats;
 import android.service.notification.StatusBarNotification;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -277,7 +276,6 @@ public class CarHeadsUpNotificationManager
         boolean shouldShowAnimation = !isUpdate(statusBarNotification);
         HeadsUpEntry currentNotification = addNewHeadsUpEntry(statusBarNotification);
         if (isNew(statusBarNotification)) {
-            Log.d("testing", "NEW: " + statusBarNotification.getKey());
             FrameLayout currentWrapper = addNewLayoutForHeadsUp(currentNotification);
             currentNotification.setFrameLayout(currentWrapper);
             setAutoDismissViews(currentNotification, statusBarNotification);
