@@ -62,13 +62,13 @@ public class HeadsUpEntryTest {
         mNotification1 = new StatusBarNotification(PKG_1, OP_PKG,
                 ID, TAG, UID, INITIAL_PID, mNotificationBuilder1.build(), USER_HANDLE,
                 OVERRIDE_GROUP_KEY, POST_TIME);
-        mHeadsUpEntry = new HeadsUpEntry(mNotification1);
+        mHeadsUpEntry = new HeadsUpEntry(mNotification1, mContext);
     }
 
     @Test
     public void headsUpEntry_shouldInitializePostTime() {
         long currentTme = System.currentTimeMillis();
-        mHeadsUpEntry = new HeadsUpEntry(mNotification1);
+        mHeadsUpEntry = new HeadsUpEntry(mNotification1, mContext);
 
         assertThat(mHeadsUpEntry.getPostTime()).isNotEqualTo(0);
         assertThat(currentTme).isAtMost(mHeadsUpEntry.getPostTime());
@@ -94,12 +94,30 @@ public class HeadsUpEntryTest {
 
     @Test
     public void setFrameLayout_shouldSetFrameLayout() {
-        mHeadsUpEntry = new HeadsUpEntry(mNotification1);
+        mHeadsUpEntry = new HeadsUpEntry(mNotification1, mContext);
 
         assertThat(mHeadsUpEntry.getFrameLayout()).isNull();
 
         mHeadsUpEntry.setFrameLayout(new FrameLayout(mContext));
 
         assertThat(mHeadsUpEntry.getFrameLayout()).isNotNull();
+    }
+
+    @Test
+    public void setNotificationView_shouldSetNotificationView() {
+        mHeadsUpEntry = new HeadsUpEntry(mNotification1, mContext);
+
+        assertThat(mHeadsUpEntry.getNotificationView()).isNull();
+
+        mHeadsUpEntry.setNotificationView(new FrameLayout(mContext));
+
+        assertThat(mHeadsUpEntry.getNotificationView()).isNotNull();
+    }
+
+    @Test
+    public void getScrimView_shouldNoBeNull() {
+        mHeadsUpEntry = new HeadsUpEntry(mNotification1, mContext);
+
+        assertThat(mHeadsUpEntry.getScrimView()).isNotNull();
     }
 }
