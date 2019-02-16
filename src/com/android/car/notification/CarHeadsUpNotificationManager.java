@@ -57,6 +57,7 @@ public class CarHeadsUpNotificationManager
     private final IStatusBarService mBarService;
     private final boolean mEnableNavigationHeadsup;
     private final long mDuration;
+    private final long mMinDisplayDuration;
     private final long mEnterAnimationDuration;
     private final int mScrimHeightBelowNotification;
     private final KeyguardManager mKeyguardManager;
@@ -79,6 +80,8 @@ public class CarHeadsUpNotificationManager
         mEnableNavigationHeadsup =
                 context.getResources().getBoolean(R.bool.config_showNavigationHeadsup);
         mDuration = mContext.getResources().getInteger(R.integer.headsup_notification_duration_ms);
+        mMinDisplayDuration = mContext.getResources().getInteger(
+                R.integer.heads_up_notification_minimum_time);
         mEnterAnimationDuration =
                 mContext.getResources().getInteger(R.integer.headsup_enter_duration_ms);
         mScrimHeightBelowNotification = mContext.getResources().getDimensionPixelOffset(
@@ -151,6 +154,31 @@ public class CarHeadsUpNotificationManager
         if (isNew(statusBarNotification) || canUpdate(statusBarNotification)) {
             showHeadsUp(mPreprocessingManager.optimizeForDriving(statusBarNotification));
         }
+    }
+
+    /**
+     * This method gets called when an app wants to cancel or withdraw its notification.
+     */
+    public void maybeRemoveHeadsUp(StatusBarNotification statusBarNotification) {
+        HeadsUpEntry currentActiveHeadsUpNotification = mActiveHeadsUpNotifications.get(
+                statusBarNotification.getKey());
+        // if the heads up notification is already removed do nothing.
+        if (currentActiveHeadsUpNotification == null) {
+            return;
+        }
+
+        long totalDisplayDuration =
+                System.currentTimeMillis() - currentActiveHeadsUpNotification.getPostTime();
+        // ongoing notification that has passed the minimum threshold display time.
+        if (totalDisplayDuration >= mMinDisplayDuration) {
+            clearViews(statusBarNotification);
+            return;
+        }
+
+        long earliestRemovalTime = mMinDisplayDuration - totalDisplayDuration;
+
+        currentActiveHeadsUpNotification.getHandler().postDelayed(() ->
+                clearViews(statusBarNotification), earliestRemovalTime);
     }
 
     /**
