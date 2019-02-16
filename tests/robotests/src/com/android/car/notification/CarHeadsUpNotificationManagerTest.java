@@ -38,7 +38,6 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.robolectric.RuntimeEnvironment;
 import org.robolectric.Shadows;
-import org.robolectric.shadows.ShadowLooper;
 
 @RunWith(CarNotificationRobolectricTestRunner.class)
 public class CarHeadsUpNotificationManagerTest {
@@ -150,7 +149,8 @@ public class CarHeadsUpNotificationManagerTest {
         when(mRankingMapMock.getRanking(any(), any())).thenReturn(false);
 
         mManager.maybeShowHeadsUp(mNotification1, mRankingMapMock);
-        View notificationView = mManager.getNotificationView();
+        View notificationView = mManager.getNotificationView(
+                mManager.getActiveHeadsUpNotifications().get(mNotification1.getKey()));
 
         assertThat(notificationView).isNull();
     }
@@ -165,7 +165,8 @@ public class CarHeadsUpNotificationManagerTest {
         Context context = RuntimeEnvironment.application;
         Shadows.shadowOf(context.getPackageManager()).addPackage(PKG_2);
         mManager.maybeShowHeadsUp(mNotification2, mRankingMapMock);
-        View notificationView = mManager.getNotificationView();
+        View notificationView = mManager.getNotificationView(
+                mManager.getActiveHeadsUpNotifications().get(mNotification2.getKey()));
 
         assertThat(notificationView).isNotNull();
     }
@@ -181,7 +182,8 @@ public class CarHeadsUpNotificationManagerTest {
         Context context = RuntimeEnvironment.application;
         Shadows.shadowOf(context.getPackageManager()).addPackage(PKG_1);
         mManager.maybeShowHeadsUp(mNotification1, mRankingMapMock);
-        View notificationView = mManager.getNotificationView();
+        View notificationView = mManager.getNotificationView(
+                mManager.getActiveHeadsUpNotifications().get(mNotification1.getKey()));
 
         assertThat(notificationView).isNotNull();
     }
@@ -226,22 +228,6 @@ public class CarHeadsUpNotificationManagerTest {
     }
 
     @Test
-    public void getActiveHeadsUpNotifications_clearViewCalled_shouldReturnZero() throws Exception {
-        when(mRankingMapMock.getRanking(any(), any())).thenReturn(true);
-        when(mRankingMock.getImportance()).thenReturn(NotificationManager.IMPORTANCE_HIGH);
-
-        Context context = RuntimeEnvironment.application;
-        Shadows.shadowOf(context.getPackageManager()).addPackage(PKG_1);
-        mManager.maybeShowHeadsUp(mNotification1, mRankingMapMock);
-
-        assertThat(mManager.getActiveHeadsUpNotifications().size()).isEqualTo(1);
-
-        ShadowLooper.runUiThreadTasksIncludingDelayedTasks();
-
-        assertThat(mManager.getActiveHeadsUpNotifications().size()).isEqualTo(0);
-    }
-
-    @Test
     public void maybeShowHeadsUp_categoryCarInformation_returnsNotNull() {
         when(mRankingMapMock.getRanking(any(), any())).thenReturn(true);
         when(mRankingMock.getImportance()).thenReturn(NotificationManager.IMPORTANCE_HIGH);
@@ -249,7 +235,9 @@ public class CarHeadsUpNotificationManagerTest {
         Context context = RuntimeEnvironment.application;
         Shadows.shadowOf(context.getPackageManager()).addPackage(PKG_1);
         mManager.maybeShowHeadsUp(mNotification_carInformationHeadsUp, mRankingMapMock);
-        View notificationView = mManager.getNotificationView();
+        View notificationView = mManager.getNotificationView(
+                mManager.getActiveHeadsUpNotifications().get(
+                        mNotification_carInformationHeadsUp.getKey()));
 
         assertThat(notificationView).isNotNull();
         assertThat(mManager.getActiveHeadsUpNotifications().size()).isEqualTo(1);
@@ -264,7 +252,9 @@ public class CarHeadsUpNotificationManagerTest {
         Context context = RuntimeEnvironment.application;
         Shadows.shadowOf(context.getPackageManager()).addPackage(PKG_1);
         mManager.maybeShowHeadsUp(mNotification_messageHeadsUp, mRankingMapMock);
-        View notificationView = mManager.getNotificationView();
+        View notificationView = mManager.getNotificationView(
+                mManager.getActiveHeadsUpNotifications().get(
+                        mNotification_messageHeadsUp.getKey()));
 
         assertThat(notificationView).isNotNull();
         assertThat(mManager.getActiveHeadsUpNotifications().size()).isEqualTo(1);
@@ -278,7 +268,8 @@ public class CarHeadsUpNotificationManagerTest {
         Context context = RuntimeEnvironment.application;
         Shadows.shadowOf(context.getPackageManager()).addPackage(PKG_1);
         mManager.maybeShowHeadsUp(mNotification_inboxHeadsUp, mRankingMapMock);
-        View notificationView = mManager.getNotificationView();
+        View notificationView = mManager.getNotificationView(
+                mManager.getActiveHeadsUpNotifications().get(mNotification_inboxHeadsUp.getKey()));
 
         assertThat(notificationView).isNotNull();
         assertThat(mManager.getActiveHeadsUpNotifications().size()).isEqualTo(1);

@@ -16,8 +16,10 @@
 
 package com.android.car.notification;
 
+import android.content.Context;
 import android.os.Handler;
 import android.service.notification.StatusBarNotification;
+import android.view.View;
 import android.widget.FrameLayout;
 
 /**
@@ -31,11 +33,18 @@ public class HeadsUpEntry {
     private long mPostTime;
     private final Handler mHandler;
     private FrameLayout mFrameLayout;
+    private View mScrimView;
+    protected boolean isNew;
+    protected boolean isAlertingAgain;
+    private View mNotificationView;
 
-    HeadsUpEntry(StatusBarNotification statusBarNotification) {
+    HeadsUpEntry(StatusBarNotification statusBarNotification, Context context) {
         mStatusBarNotification = statusBarNotification;
         mPostTime = calculatePostTime();
         mHandler = new Handler();
+        mScrimView = new View(context);
+        mScrimView.setBackgroundResource(R.drawable.headsup_scrim);
+        mScrimView.setVisibility(View.GONE);
     }
 
     /**
@@ -82,5 +91,23 @@ public class HeadsUpEntry {
 
     protected long getPostTime() {
         return mPostTime;
+    }
+
+    /**
+     * View that controls the scrim for each heads up notification.
+     */
+    protected View getScrimView() {
+        return mScrimView;
+    }
+
+    /**
+     * View that holds the actual card for heads up notification.
+     */
+    protected void setNotificationView(View notificationView) {
+        mNotificationView = notificationView;
+    }
+
+    protected View getNotificationView() {
+        return mNotificationView;
     }
 }
