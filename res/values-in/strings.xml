@@ -20,8 +20,8 @@
     <string name="assist_action_reply_label" msgid="6946087036560525072">"Balas"</string>
     <string name="assist_action_read_label" msgid="5779806540783232628">"Baca"</string>
     <string name="notification_service_label" msgid="7512186049723777468">"Layanan Pemroses Notifikasi Mobil"</string>
-    <!-- no translation found for notifications (2865534625906329283) -->
-    <skip />
+    <string name="notifications" msgid="2865534625906329283">"Pusat notifikasi"</string>
+    <string name="clear_all" msgid="1845314281571237722">"Hapus semua"</string>
     <string name="ellipsized_string" msgid="6993649229498857557">"…"</string>
     <string name="unshown_count" msgid="3983441624645436587">"+<xliff:g id="COUNT">%d</xliff:g>"</string>
     <plurals name="restricted_message_text" formatted="false" msgid="507312322886633308">
