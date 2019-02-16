@@ -90,9 +90,6 @@ public class NotificationViewController {
         public void handleMessage(Message message) {
             if (message.what == CarNotificationListener.NOTIFY_NOTIFICATIONS_CHANGED) {
                 updateNotifications(mShowForegroundNotifications);
-
-            } else if (message.what == CarNotificationListener.NOTIFY_NOTIFICATION_ADDED) {
-                updateNotifications(mShowForegroundNotifications);
             }
         }
     }
