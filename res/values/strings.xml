@@ -37,7 +37,7 @@
     <!-- The separator for notification header text fields. -->
     <string name="header_text_separator" translatable="false">&#160;&#8226;&#160;</string>
 
-    <!-- Text indicating the number of the unshown notifications in the group summary [CHAR_LIMIT=10] -->
+    <!-- Text indicating the number of the unshown notifications in the group summary or in the message history [CHAR_LIMIT=10] -->
     <string name="unshown_count">+<xliff:g id="count">%d</xliff:g></string>
 
     <!-- Text indicating the number of messages a user has received when driving [CHAR_LIMIT=20] -->

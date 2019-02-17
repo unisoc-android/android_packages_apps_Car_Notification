@@ -15,6 +15,7 @@
  */
 package com.android.car.notification.template;
 
+import android.annotation.ColorInt;
 import android.annotation.Nullable;
 import android.app.Notification;
 import android.app.Person;
@@ -25,9 +26,12 @@ import android.os.Parcelable;
 import android.service.notification.StatusBarNotification;
 import android.text.TextUtils;
 import android.view.View;
+import android.widget.TextView;
 
 import com.android.car.notification.NotificationClickHandlerFactory;
+import com.android.car.notification.PreprocessingManager;
 import com.android.car.notification.R;
+import com.android.car.theme.Themes;
 
 import java.util.List;
 
@@ -39,15 +43,17 @@ public class MessageNotificationViewHolder extends CarNotificationBaseViewHolder
     private final CarNotificationHeaderView mHeaderView;
     private final CarNotificationBodyView mBodyView;
     private final CarNotificationActionsView mActionsView;
+    private final TextView mMessageCountView;
     private NotificationClickHandlerFactory mClickHandlerFactory;
 
-    public MessageNotificationViewHolder(View view,
-            NotificationClickHandlerFactory clickHandlerFactory) {
+    public MessageNotificationViewHolder(
+            View view, NotificationClickHandlerFactory clickHandlerFactory) {
         super(view, clickHandlerFactory);
         mContext = view.getContext();
         mHeaderView = view.findViewById(R.id.notification_header);
         mBodyView = view.findViewById(R.id.notification_body);
         mActionsView = view.findViewById(R.id.notification_actions);
+        mMessageCountView = view.findViewById(R.id.message_count);
         mClickHandlerFactory = clickHandlerFactory;
     }
 
@@ -129,6 +135,23 @@ public class MessageNotificationViewHolder extends CarNotificationBaseViewHolder
             avatar = notification.getLargeIcon();
         }
 
-        mBodyView.bind(senderName, messageText, avatar);
+        mBodyView.bind(
+                senderName,
+                PreprocessingManager.getInstance(mContext).trimText(messageText),
+                avatar);
+
+        // bind unshown count for unrestricted mode
+        int unshownCount = messageCount - 1;
+        if (!isRestricted && unshownCount > 0) {
+            mMessageCountView.setText(mContext.getString(R.string.unshown_count, unshownCount));
+            mMessageCountView.setTextColor(getAccentColor());
+            mMessageCountView.setVisibility(View.VISIBLE);
+        }
+    }
+
+    @Override
+    void reset() {
+        super.reset();
+        mMessageCountView.setVisibility(View.GONE);
     }
 }

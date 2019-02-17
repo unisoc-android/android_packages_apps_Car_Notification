@@ -40,8 +40,7 @@ import java.util.Objects;
 public class CarNotificationListener extends NotificationListenerService {
     private static final String TAG = "CarNotificationListener";
     static final String ACTION_LOCAL_BINDING = "local_binding";
-    static final int NOTIFY_NOTIFICATION_ADDED = 1;
-    static final int NOTIFY_NOTIFICATIONS_CHANGED = 2;
+    static final int NOTIFY_NOTIFICATIONS_CHANGED = 1;
     /** Temporary {@link Ranking} object that serves as a reused value holder */
     final private Ranking mTemporaryRanking = new Ranking();
 
@@ -104,6 +103,7 @@ public class CarNotificationListener extends NotificationListenerService {
     public void onNotificationRemoved(StatusBarNotification sbn) {
         mNotifications.removeIf(notification ->
                 CarNotificationDiff.sameNotificationKey(notification, sbn));
+        mHeadsUpManager.maybeRemoveHeadsUp(sbn);
         onNotificationChanged();
     }
 
@@ -180,7 +180,7 @@ public class CarNotificationListener extends NotificationListenerService {
             return;
         }
         Message msg = Message.obtain(mHandler);
-        msg.what = NOTIFY_NOTIFICATION_ADDED;
+        msg.what = NOTIFY_NOTIFICATIONS_CHANGED;
         msg.obj = sbn;
         mHandler.sendMessage(msg);
     }

@@ -75,9 +75,11 @@ class CarNotificationDiff extends DiffUtil.Callback {
      * Checks if two grouped notifications have the same:
      * <ol>
      * <li> GroupKey
-     * <li> Number of StatusBarNotifications contained
-     * <li> The identifier of each individual StatusBarNotification contained
+     * <li> GroupSummaryKey
      * </ol>
+     * <p>
+     * Checks for individual StatusBarNotification contained is not done because child will itself
+     * take care of it.
      */
     static boolean sameGroupUniqueIdentifiers(
             NotificationGroup oldItem, NotificationGroup newItem) {
@@ -90,24 +92,9 @@ class CarNotificationDiff extends DiffUtil.Callback {
             return false;
         }
 
-        if (oldItem.getChildCount() != newItem.getChildCount()) {
-            return false;
-        }
-
         if (!sameNotificationKey(
                 oldItem.getGroupSummaryNotification(), newItem.getGroupSummaryNotification())) {
             return false;
-        }
-
-        List<StatusBarNotification> oldNotifications = oldItem.getChildNotifications();
-        List<StatusBarNotification> newNotifications = newItem.getChildNotifications();
-
-        for (int i = 0; i < oldItem.getChildCount(); i++) {
-            StatusBarNotification oldNotification = oldNotifications.get(i);
-            StatusBarNotification newNotification = newNotifications.get(i);
-            if (!sameNotificationKey(oldNotification, newNotification)) {
-                return false;
-            }
         }
 
         return true;
@@ -144,7 +131,7 @@ class CarNotificationDiff extends DiffUtil.Callback {
     /**
      * Deep comparison for {@link NotificationGroup}.
      *
-     * <p> Compare the content of each StatusBarNotification inside the NotificationGroup.
+     * <p> Compare the size and contents of each StatusBarNotification inside the NotificationGroup.
      *
      * <p> This method will only be called if {@link #areItemsTheSame} returns true.
      */
@@ -155,6 +142,10 @@ class CarNotificationDiff extends DiffUtil.Callback {
 
         if (!sameNotificationContent(
                 oldItem.getGroupSummaryNotification(), newItem.getGroupSummaryNotification())) {
+            return false;
+        }
+
+        if (oldItem.getChildCount() != newItem.getChildCount()) {
             return false;
         }
 
