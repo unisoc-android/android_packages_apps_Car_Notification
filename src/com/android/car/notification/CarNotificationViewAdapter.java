@@ -60,7 +60,7 @@ public class CarNotificationViewAdapter extends RecyclerView.Adapter<RecyclerVie
      * Constructor for a notification adapter.
      * Can be used both by the root notification list view, or a grouped notification view.
      *
-     * @param context                    the context for resources and inflating views
+     * @param context the context for resources and inflating views
      * @param isGroupNotificationAdapter true if this adapter is used by a grouped notification view
      */
     public CarNotificationViewAdapter(Context context, boolean isGroupNotificationAdapter) {
@@ -324,8 +324,7 @@ public class CarNotificationViewAdapter extends RecyclerView.Adapter<RecyclerVie
     public int getItemCount() {
         int itemCount = mNotifications.size();
 
-        if (!mIsGroupNotificationAdapter
-                && mCarUxRestrictions != null
+        if (!mIsGroupNotificationAdapter && mCarUxRestrictions != null
                 && (mCarUxRestrictions.getActiveRestrictions()
                     & CarUxRestrictions.UX_RESTRICTIONS_LIMIT_CONTENT) != 0) {
 
@@ -347,7 +346,7 @@ public class CarNotificationViewAdapter extends RecyclerView.Adapter<RecyclerVie
     /**
      * Set the expansion state of a group notification given its group key.
      *
-     * @param groupKey   the unique identifier of a {@link NotificationGroup}
+     * @param groupKey the unique identifier of a {@link NotificationGroup}
      * @param isExpanded whether the group notification should be expanded.
      */
     public void setExpanded(String groupKey, boolean isExpanded) {
@@ -407,9 +406,8 @@ public class CarNotificationViewAdapter extends RecyclerView.Adapter<RecyclerVie
      * should have restricted content (no message preview).
      */
     private boolean shouldRestrictMessagePreview() {
-        return mCarUxRestrictions != null
-                && (mCarUxRestrictions.getActiveRestrictions()
-                    & CarUxRestrictions.UX_RESTRICTIONS_NO_TEXT_MESSAGE) != 0;
+        return mCarUxRestrictions != null && (mCarUxRestrictions.getActiveRestrictions()
+                & CarUxRestrictions.UX_RESTRICTIONS_NO_TEXT_MESSAGE) != 0;
     }
 
     /**
