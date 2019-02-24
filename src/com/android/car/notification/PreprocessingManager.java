@@ -64,19 +64,21 @@ public class PreprocessingManager {
     /**
      * Process the given notifications.
      *
-     * @param showForeground whether less important foreground notifications should be shown.
-     * @param notifications  the list of notifications to be processed.
-     * @param rankingMap     the ranking map for the notifications.
+     * @param showLessImportantNotifications whether less important notifications should be shown.
+     * @param notifications the list of notifications to be processed.
+     * @param rankingMap the ranking map for the notifications.
      * @return the processed notifications in a new list.
      */
     public List<NotificationGroup> process(
-            boolean showForeground,
+            boolean showLessImportantNotifications,
             @NonNull List<StatusBarNotification> notifications,
             @NonNull NotificationListenerService.RankingMap rankingMap) {
 
         return new ArrayList<>(
                 rank(group(optimizeForDriving(
-                        filter(showForeground, new ArrayList<>(notifications), rankingMap))),
+                        filter(showLessImportantNotifications,
+                                new ArrayList<>(notifications),
+                                rankingMap))),
                         rankingMap));
     }
 
@@ -84,12 +86,12 @@ public class PreprocessingManager {
      * Filter a list of {@link StatusBarNotification}s according to OEM's configurations.
      */
     private List<StatusBarNotification> filter(
-            boolean showForeground,
+            boolean showLessImportantNotifications,
             List<StatusBarNotification> notifications,
             NotificationListenerService.RankingMap rankingMap) {
 
         // remove less important foreground service notifications for car
-        if (!showForeground) {
+        if (!showLessImportantNotifications) {
             notifications.removeIf(
                     statusBarNotification -> {
                         boolean isForeground =
@@ -108,15 +110,15 @@ public class PreprocessingManager {
                         }
                         return importance < NotificationManager.IMPORTANCE_DEFAULT;
                     });
-        }
 
-        // remove media and navigation notifications in the notification center for car
-        notifications.removeIf(
-                statusBarNotification -> {
-                    Notification notification = statusBarNotification.getNotification();
-                    return notification.isMediaNotification()
-                            || Notification.CATEGORY_NAVIGATION.equals(notification.category);
-                });
+            // remove media and navigation notifications in the notification center for car
+            notifications.removeIf(
+                    statusBarNotification -> {
+                        Notification notification = statusBarNotification.getNotification();
+                        return notification.isMediaNotification()
+                                || Notification.CATEGORY_NAVIGATION.equals(notification.category);
+                    });
+        }
 
         return notifications;
     }
