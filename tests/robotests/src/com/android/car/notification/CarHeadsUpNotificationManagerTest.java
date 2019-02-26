@@ -19,6 +19,8 @@ package com.android.car.notification;
 import static com.google.common.truth.Truth.assertThat;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import android.app.Notification;
@@ -36,8 +38,10 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.mockito.Spy;
 import org.robolectric.RuntimeEnvironment;
 import org.robolectric.Shadows;
+import org.robolectric.shadows.ShadowLooper;
 
 @RunWith(CarNotificationRobolectricTestRunner.class)
 public class CarHeadsUpNotificationManagerTest {
@@ -52,6 +56,9 @@ public class CarHeadsUpNotificationManagerTest {
 
     @Mock
     NotificationClickHandlerFactory mClickHandlerFactory;
+
+    @Spy
+    StatusBarNotification mStatusBarNotificationSpy;
 
     private CarHeadsUpNotificationManager mManager;
 
@@ -171,6 +178,13 @@ public class CarHeadsUpNotificationManagerTest {
         assertThat(notificationView).isNotNull();
     }
 
+    @Test
+    public void maybeRemoveHeadsUp_noCurrentNotifications_shouldNotCallClearView() {
+        mManager.maybeRemoveHeadsUp(mStatusBarNotificationSpy);
+
+        verify(mStatusBarNotificationSpy, times(1)).getKey();
+    }
+
     /**
      * Test that Heads up notification should be shown when notification is IMPORTANCE_HIGH.
      */
@@ -273,6 +287,21 @@ public class CarHeadsUpNotificationManagerTest {
 
         assertThat(notificationView).isNotNull();
         assertThat(mManager.getActiveHeadsUpNotifications().size()).isEqualTo(1);
+    }
+
+    @Test
+    public void getActiveHeadsUpNotifications_clearViewCalled_shouldReturnZero() throws Exception {
+        initializeWithFactory();
+        when(mRankingMapMock.getRanking(any(), any())).thenReturn(true);
+        when(mRankingMock.getImportance()).thenReturn(NotificationManager.IMPORTANCE_HIGH);
+
+        Context context = RuntimeEnvironment.application;
+        Shadows.shadowOf(context.getPackageManager()).addPackage(PKG_1);
+        mManager.maybeShowHeadsUp(mNotification1, mRankingMapMock);
+
+        assertThat(mManager.getActiveHeadsUpNotifications().size()).isEqualTo(1);
+
+        ShadowLooper.runUiThreadTasksIncludingDelayedTasks();
     }
 
 
