@@ -15,7 +15,7 @@
     limitations under the License.
 -->
 
-<com.android.car.notification.HeadsUpNotificationView
+<FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
@@ -36,5 +36,6 @@
             layout="@layout/message_notification_template_inner"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"/>
+
     </androidx.car.widget.ColumnCardView>
-</com.android.car.notification.HeadsUpNotificationView>
+</FrameLayout>
