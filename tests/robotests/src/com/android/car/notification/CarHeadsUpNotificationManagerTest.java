@@ -163,11 +163,12 @@ public class CarHeadsUpNotificationManagerTest {
     }
 
     /**
-     * Test that Heads up notification should be shown when category is CATEGORY_CAR_WARNING.
+     * Heads up notification not be shown when is not important.
      */
     @Test
-    public void maybeShowHeadsUp_isCarWarning_returnsNotNull() {
+    public void maybeShowHeadsUp_isNotImportant_returnsNull() {
         when(mRankingMapMock.getRanking(any(), any())).thenReturn(true);
+        when(mRankingMock.getImportance()).thenReturn(NotificationManager.IMPORTANCE_DEFAULT);
 
         Context context = RuntimeEnvironment.application;
         Shadows.shadowOf(context.getPackageManager()).addPackage(PKG_2);
@@ -175,7 +176,7 @@ public class CarHeadsUpNotificationManagerTest {
         View notificationView = mManager.getNotificationView(
                 mManager.getActiveHeadsUpNotifications().get(mNotification2.getKey()));
 
-        assertThat(notificationView).isNotNull();
+        assertThat(notificationView).isNull();
     }
 
     @Test

@@ -559,14 +559,15 @@ public class CarHeadsUpNotificationManager
      * <p> A notification will never be shown as a heads-up if:
      * <ul>
      * <li> Keyguard (lock screen) is showing
-     * <li> Is ongoing
+     * <li> OEMs configured CATEGORY_NAVIGATION should not be shown
      * </ul>
      *
-     * <p> A non-ongoing notification will be shown as a heads-up if:
+     * <p> A notification will be shown as a heads-up if:
      * <ul>
      * <li> Importance >= HIGH
-     * <li> Category in {CAR_EMERGENCY, CAR_WARNING}
      * </ul>
+     *
+     * <p> Group alert behavior still follows API documentation.
      *
      * @return true if a notification should be shown as a heads-up
      */
@@ -593,12 +594,6 @@ public class CarHeadsUpNotificationManager
             if (ranking.getImportance() >= NotificationManager.IMPORTANCE_HIGH) {
                 return true;
             }
-        }
-        // Show if category in {CAR_EMERGENCY, CAR_WARNING}
-        String category = notification.category;
-        if (Notification.CATEGORY_CAR_EMERGENCY.equals(category)
-                || Notification.CATEGORY_CAR_WARNING.equals(category)) {
-            return true;
         }
         return false;
     }
