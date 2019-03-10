@@ -30,6 +30,7 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 
 import com.android.car.notification.template.MessageNotificationViewHolder;
+import com.android.internal.annotations.VisibleForTesting;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -62,7 +63,8 @@ public class PreprocessingManager {
     }
 
     /**
-     * Process the given notifications.
+     * Process the given notifications. In order for DiffUtil to work, the adapter needs a new
+     * data object each time it updates, therefore wrapping the return value in a new list.
      *
      * @param showLessImportantNotifications whether less important notifications should be shown.
      * @param notifications the list of notifications to be processed.
@@ -181,12 +183,16 @@ public class PreprocessingManager {
 
     /**
      * Group notifications that have the same group key.
-     * Never groups system notifications nor car emergency notifications.
+     *
+     * <p> Automatically generated group summaries that contains no child notifications are removed.
+     * This can happen if a notification group only contains less important notifications that are
+     * filtered out in the previous {@link #filter} step.
      *
      * @param list list of ungrouped {@link StatusBarNotification}s.
      * @return list of grouped notifications as {@link NotificationGroup}s.
      */
-    private List<NotificationGroup> group(List<StatusBarNotification> list) {
+    @VisibleForTesting
+    List<NotificationGroup> group(List<StatusBarNotification> list) {
         SortedMap<String, NotificationGroup> groupedNotifications = new TreeMap<>();
 
         for (int i = 0; i < list.size(); i++) {
@@ -206,9 +212,17 @@ public class PreprocessingManager {
             }
         }
 
-        // In order for DiffUtil to work, the adapter needs a new data object each time it
-        // updates, therefore wrapping the return value in a new list.
-        return new ArrayList(groupedNotifications.values());
+        List<NotificationGroup> groupList = new ArrayList<>(groupedNotifications.values());
+        // remove automatically generated group summary if it contains no child notifications
+        groupList.removeIf(
+                notificationGroup -> {
+                    StatusBarNotification summaryNotification =
+                            notificationGroup.getGroupSummaryNotification();
+                    return notificationGroup.getChildCount() == 0
+                            && summaryNotification != null
+                            && summaryNotification.getOverrideGroupKey() != null;
+                });
+        return groupList;
     }
 
     /**
