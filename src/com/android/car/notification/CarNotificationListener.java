@@ -25,6 +25,7 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
 import android.os.RemoteException;
+import android.os.UserHandle;
 import android.service.notification.NotificationListenerService;
 import android.service.notification.StatusBarNotification;
 import android.util.Log;
@@ -93,6 +94,12 @@ public class CarNotificationListener extends NotificationListenerService {
     @Override
     public void onNotificationPosted(StatusBarNotification sbn, RankingMap rankingMap) {
         Log.d(TAG, "onNotificationPosted: " + sbn);
+        // Notifications should only be shown for the current user and the the notifications from
+        // the system when CarNotification is running as SystemUI component.
+        if (sbn.getUser().getIdentifier() != ActivityManager.getCurrentUser()
+                && sbn.getUser().getIdentifier() != UserHandle.USER_ALL) {
+            return;
+        }
         mNotifications.removeIf(notification ->
                 CarNotificationDiff.sameNotificationKey(notification, sbn));
         mNotifications.add(sbn);
