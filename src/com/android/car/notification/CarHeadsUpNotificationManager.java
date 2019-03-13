@@ -415,7 +415,12 @@ public class CarHeadsUpNotificationManager
                 R.id.column_card_view);
         columnCardView.setOnTouchListener(
                 new HeadsUpNotificationOnTouchListener(
-                        columnCardView, () -> clearViews(statusBarNotification)));
+                        columnCardView, () -> {
+                    if (hasFullScreenIntent(statusBarNotification)) {
+                        return;
+                    }
+                    clearViews(statusBarNotification);
+                }));
     }
 
     @VisibleForTesting
@@ -430,6 +435,10 @@ public class CarHeadsUpNotificationManager
 
     private void setAutoDismissViews(HeadsUpEntry currentNotification,
             StatusBarNotification statusBarNotification) {
+        // Should not auto dismiss if HUN has a full screen Intent.
+        if (hasFullScreenIntent(statusBarNotification)) {
+            return;
+        }
         currentNotification.getHandler().removeCallbacksAndMessages(null);
         currentNotification.getHandler().postDelayed(() -> clearViews(statusBarNotification),
                 mDuration);
@@ -445,6 +454,13 @@ public class CarHeadsUpNotificationManager
             return currentHeadsUpNotification.getFrameLayout();
         }
         return null;
+    }
+
+    /**
+     * Returns true if StatusBarNotification has a full screen Intent.
+     */
+    private boolean hasFullScreenIntent(StatusBarNotification sbn) {
+        return sbn.getNotification().fullScreenIntent != null;
     }
 
     private void clearViews(StatusBarNotification statusBarNotification) {
