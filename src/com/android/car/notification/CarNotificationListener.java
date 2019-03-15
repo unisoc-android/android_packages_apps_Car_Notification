@@ -92,6 +92,7 @@ public class CarNotificationListener extends NotificationListenerService {
 
     @Override
     public void onNotificationPosted(StatusBarNotification sbn, RankingMap rankingMap) {
+        Log.d(TAG, "onNotificationPosted: " + sbn);
         mNotifications.removeIf(notification ->
                 CarNotificationDiff.sameNotificationKey(notification, sbn));
         mNotifications.add(sbn);
@@ -101,6 +102,7 @@ public class CarNotificationListener extends NotificationListenerService {
 
     @Override
     public void onNotificationRemoved(StatusBarNotification sbn) {
+        Log.d(TAG, "onNotificationRemoved: " + sbn);
         mNotifications.removeIf(notification ->
                 CarNotificationDiff.sameNotificationKey(notification, sbn));
         mHeadsUpManager.maybeRemoveHeadsUp(sbn);
@@ -175,7 +177,6 @@ public class CarNotificationListener extends NotificationListenerService {
 
     private void onNotificationAdded(StatusBarNotification sbn) {
         mHeadsUpManager.maybeShowHeadsUp(sbn, getCurrentRanking());
-
         if (mHandler == null) {
             return;
         }
