@@ -67,11 +67,8 @@ public class GroupNotificationViewHolder extends CarNotificationBaseViewHolder {
         mToggleButton = view.findViewById(R.id.group_toggle_button);
         mNotificationListView = view.findViewById(R.id.notification_list);
 
-        int carAccentColor = mContext.getColor(R.color.notification_accent_color);
         mExpandDrawable = mContext.getDrawable(R.drawable.expand_more);
-        mExpandDrawable.setTint(carAccentColor);
         mCollapseDrawable = mContext.getDrawable(R.drawable.expand_less);
-        mCollapseDrawable.setTint(carAccentColor);
 
         mPaint = new Paint();
         mPaint.setColor(mContext.getColor(R.color.notification_list_divider_color));
@@ -171,11 +168,11 @@ public class GroupNotificationViewHolder extends CarNotificationBaseViewHolder {
         mToggleButton.setVisibility(View.VISIBLE);
 
         if (isExpanded) {
-            mToggleButton.setCompoundDrawablesWithIntrinsicBounds(
-                    mCollapseDrawable, null, null, null);
+            mToggleButton.setCompoundDrawablesWithIntrinsicBounds(mCollapseDrawable, null, null,
+                    null);
         } else {
-            mToggleButton.setCompoundDrawablesWithIntrinsicBounds(
-                    mExpandDrawable, null, null, null);
+            mToggleButton.setCompoundDrawablesWithIntrinsicBounds(mExpandDrawable, null, null,
+                    null);
         }
     }
 
