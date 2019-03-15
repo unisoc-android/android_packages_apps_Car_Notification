@@ -25,10 +25,7 @@ import android.car.drivingstate.CarUxRestrictionsManager;
 import android.content.Context;
 import android.graphics.PixelFormat;
 import android.os.Bundle;
-import android.os.RemoteException;
-import android.os.ServiceManager;
 import android.service.notification.NotificationListenerService;
-import android.service.notification.NotificationStats;
 import android.service.notification.StatusBarNotification;
 import android.util.Log;
 import android.view.Gravity;
@@ -46,8 +43,6 @@ import com.android.car.notification.template.BasicNotificationViewHolder;
 import com.android.car.notification.template.EmergencyNotificationViewHolder;
 import com.android.car.notification.template.InboxNotificationViewHolder;
 import com.android.car.notification.template.MessageNotificationViewHolder;
-import com.android.internal.statusbar.IStatusBarService;
-import com.android.internal.statusbar.NotificationVisibility;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -59,7 +54,6 @@ public class CarHeadsUpNotificationManager
         implements CarUxRestrictionsManager.OnUxRestrictionsChangedListener {
     private static CarHeadsUpNotificationManager sManager;
     private final Context mContext;
-    private final IStatusBarService mBarService;
     private final boolean mEnableNavigationHeadsup;
     private final long mDuration;
     private final long mMinDisplayDuration;
@@ -81,8 +75,6 @@ public class CarHeadsUpNotificationManager
     @VisibleForTesting
     CarHeadsUpNotificationManager(Context context) {
         mContext = context.getApplicationContext();
-        mBarService = IStatusBarService.Stub.asInterface(
-                ServiceManager.getService(Context.STATUS_BAR_SERVICE));
         mEnableNavigationHeadsup =
                 context.getResources().getBoolean(R.bool.config_showNavigationHeadsup);
         mDuration = mContext.getResources().getInteger(R.integer.headsup_notification_duration_ms);
@@ -422,38 +414,8 @@ public class CarHeadsUpNotificationManager
         View columnCardView = currentNotification.getNotificationView().findViewById(
                 R.id.column_card_view);
         columnCardView.setOnTouchListener(
-                new HeadsUpNotificationOnTouchListener(columnCardView,
-                        () -> {
-                            boolean isDismissible = (statusBarNotification.getNotification().flags
-                                    & (Notification.FLAG_FOREGROUND_SERVICE
-                                    | Notification.FLAG_ONGOING_EVENT)) == 0;
-                            if (!isDismissible) {
-                                return;
-                            }
-                            try {
-                                // rank and count is used for logging and is not need at this
-                                // time thus -1
-                                NotificationVisibility notificationVisibility =
-                                        NotificationVisibility.obtain(
-                                                statusBarNotification.getKey(),
-                                                /* rank= */ -1,
-                                                /* count= */ -1,
-                                                /* visible= */ true);
-                                mBarService.onNotificationClear(
-                                        statusBarNotification.getPackageName(),
-                                        statusBarNotification.getTag(),
-                                        statusBarNotification.getId(),
-                                        statusBarNotification.getUser().getIdentifier(),
-                                        statusBarNotification.getKey(),
-                                        NotificationStats.DISMISSAL_SHADE,
-                                        notificationVisibility
-                                );
-
-                            } catch (RemoteException e) {
-                                throw e.rethrowFromSystemServer();
-                            }
-                            clearViews(statusBarNotification);
-                        }));
+                new HeadsUpNotificationOnTouchListener(
+                        columnCardView, () -> clearViews(statusBarNotification)));
     }
 
     @VisibleForTesting
