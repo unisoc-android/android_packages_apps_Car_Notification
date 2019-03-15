@@ -404,6 +404,7 @@ public class CarNotificationViewAdapter extends RecyclerView.Adapter<RecyclerVie
      * Sets the current {@link CarUxRestrictions}.
      */
     public void setCarUxRestrictions(CarUxRestrictions carUxRestrictions) {
+        Log.d(TAG, "setCarUxRestrictions");
         mCarUxRestrictions = carUxRestrictions;
         notifyDataSetChanged();
     }

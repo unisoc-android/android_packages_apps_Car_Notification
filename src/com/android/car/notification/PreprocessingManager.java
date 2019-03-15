@@ -91,7 +91,7 @@ public class PreprocessingManager {
             boolean showLessImportantNotifications,
             List<StatusBarNotification> notifications,
             NotificationListenerService.RankingMap rankingMap) {
-
+        Log.d(TAG, "Number of notifications before filtering: " + notifications.size());
         // remove less important foreground service notifications for car
         if (!showLessImportantNotifications) {
             notifications.removeIf(
@@ -121,7 +121,7 @@ public class PreprocessingManager {
                                 || Notification.CATEGORY_NAVIGATION.equals(notification.category);
                     });
         }
-
+        Log.d(TAG, "Number of notifications after filtering: " + notifications.size());
         return notifications;
     }
 

@@ -44,6 +44,7 @@ public class NotificationApplication extends Application {
     private ServiceConnection mCarConnectionListener = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
+            Log.d(TAG, "onServiceConnected");
             try {
                 CarUxRestrictionsManager carUxRestrictionsManager =
                         (CarUxRestrictionsManager)
