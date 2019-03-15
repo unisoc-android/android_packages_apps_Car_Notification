@@ -57,6 +57,8 @@ import java.util.Map;
  */
 public class CarHeadsUpNotificationManager
         implements CarUxRestrictionsManager.OnUxRestrictionsChangedListener {
+    private static final String TAG = CarHeadsUpNotificationManager.class.getSimpleName();
+
     private static CarHeadsUpNotificationManager sManager;
     private final Context mContext;
     private final IStatusBarService mBarService;
@@ -268,6 +270,7 @@ public class CarHeadsUpNotificationManager
      * </ol>
      */
     private void showHeadsUp(StatusBarNotification statusBarNotification) {
+        Log.d(TAG, "showHeadsUp");
         if (getWrapper(statusBarNotification) != null) {
             getWrapper(statusBarNotification).removeAllViews();
         }
@@ -277,7 +280,6 @@ public class CarHeadsUpNotificationManager
         boolean shouldShowAnimation = !isUpdate(statusBarNotification);
         HeadsUpEntry currentNotification = addNewHeadsUpEntry(statusBarNotification);
         if (isNew(statusBarNotification)) {
-            Log.d("testing", "NEW: " + statusBarNotification.getKey());
             FrameLayout currentWrapper = addNewLayoutForHeadsUp(currentNotification);
             currentNotification.setFrameLayout(currentWrapper);
             setAutoDismissViews(currentNotification, statusBarNotification);
@@ -366,7 +368,6 @@ public class CarHeadsUpNotificationManager
                 break;
             }
         }
-
         // Get the height of the notification view after onLayout()
         // in order to set the height of the scrim view and do animations
         currentNotification.getNotificationView().getViewTreeObserver().addOnGlobalLayoutListener(
@@ -417,7 +418,6 @@ public class CarHeadsUpNotificationManager
                                 .removeOnGlobalLayoutListener(this);
                     }
                 });
-
         // Add swipe gesture
         View columnCardView = currentNotification.getNotificationView().findViewById(
                 R.id.column_card_view);
@@ -486,6 +486,7 @@ public class CarHeadsUpNotificationManager
     }
 
     private void clearViews(StatusBarNotification statusBarNotification) {
+        Log.d(TAG, "clearViews for Heads Up Notification: ");
         HeadsUpEntry currentHeadsUpNotification = mActiveHeadsUpNotifications.get(
                 statusBarNotification.getKey());
         Interpolator exitInterpolator = AnimationUtils.loadInterpolator(mContext,

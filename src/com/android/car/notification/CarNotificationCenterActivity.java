@@ -22,6 +22,7 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.util.Log;
 
 /**
  * Displays all undismissed notifications.
@@ -38,6 +39,7 @@ public class CarNotificationCenterActivity extends Activity {
 
     private ServiceConnection mNotificationListenerConnectionListener = new ServiceConnection() {
         public void onServiceConnected(ComponentName className, IBinder binder) {
+            Log.d(TAG, "onServiceConnected");
             mNotificationListener = ((CarNotificationListener.LocalBinder) binder).getService();
             NotificationApplication app = (NotificationApplication) getApplication();
             mNotificationViewController =
@@ -50,6 +52,7 @@ public class CarNotificationCenterActivity extends Activity {
         }
 
         public void onServiceDisconnected(ComponentName className) {
+            Log.d(TAG, "onServiceDisconnected");
             mNotificationViewController.disable();
             mNotificationViewController = null;
             mNotificationListener = null;
