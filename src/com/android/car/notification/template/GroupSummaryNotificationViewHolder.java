@@ -70,7 +70,8 @@ public class GroupSummaryNotificationViewHolder extends CarNotificationBaseViewH
      * need to work.
      */
     public void bind(NotificationGroup notificationGroup) {
-        super.bind(notificationGroup.getSingleNotification(), /* isInGroup= */ false);
+        // isInGroup is always true for group summaries
+        super.bind(notificationGroup.getSingleNotification(), /* isInGroup= */ true);
 
         List<String> titles = notificationGroup.getChildTitles();
 

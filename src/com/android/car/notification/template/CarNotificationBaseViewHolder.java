@@ -16,6 +16,8 @@
 
 package com.android.car.notification.template;
 
+import static com.android.internal.util.Preconditions.checkArgument;
+
 import android.annotation.CallSuper;
 import android.annotation.ColorInt;
 import android.annotation.Nullable;
@@ -44,7 +46,9 @@ public abstract class CarNotificationBaseViewHolder extends RecyclerView.ViewHol
     private final NotificationClickHandlerFactory mClickHandlerFactory;
 
     @Nullable
-    private final CardView mCardView;
+    private final CardView mCardView; // can be null for group child or group summary notification
+    @Nullable
+    private final View mInnerView; // can be null for GroupNotificationViewHolder
     @Nullable
     private final CarNotificationHeaderView mHeaderView;
     @Nullable
@@ -71,6 +75,7 @@ public abstract class CarNotificationBaseViewHolder extends RecyclerView.ViewHol
         mPackageManager = context.getPackageManager();
         mClickHandlerFactory = clickHandlerFactory;
         mCardView = itemView.findViewById(R.id.column_card_view);
+        mInnerView = itemView.findViewById(R.id.inner_template_view);
         mHeaderView = itemView.findViewById(R.id.notification_header);
         mBodyView = itemView.findViewById(R.id.notification_body);
         mActionsView = itemView.findViewById(R.id.notification_actions);
@@ -91,12 +96,14 @@ public abstract class CarNotificationBaseViewHolder extends RecyclerView.ViewHol
         reset();
         mStatusBarNotification = statusBarNotification;
 
-        if (mCardView == null) {
-            return;
+        if (isInGroup) {
+            mInnerView.setBackgroundColor(mDefaultBackgroundColor);
+            mInnerView.setOnClickListener(
+                    mClickHandlerFactory.getClickHandler(mStatusBarNotification));
+        } else {
+            mCardView.setOnClickListener(
+                    mClickHandlerFactory.getClickHandler(mStatusBarNotification));
         }
-
-        mCardView.setOnClickListener(
-                mClickHandlerFactory.getClickHandler(mStatusBarNotification));
 
         ApplicationInfo appInfo;
         try {
