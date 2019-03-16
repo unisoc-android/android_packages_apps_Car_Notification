@@ -15,6 +15,7 @@
     limitations under the License.
 -->
 <resources>
+    <color name="group_notification_background_color">@*android:color/car_grey_900</color>
     <color name="emergency_background_color">#B41B1A</color>
     <color name="primary_text_color">@*android:color/car_body1</color>
     <color name="secondary_text_color">@*android:color/car_body3</color>

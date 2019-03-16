@@ -39,8 +39,7 @@
             android:clickable="false"
             android:focusable="false"
             android:scaleType="fitXY"
-            android:src="@drawable/ic_clear_black"
-            android:tint="@color/icon_tint"/>
+            android:src="@drawable/ic_clear"/>
     </FrameLayout>
 
     <TextView
