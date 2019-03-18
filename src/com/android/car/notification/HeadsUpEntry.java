@@ -37,6 +37,7 @@ public class HeadsUpEntry {
     protected boolean isNew;
     protected boolean isAlertingAgain;
     private View mNotificationView;
+    private NotificationClickHandlerFactory mClickHandlerFactory;
 
     HeadsUpEntry(StatusBarNotification statusBarNotification, Context context) {
         mStatusBarNotification = statusBarNotification;
@@ -109,5 +110,14 @@ public class HeadsUpEntry {
 
     protected View getNotificationView() {
         return mNotificationView;
+    }
+
+    protected NotificationClickHandlerFactory getClickHandlerFactory() {
+        return mClickHandlerFactory;
+    }
+
+    protected void setClickHandlerFactory(
+            NotificationClickHandlerFactory clickHandlerFactory) {
+        mClickHandlerFactory = clickHandlerFactory;
     }
 }
