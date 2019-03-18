@@ -288,6 +288,7 @@ public class CarHeadsUpNotificationManager
                         clearViews(statusBarNotification);
                     }
                 });
+        currentNotification.setClickHandlerFactory(mClickHandlerFactory);
         switch (viewType) {
             case NotificationViewType.CAR_EMERGENCY_HEADSUP: {
                 currentNotification.setNotificationView(mInflater.inflate(
@@ -465,8 +466,14 @@ public class CarHeadsUpNotificationManager
 
     private void clearViews(StatusBarNotification statusBarNotification) {
         Log.d(TAG, "clearViews for Heads Up Notification: ");
+        // get the current notification to perform animations and remove it immediately from the
+        // active notification maps and cancel all other call backs if any.
         HeadsUpEntry currentHeadsUpNotification = mActiveHeadsUpNotifications.get(
                 statusBarNotification.getKey());
+        mActiveHeadsUpNotifications.remove(statusBarNotification.getKey());
+        currentHeadsUpNotification.getHandler().removeCallbacksAndMessages(null);
+        currentHeadsUpNotification.getClickHandlerFactory().setHeadsUpNotificationCallBack(null);
+
         Interpolator exitInterpolator = AnimationUtils.loadInterpolator(mContext,
                 R.interpolator.heads_up_exit_direction_interpolator);
         Interpolator alphaInterpolator = AnimationUtils.loadInterpolator(mContext,
@@ -493,11 +500,8 @@ public class CarHeadsUpNotificationManager
                 .setDuration(mExitAnimationDuration)
                 .withEndAction(() -> {
                     currentHeadsUpNotification.getScrimView().setVisibility(View.GONE);
-                    currentHeadsUpNotification.getHandler().removeCallbacksAndMessages(
-                            null);
-                    getWrapper(statusBarNotification).removeAllViews();
+                    currentHeadsUpNotification.getFrameLayout().removeAllViews();
                     mWindowManager.removeView(currentHeadsUpNotification.getFrameLayout());
-                    mActiveHeadsUpNotifications.remove(statusBarNotification.getKey());
                 });
     }
 
