@@ -34,8 +34,8 @@ public class HeadsUpEntry {
     private final Handler mHandler;
     private FrameLayout mFrameLayout;
     private View mScrimView;
-    protected boolean isNew;
-    protected boolean isAlertingAgain;
+    protected boolean isAlertAgain;
+    protected boolean isNewHeadsUp;
     private View mNotificationView;
     private NotificationClickHandlerFactory mClickHandlerFactory;
 

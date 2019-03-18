@@ -137,13 +137,15 @@ public class CarHeadsUpNotificationManager
      */
     public void maybeShowHeadsUp(
             StatusBarNotification statusBarNotification,
-            NotificationListenerService.RankingMap rankingMap) {
+            NotificationListenerService.RankingMap rankingMap,
+            Map<String, StatusBarNotification> activeNotifications) {
         if (!shouldShowHeadsUp(statusBarNotification, rankingMap)) {
             // check if this is a update to the existing notification and if it should still show
             // as a heads up or not.
             HeadsUpEntry currentActiveHeadsUpNotification = mActiveHeadsUpNotifications.get(
                     statusBarNotification.getKey());
             if (currentActiveHeadsUpNotification == null) {
+                activeNotifications.put(statusBarNotification.getKey(), statusBarNotification);
                 return;
             }
             if (CarNotificationDiff.sameNotificationKey(
@@ -152,11 +154,14 @@ public class CarHeadsUpNotificationManager
                     && currentActiveHeadsUpNotification.getHandler().hasMessagesOrCallbacks()) {
                 clearViews(statusBarNotification);
             }
+            activeNotifications.put(statusBarNotification.getKey(), statusBarNotification);
             return;
         }
-        if (isNew(statusBarNotification) || canUpdate(statusBarNotification)) {
+        if (!activeNotifications.containsKey(statusBarNotification.getKey()) || canUpdate(
+                statusBarNotification) || alertAgain(statusBarNotification.getNotification())) {
             showHeadsUp(mPreprocessingManager.optimizeForDriving(statusBarNotification));
         }
+        activeNotifications.put(statusBarNotification.getKey(), statusBarNotification);
     }
 
     /**
@@ -190,14 +195,6 @@ public class CarHeadsUpNotificationManager
      */
     private boolean alertAgain(Notification newNotification) {
         return (newNotification.flags & Notification.FLAG_ONLY_ALERT_ONCE) == 0;
-    }
-
-    /**
-     * Checks if the notification is a new notification or not.
-     */
-    private boolean isNew(StatusBarNotification statusBarNotification) {
-        return mActiveHeadsUpNotifications.get(statusBarNotification.getKey()) == null
-                || mActiveHeadsUpNotifications.get(statusBarNotification.getKey()).isNew;
     }
 
     /**
@@ -235,16 +232,21 @@ public class CarHeadsUpNotificationManager
                 statusBarNotification.getKey());
         if (currentActiveHeadsUpNotification == null) {
             currentActiveHeadsUpNotification = new HeadsUpEntry(statusBarNotification, mContext);
-            currentActiveHeadsUpNotification.isNew = true;
             mActiveHeadsUpNotifications.put(statusBarNotification.getKey(),
                     currentActiveHeadsUpNotification);
+            currentActiveHeadsUpNotification.isAlertAgain = alertAgain(
+                    statusBarNotification.getNotification());
+            currentActiveHeadsUpNotification.isNewHeadsUp = true;
             return currentActiveHeadsUpNotification;
         }
-        // This is a ongoing notification which needs to be alerted again to the user. This
-        // requires for the post time to be updated.
-        currentActiveHeadsUpNotification.updatePostTime();
-        currentActiveHeadsUpNotification.isNew = false;
-        currentActiveHeadsUpNotification.isAlertingAgain = true;
+        currentActiveHeadsUpNotification.isNewHeadsUp = false;
+        currentActiveHeadsUpNotification.isAlertAgain = alertAgain(
+                statusBarNotification.getNotification());
+        if (currentActiveHeadsUpNotification.isAlertAgain) {
+            // This is a ongoing notification which needs to be alerted again to the user. This
+            // requires for the post time to be updated.
+            currentActiveHeadsUpNotification.updatePostTime();
+        }
         return currentActiveHeadsUpNotification;
     }
 
@@ -271,11 +273,11 @@ public class CarHeadsUpNotificationManager
         // holding ongoing notifications.
         boolean shouldShowAnimation = !isUpdate(statusBarNotification);
         HeadsUpEntry currentNotification = addNewHeadsUpEntry(statusBarNotification);
-        if (isNew(statusBarNotification)) {
+        if (currentNotification.isNewHeadsUp) {
             FrameLayout currentWrapper = addNewLayoutForHeadsUp(currentNotification);
             currentNotification.setFrameLayout(currentWrapper);
             setAutoDismissViews(currentNotification, statusBarNotification);
-        } else if (alertAgain(statusBarNotification.getNotification())) {
+        } else if (currentNotification.isAlertAgain) {
             setAutoDismissViews(currentNotification, statusBarNotification);
         }
 
