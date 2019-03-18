@@ -463,7 +463,7 @@ public class CarNotificationViewAdapterTest {
         initializeWithFactory(false);
         mCarNotificationViewAdapter.setNotifications(mNotificationGroupList1);
         RecyclerView.ViewHolder vh = mCarNotificationViewAdapter.onCreateViewHolder(null,
-                NotificationViewType.CAR_INFORMATION_IN_GROUP);
+                NotificationViewType.CAR_INFORMATION);
 
         mCarNotificationViewAdapter.onBindViewHolder(vh, 0);
     }
@@ -471,11 +471,15 @@ public class CarNotificationViewAdapterTest {
     @Test
     public void onBindViewHolder_basicInGroup_shouldNotThrowError() {
         initializeWithFactory(false);
-        mCarNotificationViewAdapter.setNotifications(mNotificationGroupList1);
-        RecyclerView.ViewHolder vh = mCarNotificationViewAdapter.onCreateViewHolder(null,
-                NotificationViewType.BASIC_IN_GROUP);
 
-        mCarNotificationViewAdapter.onBindViewHolder(vh, 0);
+        NotificationGroup notificationGroup = new NotificationGroup();
+        notificationGroup.setGroupSummaryNotification(mNotification1);
+        mNotificationGroupList1.add(notificationGroup);
+        mCarNotificationViewAdapter.setNotifications(mNotificationGroupList1);
+
+        RecyclerView.ViewHolder vh = mCarNotificationViewAdapter.createViewHolder(null,
+                NotificationViewType.BASIC_IN_GROUP);
+        mCarNotificationViewAdapter.onBindViewHolder(vh, 2);
     }
 
     @Test
