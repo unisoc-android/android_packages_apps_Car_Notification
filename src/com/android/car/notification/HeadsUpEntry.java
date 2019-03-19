@@ -22,6 +22,8 @@ import android.service.notification.StatusBarNotification;
 import android.view.View;
 import android.widget.FrameLayout;
 
+import com.android.car.notification.template.CarNotificationBaseViewHolder;
+
 /**
  * Class to store the state for Heads Up Notifications. Each notification will have its own post
  * time, handler, and Layout. This class ensures to store it as a separate state so that each Heads
@@ -34,9 +36,11 @@ public class HeadsUpEntry {
     private final Handler mHandler;
     private FrameLayout mFrameLayout;
     private View mScrimView;
-    protected boolean isNew;
-    protected boolean isAlertingAgain;
+    protected boolean isAlertAgain;
+    protected boolean isNewHeadsUp;
     private View mNotificationView;
+    private NotificationClickHandlerFactory mClickHandlerFactory;
+    private CarNotificationBaseViewHolder mCarNotificationBaseViewHolder;
 
     HeadsUpEntry(StatusBarNotification statusBarNotification, Context context) {
         mStatusBarNotification = statusBarNotification;
@@ -109,5 +113,22 @@ public class HeadsUpEntry {
 
     protected View getNotificationView() {
         return mNotificationView;
+    }
+
+    protected NotificationClickHandlerFactory getClickHandlerFactory() {
+        return mClickHandlerFactory;
+    }
+
+    protected void setClickHandlerFactory(
+            NotificationClickHandlerFactory clickHandlerFactory) {
+        mClickHandlerFactory = clickHandlerFactory;
+    }
+
+    protected void setViewHolder(CarNotificationBaseViewHolder viewHolder) {
+        mCarNotificationBaseViewHolder = viewHolder;
+    }
+
+    protected CarNotificationBaseViewHolder getViewHolder() {
+        return mCarNotificationBaseViewHolder;
     }
 }

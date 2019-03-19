@@ -24,6 +24,9 @@ import android.os.UserHandle;
 import android.service.notification.StatusBarNotification;
 import android.widget.FrameLayout;
 
+import com.android.car.notification.template.BasicNotificationViewHolder;
+import com.android.car.notification.template.CarNotificationBaseViewHolder;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -112,6 +115,18 @@ public class HeadsUpEntryTest {
         mHeadsUpEntry.setNotificationView(new FrameLayout(mContext));
 
         assertThat(mHeadsUpEntry.getNotificationView()).isNotNull();
+    }
+
+    @Test
+    public void setViewHolder_shouldSetViewHolder() {
+        mHeadsUpEntry = new HeadsUpEntry(mNotification1, mContext);
+
+        assertThat(mHeadsUpEntry.getViewHolder()).isNull();
+
+        mHeadsUpEntry.setViewHolder(
+                new BasicNotificationViewHolder(new FrameLayout(mContext), null));
+
+        assertThat(mHeadsUpEntry.getViewHolder()).isNotNull();
     }
 
     @Test
