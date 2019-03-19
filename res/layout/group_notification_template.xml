@@ -53,15 +53,16 @@
                 android:layout_below="@id/group_header"
                 android:background="@color/notification_list_divider_color"/>
 
-            <Button
-                android:id="@+id/group_toggle_button"
+            <ImageView
+                android:id="@+id/group_toggle_icon"
                 android:layout_width="wrap_content"
                 android:layout_height="@dimen/notification_card_header_height"
                 android:layout_alignParentTop="true"
                 android:layout_alignParentEnd="true"
                 android:layout_marginStart="@dimen/header_small_icon_padding"
                 android:layout_marginEnd="@dimen/card_end_margin"
-                style="@style/NotificationActionButton"/>
+                android:tint="@color/icon_tint"
+                android:focusable="false"/>
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/notification_list"
@@ -69,8 +70,13 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@id/header_divider"
                 android:background="@color/group_notification_background_color"/>
-
         </RelativeLayout>
+
+        <!-- This view intercepts all clicks on the card in the collapsed state -->
+        <View
+            android:id="@+id/touch_interceptor_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
 
     </androidx.car.widget.ColumnCardView>
 </FrameLayout>
