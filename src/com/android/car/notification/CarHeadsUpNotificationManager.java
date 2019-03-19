@@ -152,7 +152,7 @@ public class CarHeadsUpNotificationManager
                     currentActiveHeadsUpNotification.getStatusBarNotification(),
                     statusBarNotification)
                     && currentActiveHeadsUpNotification.getHandler().hasMessagesOrCallbacks()) {
-                clearViews(statusBarNotification);
+                animateOutHUN(statusBarNotification);
             }
             activeNotifications.put(statusBarNotification.getKey(), statusBarNotification);
             return;
@@ -179,14 +179,14 @@ public class CarHeadsUpNotificationManager
                 System.currentTimeMillis() - currentActiveHeadsUpNotification.getPostTime();
         // ongoing notification that has passed the minimum threshold display time.
         if (totalDisplayDuration >= mMinDisplayDuration) {
-            clearViews(statusBarNotification);
+            animateOutHUN(statusBarNotification);
             return;
         }
 
         long earliestRemovalTime = mMinDisplayDuration - totalDisplayDuration;
 
         currentActiveHeadsUpNotification.getHandler().postDelayed(() ->
-                clearViews(statusBarNotification), earliestRemovalTime);
+                animateOutHUN(statusBarNotification), earliestRemovalTime);
     }
 
     /**
@@ -224,7 +224,7 @@ public class CarHeadsUpNotificationManager
     }
 
     /**
-     * Returns the active HeadsUpEntry or creates a new one while adding it to the list of
+     * Returns the active headsUpEntry or creates a new one while adding it to the list of
      * mActiveHeadsUpNotifications.
      */
     private HeadsUpEntry addNewHeadsUpEntry(StatusBarNotification statusBarNotification) {
@@ -287,7 +287,7 @@ public class CarHeadsUpNotificationManager
                 new CarHeadsUpNotificationManager.Callback() {
                     @Override
                     public void clearHeadsUpNotification() {
-                        clearViews(statusBarNotification);
+                        animateOutHUN(statusBarNotification);
                     }
                 });
         currentNotification.setClickHandlerFactory(mClickHandlerFactory);
@@ -422,7 +422,7 @@ public class CarHeadsUpNotificationManager
                     if (hasFullScreenIntent(statusBarNotification)) {
                         return;
                     }
-                    clearViews(statusBarNotification);
+                    resetView(statusBarNotification);
                 }));
     }
 
@@ -443,12 +443,12 @@ public class CarHeadsUpNotificationManager
             return;
         }
         currentNotification.getHandler().removeCallbacksAndMessages(null);
-        currentNotification.getHandler().postDelayed(() -> clearViews(statusBarNotification),
+        currentNotification.getHandler().postDelayed(() -> animateOutHUN(statusBarNotification),
                 mDuration);
     }
 
     /**
-     * Returns the {@link FrameLayout} related to the currently displaying Heads Up Notification.
+     * Returns the {@link FrameLayout} related to the currently displaying heads Up notification.
      */
     private FrameLayout getWrapper(StatusBarNotification statusBarNotification) {
         HeadsUpEntry currentHeadsUpNotification = mActiveHeadsUpNotifications.get(
@@ -466,7 +466,10 @@ public class CarHeadsUpNotificationManager
         return sbn.getNotification().fullScreenIntent != null;
     }
 
-    private void clearViews(StatusBarNotification statusBarNotification) {
+    /**
+     * Animates the heads up notification out of the screen and reset the views.
+     */
+    private void animateOutHUN(StatusBarNotification statusBarNotification) {
         Log.d(TAG, "clearViews for Heads Up Notification: ");
         // get the current notification to perform animations and remove it immediately from the
         // active notification maps and cancel all other call backs if any.
@@ -505,6 +508,21 @@ public class CarHeadsUpNotificationManager
                     currentHeadsUpNotification.getFrameLayout().removeAllViews();
                     mWindowManager.removeView(currentHeadsUpNotification.getFrameLayout());
                 });
+    }
+
+    /**
+     * Removes the view for the active heads up notification and also removes the HUN from the map
+     * of active Notifications.
+     */
+    private void resetView(StatusBarNotification statusBarNotification) {
+        HeadsUpEntry currentHeadsUpNotification = mActiveHeadsUpNotifications.get(
+                statusBarNotification.getKey());
+        currentHeadsUpNotification.getClickHandlerFactory().setHeadsUpNotificationCallBack(null);
+        currentHeadsUpNotification.getScrimView().setVisibility(View.GONE);
+        currentHeadsUpNotification.getHandler().removeCallbacksAndMessages(null);
+        getWrapper(statusBarNotification).removeAllViews();
+        mWindowManager.removeView(currentHeadsUpNotification.getFrameLayout());
+        mActiveHeadsUpNotifications.remove(statusBarNotification.getKey());
     }
 
     /**
@@ -621,7 +639,7 @@ public class CarHeadsUpNotificationManager
     }
 
     /**
-     * Callback that will be issued after a Heads up notification is clicked
+     * Callback that will be issued after a heads up notification is clicked
      */
     public interface Callback {
         /**
