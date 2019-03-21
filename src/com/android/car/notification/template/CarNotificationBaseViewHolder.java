@@ -16,8 +16,6 @@
 
 package com.android.car.notification.template;
 
-import static com.android.internal.util.Preconditions.checkArgument;
-
 import android.annotation.CallSuper;
 import android.annotation.ColorInt;
 import android.annotation.Nullable;
@@ -74,7 +72,7 @@ public abstract class CarNotificationBaseViewHolder extends RecyclerView.ViewHol
         Context context = itemView.getContext();
         mPackageManager = context.getPackageManager();
         mClickHandlerFactory = clickHandlerFactory;
-        mCardView = itemView.findViewById(R.id.column_card_view);
+        mCardView = itemView.findViewById(R.id.card_view);
         mInnerView = itemView.findViewById(R.id.inner_template_view);
         mHeaderView = itemView.findViewById(R.id.notification_header);
         mBodyView = itemView.findViewById(R.id.notification_body);
