@@ -435,13 +435,13 @@ public class CarHeadsUpNotificationManager
                                 .removeOnGlobalLayoutListener(this);
                     }
                 });
+
         if (currentNotification.isNewHeadsUp) {
             // Add swipe gesture
-            View columnCardView = currentNotification.getNotificationView().findViewById(
-                    R.id.column_card_view);
-            columnCardView.setOnTouchListener(
+            View cardView = currentNotification.getNotificationView().findViewById(R.id.card_view);
+            cardView.setOnTouchListener(
                     new HeadsUpNotificationOnTouchListener(
-                            columnCardView, () -> {
+                            cardView, () -> {
                         if (hasFullScreenIntent(statusBarNotification)) {
                             return;
                         }
