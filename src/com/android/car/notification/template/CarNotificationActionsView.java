@@ -27,7 +27,7 @@ import android.widget.RelativeLayout;
 import com.android.car.assist.client.CarAssistUtils;
 import com.android.car.notification.NotificationClickHandlerFactory;
 import com.android.car.notification.R;
-import com.android.car.theme.Themes;
+import com.android.car.notification.ThemesUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -65,8 +65,8 @@ public class CarNotificationActionsView extends RelativeLayout {
     }
 
     {
-        mCardBackgroundColor = Themes.getAttrColor(getContext(), android.R.attr.colorPrimary);
-        mDefaultTextColor = Themes.getAttrColor(getContext(), android.R.attr.textColorPrimary);
+        mCardBackgroundColor = ThemesUtil.getAttrColor(getContext(), android.R.attr.colorPrimary);
+        mDefaultTextColor = ThemesUtil.getAttrColor(getContext(), android.R.attr.textColorPrimary);
         inflate(getContext(), R.layout.car_notification_actions_view, /* root= */ this);
     }
 
