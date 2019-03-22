@@ -442,9 +442,6 @@ public class CarHeadsUpNotificationManager
             cardView.setOnTouchListener(
                     new HeadsUpNotificationOnTouchListener(
                             cardView, () -> {
-                        if (hasFullScreenIntent(statusBarNotification)) {
-                            return;
-                        }
                         resetView(statusBarNotification);
                     }));
         }
