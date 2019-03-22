@@ -146,12 +146,6 @@ public abstract class CarNotificationBaseViewHolder extends RecyclerView.ViewHol
             mBodyView.setPrimaryTextColor(calculatedPrimaryForegroundColor);
             mBodyView.setSecondaryTextColor(calculatedSecondaryForegroundColor);
         }
-
-        if (mActionsView != null) {
-            mActionsView.setActionTextColor(
-                    hasCustomBackgroundColor() ? calculatedPrimaryForegroundColor
-                            : getAccentColor());
-        }
     }
 
     /**

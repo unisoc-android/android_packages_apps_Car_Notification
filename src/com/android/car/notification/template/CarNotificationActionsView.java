@@ -42,9 +42,6 @@ public class CarNotificationActionsView extends RelativeLayout {
     // https://developer.android.com/reference/android/app/Notification.Builder.html#addAction
     private static final int MAX_NUM_ACTIONS = 3;
 
-    private final int mCardBackgroundColor;
-    private final int mDefaultTextColor;
-
     private final List<Button> mActionButtons = new ArrayList<>();
 
     public CarNotificationActionsView(Context context) {
@@ -65,8 +62,6 @@ public class CarNotificationActionsView extends RelativeLayout {
     }
 
     {
-        mCardBackgroundColor = ThemesUtil.getAttrColor(getContext(), android.R.attr.colorPrimary);
-        mDefaultTextColor = ThemesUtil.getAttrColor(getContext(), android.R.attr.textColorPrimary);
         inflate(getContext(), R.layout.car_notification_actions_view, /* root= */ this);
     }
 
@@ -142,21 +137,12 @@ public class CarNotificationActionsView extends RelativeLayout {
     }
 
     /**
-     * Sets the text color for action buttons.
-     */
-    void setActionTextColor(@ColorInt int color) {
-        mActionButtons.forEach(button -> button.setTextColor(color));
-    }
-
-    /**
      * Resets the notification actions empty for recycling.
      */
     public void reset() {
         for (Button button : mActionButtons) {
             button.setVisibility(View.GONE);
             button.setText(null);
-            button.setTextColor(mDefaultTextColor);
-            button.setCompoundDrawables(null, null, null, null);
             button.setOnClickListener(null);
         }
     }
