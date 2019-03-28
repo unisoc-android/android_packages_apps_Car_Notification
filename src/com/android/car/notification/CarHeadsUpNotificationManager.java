@@ -437,14 +437,22 @@ public class CarHeadsUpNotificationManager
                 });
 
         if (currentNotification.isNewHeadsUp) {
+            boolean shouldDismissOnSwipe = true;
+            if (shouldDismissOnSwipe(statusBarNotification)) {
+                shouldDismissOnSwipe = false;
+            }
             // Add swipe gesture
             View cardView = currentNotification.getNotificationView().findViewById(R.id.card_view);
             cardView.setOnTouchListener(
-                    new HeadsUpNotificationOnTouchListener(
-                            cardView, () -> {
-                        resetView(statusBarNotification);
-                    }));
+                    new HeadsUpNotificationOnTouchListener(cardView, shouldDismissOnSwipe,
+                            () -> resetView(statusBarNotification)));
         }
+    }
+
+    private boolean shouldDismissOnSwipe(StatusBarNotification statusBarNotification) {
+        return hasFullScreenIntent(statusBarNotification)
+                && statusBarNotification.getNotification().category.equals(
+                Notification.CATEGORY_CALL) && statusBarNotification.isOngoing();
     }
 
     @VisibleForTesting
