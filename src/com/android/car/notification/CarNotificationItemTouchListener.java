@@ -159,10 +159,6 @@ public class CarNotificationItemTouchListener extends RecyclerView.SimpleOnItemT
         // touch events bubbling down to our children.
         switch (event.getActionMasked()) {
             case MotionEvent.ACTION_DOWN:
-                if (hasValidGestureSwipeTarget()) {
-                    break;
-                }
-
                 onGestureStart();
 
                 mVelocityTracker.addMovement(event);
