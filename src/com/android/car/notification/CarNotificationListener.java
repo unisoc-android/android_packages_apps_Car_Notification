@@ -71,7 +71,7 @@ public class CarNotificationListener extends NotificationListenerService {
      * @param context Context required for registering the service.
      * @param carUxRestrictionManagerWrapper will have the heads up manager registered with it.
      * @param carHeadsUpNotificationManager HUN controller.
-     * @param notificationDataManager used for keeping track of mute state.
+     * @param notificationDataManager used for keeping track of additional notification states.
      */
     public void registerAsSystemService(Context context,
             CarUxRestrictionManagerWrapper carUxRestrictionManagerWrapper,
@@ -195,9 +195,7 @@ public class CarNotificationListener extends NotificationListenerService {
     }
 
     private void onNotificationAdded(StatusBarNotification sbn) {
-        if (CarAssistUtils.isCarCompatibleMessagingNotification(sbn)) {
-            mNotificationDataManager.addNewMessageNotification(sbn);
-        }
+        mNotificationDataManager.addNewMessageNotification(sbn);
         mHeadsUpManager.maybeShowHeadsUp(sbn, getCurrentRanking(), mActiveNotifications);
         if (mHandler == null) {
             return;
