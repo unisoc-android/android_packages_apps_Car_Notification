@@ -46,6 +46,10 @@ LOCAL_STATIC_ANDROID_LIBRARIES += \
     androidx.recyclerview_recyclerview \
     car-assist-client-lib \
 
+# Including the resources for the static android libraries allows to pick up their static overlays.
+LOCAL_RESOURCE_DIR += \
+    $(LOCAL_PATH)/../libs/car-assist-client-lib/res
+
 LOCAL_STATIC_JAVA_LIBRARIES += \
     android.car.userlib \
     androidx-constraintlayout_constraintlayout-solver
