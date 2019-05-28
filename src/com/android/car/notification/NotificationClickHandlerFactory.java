@@ -194,8 +194,8 @@ public class NotificationClickHandlerFactory {
             if (mCarAssistUtils == null) {
                 mCarAssistUtils = new CarAssistUtils(context);
             }
-            CarAssistUtils.ActionRequestCallback requestCallback = hasError -> {
-                if (hasError) {
+            CarAssistUtils.ActionRequestCallback requestCallback = resultState -> {
+                if (resultState.equals(CarAssistUtils.ActionRequestCallback.RESULT_FAILED)) {
                     showToast(context, R.string.assist_action_failed_toast);
                     Log.e(TAG, "Assistant failed to read aloud the message");
                 }
