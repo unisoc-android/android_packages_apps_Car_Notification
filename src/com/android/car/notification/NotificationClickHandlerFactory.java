@@ -194,11 +194,17 @@ public class NotificationClickHandlerFactory {
             if (mCarAssistUtils == null) {
                 mCarAssistUtils = new CarAssistUtils(context);
             }
-            if (!mCarAssistUtils.requestAssistantVoiceAction(messageNotification,
-                    CarVoiceInteractionSession.VOICE_ACTION_READ_NOTIFICATION)) {
-                showToast(context, R.string.assist_action_failed_toast);
-                Log.e(TAG, "Assistant failed to read aloud the message");
-            }
+            CarAssistUtils.ActionRequestCallback requestCallback = hasError -> {
+                if (hasError) {
+                    showToast(context, R.string.assist_action_failed_toast);
+                    Log.e(TAG, "Assistant failed to read aloud the message");
+                }
+                // Don't trigger mCallback so the shade remains open.
+            };
+
+            mCarAssistUtils.requestAssistantVoiceAction(messageNotification,
+                    CarVoiceInteractionSession.VOICE_ACTION_READ_NOTIFICATION,
+                    requestCallback);
         };
     }
 
@@ -216,7 +222,7 @@ public class NotificationClickHandlerFactory {
                         (mNotificationDataManager.isMessageNotificationMuted(messageNotification))
                                 ? context.getString(R.string.action_unmute_long)
                                 : context.getString(R.string.action_mute_long));
-                mCallback.onNotificationClicked(ActivityManager.START_SUCCESS);
+                // Don't trigger mCallback so the shade remains open.
             } else {
               Log.d(TAG, "Could not set mute click handler as NotificationDataManager is null");
             }
