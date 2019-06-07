@@ -108,6 +108,8 @@ public class CarNotificationRobolectricTestRunner extends RobolectricTestRunner 
                     List<ResourcePath> paths = super.getIncludedResourcePaths();
                     paths.add(createResourcePath("file:packages/apps/Car/Notification/res"));
                     paths.add(createResourcePath("file:packages/apps/Car/libs/car-theme-lib/res"));
+                    paths.add(createResourcePath(
+                            "file:packages/apps/Car/libs/car-apps-common/res"));
 
                     // Support library resources. These need to point to the prebuilts of support
                     // library and not the source.
