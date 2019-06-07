@@ -504,7 +504,7 @@ public class CarNotificationViewAdapterTest {
         initializeWithFactory(false);
         NotificationGroup notificationGroup = new NotificationGroup();
         notificationGroup.setGroupSummaryNotification(mNotification1);
-        notificationGroup.setGroupSummaryNotification(mNotification1);
+        notificationGroup.addNotification(mNotification1);
         notificationGroup.addNotification(mNotification1);
         mNotificationGroupList1.add(notificationGroup);
         mCarNotificationViewAdapter.setNotifications(
@@ -521,7 +521,7 @@ public class CarNotificationViewAdapterTest {
         initializeWithFactory(false);
         NotificationGroup notificationGroup = new NotificationGroup();
         notificationGroup.setGroupSummaryNotification(mNotification1);
-        notificationGroup.setGroupSummaryNotification(mNotification1);
+        notificationGroup.addNotification(mNotification1);
         notificationGroup.addNotification(mNotification1);
         mNotificationGroupList1.add(notificationGroup);
         mCarNotificationViewAdapter.setNotifications(
@@ -715,7 +715,7 @@ public class CarNotificationViewAdapterTest {
         initializeWithFactory(false);
         NotificationGroup notificationGroup = new NotificationGroup();
         notificationGroup.setGroupSummaryNotification(mNotification1);
-        notificationGroup.setGroupSummaryNotification(mNotification1);
+        notificationGroup.addNotification(mNotification1);
         notificationGroup.addNotification(mNotification1);
         mNotificationGroupList1.add(notificationGroup);
         mCarNotificationViewAdapter.setNotifications(
